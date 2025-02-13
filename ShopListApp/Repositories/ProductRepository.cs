@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopListApp.Database;
 using ShopListApp.Exceptions;
+using ShopListApp.Interfaces;
 using ShopListApp.Models;
 
 namespace ShopListApp.Repositories
 {
-    public class ProductRepository
+    public class ProductRepository : IProductRepository
     {
         private ShopListDbContext _context;
         public ProductRepository(ShopListDbContext context)

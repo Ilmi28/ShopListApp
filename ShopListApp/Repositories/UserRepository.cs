@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ShopListApp.Database;
+using ShopListApp.Interfaces;
 using ShopListApp.Models;
 
 namespace ShopListApp.Repositories
 {
-    public class UserRepository
+    public class UserRepository : IUserRepository
     {
         private readonly UserManager<User> _userManager;
         public UserRepository(UserManager<User> userManager)
@@ -30,7 +31,9 @@ namespace ShopListApp.Repositories
             user.UserName = newUser.UserName;
             user.Email = newUser.Email;
             await _userManager.UpdateAsync(newUser);
-            await _userManager.ChangePasswordAsync(newUser, currentPassword, newPassword);
+            var result = await _userManager.ChangePasswordAsync(newUser, currentPassword, newPassword);
+            if (!result.Succeeded)
+                return false;
             return true;
         }
 

@@ -1,6 +1,6 @@
 ﻿namespace ShopListApp.Exceptions
 {
-    public class DatabaseErrorException : Exception
+    public class UserNotFoundException : Exception
     {
     }
 }
