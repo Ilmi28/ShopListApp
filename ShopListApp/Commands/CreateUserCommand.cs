@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ShopListApp.Commands.CreateCommands
+namespace ShopListApp.Commands
 {
     public class CreateUserCommand
     {

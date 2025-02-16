@@ -23,7 +23,7 @@ namespace ShopListApp.Repositories
             var shopList = await _context.ShopLists.FindAsync(id);
             if (shopList == null) 
                 return false;
-            _context.ShopLists.Remove(shopList);
+            shopList.IsDeleted = true;
             await _context.SaveChangesAsync();
             return true;
         }

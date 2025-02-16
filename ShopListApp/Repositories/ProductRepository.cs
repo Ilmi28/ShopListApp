@@ -25,7 +25,7 @@ namespace ShopListApp.Repositories
             var product = await _context.Products.FindAsync(id);
             if (product == null)
                 return false;
-            _context.Products.Remove(product);
+            product.IsDeleted = true;
             await _context.SaveChangesAsync();
             return true;
         }

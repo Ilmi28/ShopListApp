@@ -1,6 +1,6 @@
-﻿using Moq;
-using ShopListApp.Commands.CreateCommands;
-using ShopListApp.Commands.UpdateCommands;
+﻿using Microsoft.AspNetCore.Identity;
+using Moq;
+using ShopListApp.Commands;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
 using ShopListApp.Models;
@@ -16,12 +16,15 @@ namespace ShopListAppTests.ServiceTests
 {
     public class UserServiceTests
     {
-        private Mock<IUserRepository> _mockRepo;
+        private Mock<UserManager<User>> _mockManager;
+        private Mock<IDbLogger<User>> _mockLogger;
         private UserService _userService;
         public UserServiceTests()
         {
-            _mockRepo = new Mock<IUserRepository>();
-            _userService = new UserService(_mockRepo.Object);
+            var store = new Mock<IUserStore<User>>();
+            _mockManager = new Mock<UserManager<User>>(store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
+            _mockLogger = new Mock<IDbLogger<User>>();
+            _userService = new UserService(_mockLogger.Object, _mockManager.Object);
         }
 
         [Fact]
@@ -33,7 +36,7 @@ namespace ShopListAppTests.ServiceTests
                 Email = "test@gmail.com",
                 Password = "Password123@"
             };
-            _mockRepo.Setup(x => x.CreateUser(It.IsAny<User>(), cmd.Password)).Returns(Task.CompletedTask);
+            _mockManager.Setup(x => x.CreateAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(IdentityResult.Success);
 
             var task = _userService.CreateUser(cmd);
 
@@ -59,7 +62,7 @@ namespace ShopListAppTests.ServiceTests
                 Email = "test@gmail.com",
                 Password = "Password123@"
             };
-            _mockRepo.Setup(x => x.CreateUser(It.IsAny<User>(), cmd.Password)).ThrowsAsync(new Exception());
+            _mockManager.Setup(x => x.CreateAsync(It.IsAny<User>(), cmd.Password)).ThrowsAsync(new Exception());
 
             Func<Task> task = async () => await _userService.CreateUser(cmd);
 
@@ -70,7 +73,9 @@ namespace ShopListAppTests.ServiceTests
         public void DeleteUser_UserFound_DeletesUser()
         {
             string id = "1";
-            _mockRepo.Setup(x => x.DeleteUser(id)).ReturnsAsync(true);
+            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
+            _mockManager.Setup(x => x.UpdateAsync(It.IsAny<User>())).ReturnsAsync(IdentityResult.Success);
+            _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
 
             var task = _userService.DeleteUser(id);
 
@@ -81,7 +86,7 @@ namespace ShopListAppTests.ServiceTests
         public async Task DeleteUser_UserNotFound_ThrowsUnathorizedAccessException()
         {
             string id = "1";
-            _mockRepo.Setup(x => x.DeleteUser(id)).ReturnsAsync(false);
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((User?)null);
 
             Func<Task> task = async () => await _userService.DeleteUser(id);
 
@@ -102,7 +107,8 @@ namespace ShopListAppTests.ServiceTests
         public async Task DeleteUser_DatabaseError_ThrowsDatabaseErrorException()
         {
             string id = "1";
-            _mockRepo.Setup(x => x.DeleteUser(id)).ThrowsAsync(new Exception());
+            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
+            _mockManager.Setup(x => x.UpdateAsync(It.IsAny<User>())).ThrowsAsync(new Exception());
 
             Func<Task> task = async () => await _userService.DeleteUser(id);
 
@@ -118,7 +124,9 @@ namespace ShopListAppTests.ServiceTests
                 UserName = "updated",
                 CurrentPassword = "Password123@"
             };
-            _mockRepo.Setup(x => x.UpdateUser(id, It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true);
+            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
+            _mockManager.Setup(x => x.UpdateAsync(It.IsAny<User>())).ReturnsAsync(IdentityResult.Success);
+            _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
 
             var task = _userService.UpdateUser(id, cmd);
 
@@ -126,7 +134,7 @@ namespace ShopListAppTests.ServiceTests
         }
 
         [Fact]
-        public async Task UpdateUser_NotFoundOrInvalidPassword_ThrowsUnathorizedAccessException()
+        public async Task UpdateUser_NotFound_ThrowsUnathorizedAccessException()
         {
             string id = "1";
             UpdateUserCommand cmd = new UpdateUserCommand
@@ -134,7 +142,24 @@ namespace ShopListAppTests.ServiceTests
                 UserName = "updated",
                 CurrentPassword = "Password123@"
             };
-            _mockRepo.Setup(x => x.UpdateUser(id, It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(false);
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((User?)null);
+
+            Func<Task> task = async () => await _userService.UpdateUser(id, cmd);
+
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(task);
+        }
+
+        [Fact]
+        public async Task UpdateUser_InvalidPassword_ThrowsUnathorizedAccessException()
+        {
+            string id = "1";
+            UpdateUserCommand cmd = new UpdateUserCommand
+            {
+                UserName = "updated",
+                CurrentPassword = "Password123@"
+            };
+            _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(IdentityResult.Failed(new IdentityError { }));
 
             Func<Task> task = async () => await _userService.UpdateUser(id, cmd);
 
@@ -166,7 +191,8 @@ namespace ShopListAppTests.ServiceTests
                 UserName = "updated",
                 CurrentPassword = "Password123@"
             };
-            _mockRepo.Setup(x => x.UpdateUser(id, It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>())).ThrowsAsync(new Exception());
+            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
+            _mockManager.Setup(x => x.UpdateAsync(It.IsAny<User>())).ThrowsAsync(new Exception());
 
             Func<Task> task = async () => await _userService.UpdateUser(id, cmd);
 
@@ -177,7 +203,7 @@ namespace ShopListAppTests.ServiceTests
         public async Task GetUserById_UserFound_ReturnsUser()
         {
             string id = "1";
-            _mockRepo.Setup(x => x.GetUserById(id)).ReturnsAsync(new User { Id = "1" });
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync(new User { Id = "1" });
 
             var user = await _userService.GetUserById(id);
 
@@ -188,7 +214,7 @@ namespace ShopListAppTests.ServiceTests
         public async Task GetUserById_UserNotFound_ThrowsUnathorizedAccessException()
         {
             string id = "1";
-            _mockRepo.Setup(x => x.GetUserById(id)).ReturnsAsync((User?)null);
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((User?)null);
 
             Func<Task> task = async () => await _userService.GetUserById(id);
 
@@ -199,7 +225,7 @@ namespace ShopListAppTests.ServiceTests
         public async Task GetUserById_DatabaseError_ThrowsDatabaseErrorException()
         {
             string id = "1";
-            _mockRepo.Setup(x => x.GetUserById(id)).ThrowsAsync(new Exception());
+            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ThrowsAsync(new Exception());
 
             Func<Task> task = async () => await _userService.GetUserById(id);
 

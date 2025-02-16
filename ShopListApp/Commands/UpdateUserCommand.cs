@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ShopListApp.Commands.UpdateCommands
+namespace ShopListApp.Commands
 {
     public class UpdateUserCommand
     {

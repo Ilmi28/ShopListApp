@@ -25,7 +25,7 @@ namespace ShopListApp.Repositories
                 && x.ProductId == productId);
             if (shopListProduct == null) 
                 return false;
-            _context.ShopListProducts.Remove(shopListProduct);
+            shopListProduct.IsDeleted = true;
             await _context.SaveChangesAsync();
             return true;
         }

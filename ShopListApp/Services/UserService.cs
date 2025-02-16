@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
-using ShopListApp.Commands.CreateCommands;
-using ShopListApp.Commands.UpdateCommands;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using ShopListApp.Commands;
+using ShopListApp.Enums;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
 using ShopListApp.Models;
@@ -8,12 +9,14 @@ using ShopListApp.Repositories;
 
 namespace ShopListApp.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
-        private IUserRepository _userRepository;
-        public UserService(IUserRepository userRepository)
+        private IDbLogger<User> _logger;
+        private UserManager<User> _userManager;
+        public UserService(IDbLogger<User> logger, UserManager<User> userManager)
         {
-            _userRepository = userRepository;
+            _logger = logger;
+            _userManager = userManager;
         }
 
         public async Task CreateUser(CreateUserCommand cmd)
@@ -26,7 +29,8 @@ namespace ShopListApp.Services
             };
             try
             {
-                await _userRepository.CreateUser(user, cmd.Password);
+                await _userManager.CreateAsync(user, cmd.Password);
+                await _logger.Log(Operation.Create, user);
             }
             catch 
             {
@@ -39,9 +43,14 @@ namespace ShopListApp.Services
             _ = id ?? throw new ArgumentNullException(nameof(id));
             try
             {
-                bool isValid = await _userRepository.DeleteUser(id);
-                if (!isValid)
+                var user = await _userManager.FindByIdAsync(id);
+                if (user == null)
                     throw new UnauthorizedAccessException();
+                user.IsDeleted = true;
+                var result = await _userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                    throw new UnauthorizedAccessException();
+                await _logger.Log(Operation.Delete, new User { Id = id });
             }
             catch (UnauthorizedAccessException)
             {
@@ -57,15 +66,18 @@ namespace ShopListApp.Services
         {
             _ = id ?? throw new ArgumentNullException(nameof(id));
             _ = updatedUser ?? throw new ArgumentNullException(nameof(updatedUser));
-            var user = new User();
-            user.UserName = updatedUser.UserName ?? user.UserName;
-            user.Email = updatedUser.Email ?? user.Email;
             try
             {
-                bool isValid = await _userRepository.UpdateUser(id, user, updatedUser.CurrentPassword, 
+                var user = await _userManager.FindByIdAsync(id) ?? throw new UnauthorizedAccessException();
+                user.UserName = updatedUser.UserName ?? user.UserName;
+                user.Email = updatedUser.Email ?? user.Email;
+                var result = await _userManager.UpdateAsync(user);
+                var passwordResult = await _userManager.ChangePasswordAsync(user, 
+                    updatedUser.CurrentPassword, 
                     updatedUser.NewPassword ?? updatedUser.CurrentPassword);
-                if (!isValid)
+                if (!result.Succeeded || !passwordResult.Succeeded)
                     throw new UnauthorizedAccessException();
+                await _logger.Log(Operation.Update, user);
             }
             catch (UnauthorizedAccessException)
             {
@@ -82,7 +94,7 @@ namespace ShopListApp.Services
             _ = id ?? throw new ArgumentNullException(nameof(id));
             try
             {
-                var user = await _userRepository.GetUserById(id);
+                var user = await _userManager.FindByIdAsync(id);
                 if (user == null)
                     throw new UnauthorizedAccessException();
                 return user;

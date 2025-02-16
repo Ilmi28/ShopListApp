@@ -7,5 +7,6 @@
         public required ShopList ShopList { get; set; }
         public int ProductId { get; set; }
         public required Product Product { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 }
