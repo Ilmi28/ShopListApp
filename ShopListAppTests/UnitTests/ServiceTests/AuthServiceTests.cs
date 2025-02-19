@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShopListAppTests.ServiceTests
+namespace ShopListAppTests.UnitTests.ServiceTests
 {
     public class AuthServiceTests
     {
@@ -43,7 +43,8 @@ namespace ShopListAppTests.ServiceTests
             _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.Email)).ReturnsAsync((User?)null);
             _mockUserManager.Setup(x => x.CreateAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(IdentityResult.Success);
             _mockTokenManager.Setup(x => x.GenerateIdentityToken(It.IsAny<User>())).Returns("token");
-            _mockTokenManager.Setup(x => x.GenerateHashRefreshToken()).Returns("refreshToken");
+            _mockTokenManager.Setup(x => x.GenerateRefreshToken()).Returns("refreshToken");
+            _mockTokenManager.Setup(x => x.GetHashRefreshToken("refreshToken")).Returns("hashedRefreshToken");
             _mockTokenRepository.Setup(x => x.AddToken(It.IsAny<Token>())).ReturnsAsync(true);
 
             (string jwtToken, string refreshToken) = await _authService.RegisterUser(cmd);
@@ -53,7 +54,7 @@ namespace ShopListAppTests.ServiceTests
         }
 
         [Fact]
-        public async Task RegisterUser_UserExists_ThrowsUserAlreadyExistsException()
+        public async Task RegisterUser_UserWithEmailExists_ThrowsUserWithEmailAlreadyExistsException()
         {
             CreateUserCommand cmd = new CreateUserCommand
             {
@@ -65,7 +66,23 @@ namespace ShopListAppTests.ServiceTests
 
             Func<Task> task = async () => await _authService.RegisterUser(cmd);
 
-            await Assert.ThrowsAsync<UserAlreadyExistsException>(task);
+            await Assert.ThrowsAsync<UserWithEmailAlreadyExistsException>(task);
+        }
+
+        [Fact]
+        public async Task RegisterUser_UserWithUserNameExists_ThrowsUserWithUserNameAlreadyExistsException()
+        {
+            CreateUserCommand cmd = new CreateUserCommand
+            {
+                UserName = "test",
+                Email = "test@gmail.com",
+                Password = "Password123@"
+            };
+            _mockUserManager.Setup(x => x.FindByNameAsync(cmd.UserName)).ReturnsAsync(new User());
+
+            Func<Task> task = async () => await _authService.RegisterUser(cmd);
+
+            await Assert.ThrowsAsync<UserWithUserNameAlreadyExistsException>(task);
         }
 
         [Fact]
@@ -107,7 +124,8 @@ namespace ShopListAppTests.ServiceTests
             _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync(new User());
             _mockUserManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(true);
             _mockTokenManager.Setup(x => x.GenerateIdentityToken(It.IsAny<User>())).Returns("token");
-            _mockTokenManager.Setup(x => x.GenerateHashRefreshToken()).Returns("refreshToken");
+            _mockTokenManager.Setup(x => x.GenerateRefreshToken()).Returns("refreshToken");
+            _mockTokenManager.Setup(x => x.GetHashRefreshToken("refreshToken")).Returns("hashedRefreshToken");
             _mockTokenRepository.Setup(x => x.AddToken(It.IsAny<Token>())).ReturnsAsync(true);
 
             (string jwtToken, string refreshToken) = await _authService.LoginUser(cmd);
@@ -128,7 +146,8 @@ namespace ShopListAppTests.ServiceTests
             _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync(new User());
             _mockUserManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(true);
             _mockTokenManager.Setup(x => x.GenerateIdentityToken(It.IsAny<User>())).Returns("token");
-            _mockTokenManager.Setup(x => x.GenerateHashRefreshToken()).Returns("refreshToken");
+            _mockTokenManager.Setup(x => x.GenerateRefreshToken()).Returns("refreshToken");
+            _mockTokenManager.Setup(x => x.GetHashRefreshToken("refreshToken")).Returns("hashedRefreshToken");
             _mockTokenRepository.Setup(x => x.AddToken(It.IsAny<Token>())).ReturnsAsync(true);
 
             (string jwtToken, string refreshToken) = await _authService.LoginUser(cmd);
@@ -200,13 +219,16 @@ namespace ShopListAppTests.ServiceTests
         [Fact]
         public async Task RefreshAccessToken_ValidToken_ReturnsToken()
         {
-            string refreshToken = "refreshToken";
-            _mockTokenManager.Setup(x => x.GetHashRefreshToken(refreshToken)).Returns("hash");
+            var cmd = new RefreshTokenCommand
+            {
+                RefreshToken = "refreshToken"
+            };
+            _mockTokenManager.Setup(x => x.GetHashRefreshToken(cmd.RefreshToken)).Returns("hash");
             _mockTokenRepository.Setup(x => x.GetToken("hash")).ReturnsAsync(new Token { UserId = "1", User = new User(), RefreshTokenHash = "hash" });
             _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(new User());
             _mockTokenManager.Setup(x => x.GenerateIdentityToken(It.IsAny<User>())).Returns("token");
 
-            string jwtToken = await _authService.RefreshAccessToken(refreshToken);
+            string jwtToken = await _authService.RefreshAccessToken(cmd);
 
             Assert.Equal("token", jwtToken);
         }
@@ -214,11 +236,14 @@ namespace ShopListAppTests.ServiceTests
         [Fact]
         public async Task RefreshAccessToken_InvalidToken_ThrowsUnauthorizedAccessException()
         {
-            string refreshToken = "refreshToken";
-            _mockTokenManager.Setup(x => x.GetHashRefreshToken(refreshToken)).Returns("hash");
+            var cmd = new RefreshTokenCommand
+            {
+                RefreshToken = "refreshToken"
+            };
+            _mockTokenManager.Setup(x => x.GetHashRefreshToken(cmd.RefreshToken)).Returns("hash");
             _mockTokenRepository.Setup(x => x.GetToken("hash")).ReturnsAsync((Token?)null);
 
-            Func<Task> task = async () => await _authService.RefreshAccessToken(refreshToken);
+            Func<Task> task = async () => await _authService.RefreshAccessToken(cmd);
 
             await Assert.ThrowsAsync<UnauthorizedAccessException>(task);
         }
@@ -226,9 +251,9 @@ namespace ShopListAppTests.ServiceTests
         [Fact]
         public async Task RefreshAccessToken_NullArg_ThrowsArgumentNullException()
         {
-            string refreshToken = null!;
+            RefreshTokenCommand cmd = null!;
 
-            Func<Task> task = async () => await _authService.RefreshAccessToken(refreshToken);
+            Func<Task> task = async () => await _authService.RefreshAccessToken(cmd);
 
             await Assert.ThrowsAsync<ArgumentNullException>(task);
         }
@@ -236,11 +261,14 @@ namespace ShopListAppTests.ServiceTests
         [Fact]
         public async Task RefreshAccessToken_DatabaseError_ThrowsDatabaseErrorException()
         {
-            string refreshToken = "refreshToken";
-            _mockTokenManager.Setup(x => x.GetHashRefreshToken(refreshToken)).Returns("hash");
+            var cmd = new RefreshTokenCommand
+            {
+                RefreshToken = "refreshToken"
+            };
+            _mockTokenManager.Setup(x => x.GetHashRefreshToken(cmd.RefreshToken)).Returns("hash");
             _mockTokenRepository.Setup(x => x.GetToken("hash")).ThrowsAsync(new Exception());
 
-            Func<Task> task = async () => await _authService.RefreshAccessToken(refreshToken);
+            Func<Task> task = async () => await _authService.RefreshAccessToken(cmd);
 
             await Assert.ThrowsAsync<DatabaseErrorException>(task);
         }

@@ -5,8 +5,8 @@ namespace ShopListApp.Interfaces
     public interface ITokenManager
     {
         string GenerateIdentityToken(User user);
-        string GenerateHashRefreshToken();
         int GetRefreshTokenExpirationDays();
-        string GetHashRefreshToken(string refreshToken);
+        string? GetHashRefreshToken(string refreshToken);
+        string GenerateRefreshToken();
     }
 }

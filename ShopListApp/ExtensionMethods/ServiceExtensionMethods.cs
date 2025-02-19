@@ -33,8 +33,7 @@ namespace ShopListApp.ExtensionMethods
         public static void AddLoggers(this IServiceCollection services)
         {
             services.AddTransient<IDbLogger<User>, UserLogger>();
-            services.AddTransient<IDbLogger<Product>, ProductLogger>();
-            services.AddTransient<IDbLogger<ShopList>, ShopListLogger>();
+            services.AddTransient<IDbLogger<ShopListProduct>, ShopListProductLogger>();
         }
 
         public static void AddManagers(this IServiceCollection services)
@@ -45,12 +44,12 @@ namespace ShopListApp.ExtensionMethods
         public static void AddIdentityDbContext(this IServiceCollection services)
         {
             var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
-            var connString = Environment.GetEnvironmentVariable("ConnectionString") 
+            var connString = Environment.GetEnvironmentVariable("ShopListAppConnectionString") 
                 ?? configuration!.GetConnectionString("DefaultConnection")
                 ?? String.Empty;
             services.AddDbContext<ShopListDbContext>(options =>
             {
-                options.UseSqlServer();
+                options.UseSqlServer(connString);
             });
             services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ShopListDbContext>();
         }
@@ -98,11 +97,6 @@ namespace ShopListApp.ExtensionMethods
                 x.AddSecurityRequirement(new OpenApiSecurityRequirement
                     {{security, Array.Empty<string>()}});
             });
-        }
-
-        public static void AddUserStore(this IServiceCollection services)
-        {
-            services.AddScoped<IUserStore<User>, ShopListUserStore>();
         }
     }
 }

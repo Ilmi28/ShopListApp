@@ -12,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShopListAppTests.ServiceTests
+namespace ShopListAppTests.UnitTests.ServiceTests
 {
     public class UserServiceTests
     {
@@ -74,8 +74,8 @@ namespace ShopListAppTests.ServiceTests
         {
             string id = "1";
             _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
-            _mockManager.Setup(x => x.UpdateAsync(It.IsAny<User>())).ReturnsAsync(IdentityResult.Success);
             _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
+            _mockManager.Setup(x => x.DeleteAsync(It.IsAny<User>())).ReturnsAsync(IdentityResult.Success);
 
             var task = _userService.DeleteUser(id);
 
@@ -168,9 +168,9 @@ namespace ShopListAppTests.ServiceTests
 
         public static IEnumerable<object[]> GetNullArgsForUpdateUser()
         {
-            yield return new object[] { null!, null! }; 
-            yield return new object[] { "123", null! }; 
-            yield return new object[] { null!, new UpdateUserCommand { UserName = "test", CurrentPassword = "Password123@" } }; 
+            yield return new object[] { null!, null! };
+            yield return new object[] { "123", null! };
+            yield return new object[] { null!, new UpdateUserCommand { UserName = "test", CurrentPassword = "Password123@" } };
         }
 
         [Theory]

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using ShopListApp.Commands;
 using ShopListApp.Interfaces;
 using ShopListApp.Managers;
 using ShopListApp.Models;
@@ -14,28 +15,21 @@ namespace ShopListApp.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private ITokenManager _tokenManager;
-        public UserController(ITokenManager tokenManager)
+        private IUserService _userService;
+        private IAuthorizationService _authorizationService;
+        public UserController(IUserService userService, IAuthorizationService authorizationService)
         {
-            _tokenManager = tokenManager;
-        }
-        [HttpGet]
-        public IActionResult GetToken()
-        {
-            var user = new User
-            {
-                Id = "1",
-                UserName = "test",
-                Email = "ilmialiev28@gmail.com"
-            };
-            return Ok(_tokenManager.GenerateIdentityToken(user));
+            _userService = userService;
+            _authorizationService = authorizationService;
         }
 
-        [HttpGet("hello")]
+        [HttpPost("update")]
         [Authorize]
-        public IActionResult Hello()
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserCommand cmd)
         {
-            return Ok("Hello, World!");
+            //_authorizationService.AuthorizeAsync()
+            await _userService.UpdateUser(id, cmd);
+            return Ok();
         }
     }
 }

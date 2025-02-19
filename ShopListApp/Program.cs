@@ -1,11 +1,14 @@
 
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using ShopListApp.Controllers;
+using ShopListApp.CustomMiddleware;
 using ShopListApp.Database;
 using ShopListApp.ExtensionMethods;
 using ShopListApp.Interfaces;
@@ -41,7 +44,6 @@ namespace ShopListApp
             builder.Services.AddManagers();
             builder.Services.AddIdentityDbContext();
             builder.Services.AddJwtBearer();
-            builder.Services.AddUserStore();
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGenWithAuthorization();
@@ -50,6 +52,7 @@ namespace ShopListApp
 
         private static void ConfigureMiddleware(WebApplication app)
         {
+            app.UseCustomExceptionHandling();
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

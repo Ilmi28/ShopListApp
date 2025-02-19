@@ -56,15 +56,24 @@ namespace ShopListApp.Managers
             }
         }
 
+        public string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+
         public int GetRefreshTokenExpirationDays() => _config.GetValue<int>("TokenConfiguration:RefreshTokenExpirationDays");
 
-        public string GetHashRefreshToken(string refreshToken)
+        public string? GetHashRefreshToken(string refreshToken)
         {
-            byte[] bytes = Convert.FromBase64String(refreshToken);
-            using (var sha256 = SHA256.Create())
+            try
             {
-                var hash = sha256.ComputeHash(bytes);
-                return Convert.ToBase64String(hash);
+                byte[] bytes = Convert.FromBase64String(refreshToken);
+                using (var sha256 = SHA256.Create())
+                {
+                    var hash = sha256.ComputeHash(bytes);
+                    return Convert.ToBase64String(hash);
+                }
+            }
+            catch
+            {
+                return null;
             }
         }
     }

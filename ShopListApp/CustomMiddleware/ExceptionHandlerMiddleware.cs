@@ -1,4 +1,6 @@
-﻿namespace ShopListApp.CustomMiddleware
+﻿using ShopListApp.Exceptions;
+
+namespace ShopListApp.CustomMiddleware
 {
     public class ExceptionHandlerMiddleware
     {
@@ -23,6 +25,33 @@
 
         public async Task HandleExceptionAsync(HttpContext context, Exception ex)
         {
+            switch (ex)
+            {
+                case UnauthorizedAccessException:
+                    context.Response.StatusCode = 401;
+                    await context.Response.WriteAsync("Unauthorized access.");
+                    return;
+                case DatabaseErrorException:
+                    context.Response.StatusCode = 500;
+                    await context.Response.WriteAsync("Database error occurred.");
+                    return;
+                case ArgumentNullException:
+                    context.Response.StatusCode = 400;
+                    await context.Response.WriteAsync("Invalid input.");
+                    return;
+                case UserWithEmailAlreadyExistsException:
+                    context.Response.StatusCode = 400;
+                    await context.Response.WriteAsync("User with this email already exists.");
+                    return;
+                case UserWithUserNameAlreadyExistsException:
+                    context.Response.StatusCode = 400;
+                    await context.Response.WriteAsync("User with this username already exists.");
+                    return;
+                case UserAlreadyExistsException:
+                    context.Response.StatusCode = 400;
+                    await context.Response.WriteAsync("User already exists.");
+                    return;
+            }
             context.Response.StatusCode = 500;
             await context.Response.WriteAsync("An error occurred. Please try again later.");
         }

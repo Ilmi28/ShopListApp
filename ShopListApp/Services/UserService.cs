@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using ShopListApp.Commands;
 using ShopListApp.Enums;
@@ -46,8 +47,7 @@ namespace ShopListApp.Services
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null)
                     throw new UnauthorizedAccessException();
-                user.IsDeleted = true;
-                var result = await _userManager.UpdateAsync(user);
+                var result = await _userManager.DeleteAsync(user);
                 if (!result.Succeeded)
                     throw new UnauthorizedAccessException();
                 await _logger.Log(Operation.Delete, new User { Id = id });

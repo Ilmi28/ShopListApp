@@ -1,4 +1,5 @@
-﻿using ShopListApp.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using ShopListApp.Database;
 using ShopListApp.Interfaces;
 using ShopListApp.Models;
 
@@ -17,7 +18,7 @@ namespace ShopListApp.Repositories
             var user = await _context.Users.FindAsync(token.UserId);
             if (user == null)
                 return false;
-            var lastToken = _context.Tokens.FirstOrDefault(x => x.UserId == token.UserId && x.IsRevoked!);
+            var lastToken = _context.Tokens.FirstOrDefault(x => x.UserId == token.UserId && !x.IsRevoked);
             if (lastToken != null)
                 lastToken.IsRevoked = true;
             await _context.Tokens.AddAsync(token);
@@ -26,8 +27,8 @@ namespace ShopListApp.Repositories
         }
 
         public async Task<Token?> GetToken(string refreshToken)
-        {
-            return await _context.Tokens.FindAsync(refreshToken);
+        { 
+            return await _context.Tokens.FirstOrDefaultAsync(x => x.RefreshTokenHash == refreshToken && x.ExpirationDate > DateTime.Now && !x.IsRevoked);
         }
     }
 }
