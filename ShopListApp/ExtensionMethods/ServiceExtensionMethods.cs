@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using HtmlAgilityPack;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,7 +8,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using ShopListApp.Database;
+using ShopListApp.DataProviders;
 using ShopListApp.Interfaces;
+using ShopListApp.Interfaces.IRepositories;
+using ShopListApp.Interfaces.IServices;
 using ShopListApp.Loggers;
 using ShopListApp.Managers;
 using ShopListApp.Models;
@@ -21,13 +26,20 @@ namespace ShopListApp.ExtensionMethods
         public static void AddRepositories(this IServiceCollection services)
         {
             services.AddTransient<IProductRepository, ProductRepository>();
+            services.AddTransient<ICategoryRepository, CategoryRepository>();
+            services.AddTransient<IShopListProductRepository, ShopListProductRepository>();
+            services.AddTransient<IShopListRepository, ShopListRepository>();
+            services.AddTransient<IStoreRepository, StoreRepository>();
+            services.AddTransient<ITokenRepository, TokenRepository>();
         }
 
         public static void AddServices(this IServiceCollection services)
         {
             services.AddTransient<IUserService, UserService>();
-            services.AddTransient<ITokenRepository, TokenRepository>();
             services.AddTransient<IAuthService, AuthService>();
+            services.AddTransient<IStoreService, StoreService>();
+            services.AddTransient<IProductService, ProductService>();
+
         }
 
         public static void AddLoggers(this IServiceCollection services)
@@ -39,6 +51,12 @@ namespace ShopListApp.ExtensionMethods
         public static void AddManagers(this IServiceCollection services)
         {
             services.AddTransient<ITokenManager, JwtTokenManager>();
+        }
+
+        public static void AddParsing(this IServiceCollection services)
+        {
+            services.AddTransient<IHtmlFetcher<HtmlNode, HtmlDocument>, HAPHtmlFetcher>();
+            services.AddHttpClient();
         }
 
         public static void AddIdentityDbContext(this IServiceCollection services)
@@ -56,7 +74,12 @@ namespace ShopListApp.ExtensionMethods
 
         public static void AddJwtBearer(this IServiceCollection services)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
             {
                 var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
                 var tokenConfiguration = configuration!.GetSection("TokenConfiguration");

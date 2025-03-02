@@ -16,7 +16,7 @@ namespace ShopListApp.Managers
         {
             _config = config;
         }
-        public string GenerateIdentityToken(User user)
+        public string GenerateAccessToken(User user)
         {
             var tokenConfig = _config.GetSection("TokenConfiguration");
             string issuer = "https://localhost:7101";

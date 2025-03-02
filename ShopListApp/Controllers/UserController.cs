@@ -1,35 +1,54 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using ShopListApp.Commands;
 using ShopListApp.Interfaces;
 using ShopListApp.Managers;
 using ShopListApp.Models;
+using ShopListApp.ViewModels;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using System.Text;
 
 namespace ShopListApp.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/user")]
     public class UserController : ControllerBase
     {
-        private IUserService _userService;
-        private IAuthorizationService _authorizationService;
-        public UserController(IUserService userService, IAuthorizationService authorizationService)
+        private readonly IUserService _userService;
+        public UserController(IUserService userService)
         {
             _userService = userService;
-            _authorizationService = authorizationService;
         }
 
-        [HttpPost("update")]
+        [HttpPut("update")]
         [Authorize]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] UpdateUserCommand cmd)
+        public async Task<IActionResult> UpdateUser([FromBody]UpdateUserCommand cmd)
         {
-            //_authorizationService.AuthorizeAsync()
+            string id = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
             await _userService.UpdateUser(id, cmd);
-            return Ok();
+            return Ok(id);
+        }
+
+        [HttpDelete("delete")]
+        [Authorize]
+        public async Task<IActionResult> DeleteUser([FromBody]DeleteUserCommand cmd)
+        {
+            string id = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            await _userService.DeleteUser(id, cmd);
+            return Ok(id);
+        }
+
+        [HttpGet("get")]
+        [Authorize]
+        public async Task<IActionResult> GetUser()
+        {
+            string id = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            var userView = await _userService.GetUserById(id);
+            return Ok(userView);
         }
     }
 }

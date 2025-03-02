@@ -19,11 +19,11 @@ namespace ShopListApp.CustomMiddleware
             }
             catch (Exception ex)
             {
-                await HandleExceptionAsync(context, ex);
+                await HandleExceptions(context, ex);
             }
         }
 
-        public async Task HandleExceptionAsync(HttpContext context, Exception ex)
+        public async Task HandleExceptions(HttpContext context, Exception ex)
         {
             switch (ex)
             {
@@ -50,6 +50,22 @@ namespace ShopListApp.CustomMiddleware
                 case UserAlreadyExistsException:
                     context.Response.StatusCode = 400;
                     await context.Response.WriteAsync("User already exists.");
+                    return;
+                case FetchingErrorException:
+                    context.Response.StatusCode = 500;
+                    await context.Response.WriteAsync("Error occurred while fetching data.");
+                    return;
+                case CategoryNotFoundException:
+                    context.Response.StatusCode = 404;
+                    await context.Response.WriteAsync("Category not found.");
+                    return;
+                case StoreNotFoundException:
+                    context.Response.StatusCode = 404;
+                    await context.Response.WriteAsync("Store not found.");
+                    return;
+                case ProductNotFoundException:
+                    context.Response.StatusCode = 404;
+                    await context.Response.WriteAsync("Product not found.");
                     return;
             }
             context.Response.StatusCode = 500;

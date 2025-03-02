@@ -73,11 +73,16 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public void DeleteUser_UserFound_DeletesUser()
         {
             string id = "1";
+            DeleteUserCommand cmd = new DeleteUserCommand
+            {
+                Password = "Password123@"
+            };
             _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
             _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
             _mockManager.Setup(x => x.DeleteAsync(It.IsAny<User>())).ReturnsAsync(IdentityResult.Success);
+            _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(true);
 
-            var task = _userService.DeleteUser(id);
+            var task = _userService.DeleteUser(id, cmd);
 
             Assert.True(task.IsCompletedSuccessfully);
         }
@@ -86,19 +91,54 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public async Task DeleteUser_UserNotFound_ThrowsUnathorizedAccessException()
         {
             string id = "1";
+            DeleteUserCommand cmd = new DeleteUserCommand
+            {
+                Password = "Password123@"
+            };
             _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((User?)null);
 
-            Func<Task> task = async () => await _userService.DeleteUser(id);
+            Func<Task> task = async () => await _userService.DeleteUser(id, cmd);
 
             await Assert.ThrowsAsync<UnauthorizedAccessException>(task);
         }
 
         [Fact]
-        public async Task DeleteUser_NullArg_ThrowsArgumentNullException()
+        public async Task DeleteUser_InvalidPassword_ThrowsUnathorizedAccessException()
+        {
+            string id = "1";
+            DeleteUserCommand cmd = new DeleteUserCommand
+            {
+                Password = "Password123@"
+            };
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((User?)null);
+            _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(false);
+
+            Func<Task> task = async () => await _userService.DeleteUser(id, cmd);
+
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(task);
+        }
+
+        [Fact]
+        public async Task DeleteUser_NullCmd_ThrowsArgumentNullException()
+        {
+            string id = "1";
+            DeleteUserCommand cmd = null!;
+
+            Func<Task> task = async () => await _userService.DeleteUser(id, cmd);
+
+            await Assert.ThrowsAsync<ArgumentNullException>(task);
+        }
+
+        [Fact]
+        public async Task DeleteUser_NullId_ThrowsArgumentNullException()
         {
             string id = null!;
+            DeleteUserCommand cmd = new DeleteUserCommand
+            {
+                Password = "Password123@"
+            };
 
-            Func<Task> task = async () => await _userService.DeleteUser(id);
+            Func<Task> task = async () => await _userService.DeleteUser(id, cmd);
 
             await Assert.ThrowsAsync<ArgumentNullException>(task);
         }
@@ -107,10 +147,15 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public async Task DeleteUser_DatabaseError_ThrowsDatabaseErrorException()
         {
             string id = "1";
+            DeleteUserCommand cmd = new DeleteUserCommand
+            {
+                Password = "Password123@"
+            };
             _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
+            _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(true);
             _mockManager.Setup(x => x.UpdateAsync(It.IsAny<User>())).ThrowsAsync(new Exception());
 
-            Func<Task> task = async () => await _userService.DeleteUser(id);
+            Func<Task> task = async () => await _userService.DeleteUser(id, cmd);
 
             await Assert.ThrowsAsync<DatabaseErrorException>(task);
         }
@@ -203,11 +248,11 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public async Task GetUserById_UserFound_ReturnsUser()
         {
             string id = "1";
-            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync(new User { Id = "1" });
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync(new User { Id = "1", UserName = "test" });
 
-            var user = await _userService.GetUserById(id);
+            var userView = await _userService.GetUserById(id);
 
-            Assert.True(user!.Id == id);
+            Assert.Equal("test", userView.UserName);
         }
 
         [Fact]

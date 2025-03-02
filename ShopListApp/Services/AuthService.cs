@@ -3,6 +3,7 @@ using ShopListApp.Commands;
 using ShopListApp.Enums;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
+using ShopListApp.Interfaces.IServices;
 using ShopListApp.Managers;
 using ShopListApp.Models;
 using ShopListApp.Repositories;
@@ -43,9 +44,10 @@ namespace ShopListApp.Services
                 if (userByName != null)
                     throw new UserWithUserNameAlreadyExistsException();
                 await _userManager.CreateAsync(user, cmd.Password);
-                string identityToken = _tokenManager.GenerateIdentityToken(user);
+                string identityToken = _tokenManager.GenerateAccessToken(user);
                 string refreshToken = _tokenManager.GenerateRefreshToken();
-                string hashRefreshToken = _tokenManager.GetHashRefreshToken(refreshToken);
+                string hashRefreshToken = _tokenManager.GetHashRefreshToken(refreshToken)
+                    ?? throw new DatabaseErrorException();
                 await CreateRefreshTokenInDb(hashRefreshToken, user);
                 await _logger.Log(Operation.Register, user);
                 return (identityToken, refreshToken);
@@ -87,9 +89,10 @@ namespace ShopListApp.Services
                 var result = await _userManager.CheckPasswordAsync(user, cmd.Password);
                 if (!result)
                     throw new UnauthorizedAccessException();
-                string identityToken = _tokenManager.GenerateIdentityToken(user);
+                string identityToken = _tokenManager.GenerateAccessToken(user);
                 string refreshToken = _tokenManager.GenerateRefreshToken();
-                string hashRefreshToken = _tokenManager.GetHashRefreshToken(refreshToken);
+                string hashRefreshToken = _tokenManager.GetHashRefreshToken(refreshToken) 
+                    ?? throw new UnauthorizedAccessException();
                 await CreateRefreshTokenInDb(hashRefreshToken, user);
                 await _logger.Log(Operation.Login, user);
                 return (identityToken, refreshToken);
@@ -115,7 +118,7 @@ namespace ShopListApp.Services
                                                         ?? throw new UnauthorizedAccessException();
                 var user = await _userManager.FindByIdAsync(token.UserId)
                                                         ?? throw new UnauthorizedAccessException();
-                var identityToken = _tokenManager.GenerateIdentityToken(user);
+                var identityToken = _tokenManager.GenerateAccessToken(user);
                 return identityToken;
             }
             catch (UnauthorizedAccessException)

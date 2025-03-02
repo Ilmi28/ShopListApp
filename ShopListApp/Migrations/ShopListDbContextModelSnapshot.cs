@@ -124,6 +124,93 @@ namespace ShopListApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("ShopListApp.Models.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "warzywa"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "owoce"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "pieczywa"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Name = "nabial i jajka"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Name = "mieso"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Name = "dania gotowe"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Name = "napoje"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Name = "mrozone"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Name = "artykuly spozywcze"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Name = "drogeria"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Name = "dla domu"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Name = "dla dzieci"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Name = "dla zwierzat"
+                        });
+                });
+
             modelBuilder.Entity("ShopListApp.Models.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -132,14 +219,20 @@ namespace ShopListApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ImageUrl")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
-                    b.Property<decimal>("Price")
+                    b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("StoreId")
@@ -147,7 +240,12 @@ namespace ShopListApp.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CategoryId");
+
                     b.HasIndex("StoreId");
+
+                    b.HasIndex("Name", "StoreId")
+                        .IsUnique();
 
                     b.ToTable("Products");
                 });
@@ -250,6 +348,14 @@ namespace ShopListApp.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Stores");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            IsDeleted = false,
+                            Name = "Biedronka"
+                        });
                 });
 
             modelBuilder.Entity("ShopListApp.Models.Token", b =>
@@ -408,11 +514,17 @@ namespace ShopListApp.Migrations
 
             modelBuilder.Entity("ShopListApp.Models.Product", b =>
                 {
+                    b.HasOne("ShopListApp.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId");
+
                     b.HasOne("ShopListApp.Models.Store", "Store")
                         .WithMany()
                         .HasForeignKey("StoreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
 
                     b.Navigation("Store");
                 });

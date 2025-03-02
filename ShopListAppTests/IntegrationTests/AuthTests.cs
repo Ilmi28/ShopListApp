@@ -19,14 +19,14 @@ using System.Threading.Tasks;
 
 namespace ShopListAppTests.IntegrationTests
 {
-    public class AuthTests : IClassFixture<CustomWebApplicationFactory>
+    public class AuthTests : IClassFixture<AuthWebApplicationFactory>
     {
         private readonly HttpClient _client;
         private readonly ShopListDbContext _context;
         private readonly UserManager<User> _manager;
         private readonly ITokenManager _tokenManager;
 
-        public AuthTests(CustomWebApplicationFactory factory)
+        public AuthTests(AuthWebApplicationFactory factory)
         {
             _client = factory.CreateClient();
             var scope = factory.Services.CreateScope();
@@ -256,6 +256,7 @@ namespace ShopListAppTests.IntegrationTests
 
             Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
         }
+
 
 
     }

@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShopListApp.Commands;
-using ShopListApp.Interfaces;
+using ShopListApp.Interfaces.IServices;
 using ShopListApp.Services;
 
 namespace ShopListApp.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;

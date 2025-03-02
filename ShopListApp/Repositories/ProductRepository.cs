@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShopListApp.Database;
 using ShopListApp.Exceptions;
-using ShopListApp.Interfaces;
+using ShopListApp.Interfaces.IRepositories;
 using ShopListApp.Models;
+using ShopListApp.ViewModels;
 
 namespace ShopListApp.Repositories
 {
@@ -39,6 +40,9 @@ namespace ShopListApp.Repositories
             product.Price = updatedProduct.Price;
             product.StoreId = updatedProduct.StoreId;
             product.Store = updatedProduct.Store;
+            product.ImageUrl = updatedProduct.ImageUrl;
+            product.CategoryId = updatedProduct.CategoryId;
+            product.Category = updatedProduct.Category;
             await _context.SaveChangesAsync();
             return true;
         }
@@ -46,6 +50,29 @@ namespace ShopListApp.Repositories
         public async Task<Product?> GetProductById(int id)
         {
             return await _context.Products.FindAsync(id);
+        }
+
+        public async Task<ICollection<Product>> GetProductsByCategoryId(int categoryId)
+        {
+            var products = await _context.Products.Where(x => x.CategoryId == categoryId).ToListAsync();
+            return products;
+        }
+
+        public async Task<ICollection<Product>> GetProductsByStoreId(int storeId)
+        {
+            var products = await _context.Products.Where(x => x.StoreId == storeId).ToListAsync();
+            return products;
+        }
+
+        public async Task<ICollection<Product>> GetAllProducts()
+        {
+            var products = await _context.Products.ToListAsync();
+            return products;
+        }
+
+        public async Task<Product?> GetProductByName(string name)
+        {
+            return await _context.Products.FirstOrDefaultAsync(x => x.Name == name);
         }
     }
 }

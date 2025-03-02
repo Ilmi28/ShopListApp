@@ -42,6 +42,7 @@ namespace ShopListApp
             builder.Services.AddServices();
             builder.Services.AddLoggers();
             builder.Services.AddManagers();
+            builder.Services.AddParsing();
             builder.Services.AddIdentityDbContext();
             builder.Services.AddJwtBearer();
             builder.Services.AddControllers();

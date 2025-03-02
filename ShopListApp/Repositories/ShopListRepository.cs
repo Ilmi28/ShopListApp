@@ -1,10 +1,11 @@
 ﻿using ShopListApp.Database;
 using ShopListApp.Exceptions;
+using ShopListApp.Interfaces.IRepositories;
 using ShopListApp.Models;
 
 namespace ShopListApp.Repositories
 {
-    public class ShopListRepository
+    public class ShopListRepository : IShopListRepository
     {
         private readonly ShopListDbContext _context;
         public ShopListRepository(ShopListDbContext context)

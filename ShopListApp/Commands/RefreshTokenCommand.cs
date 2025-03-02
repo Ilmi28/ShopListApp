@@ -2,6 +2,6 @@
 {
     public class RefreshTokenCommand
     {
-        public string RefreshToken { get; set; }
+        public required string RefreshToken { get; set; }
     }
 }

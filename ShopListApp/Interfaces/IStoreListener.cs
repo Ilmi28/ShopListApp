@@ -2,6 +2,6 @@
 {
     public interface IStoreListener
     {
-        void UpdateProducts(IDataProvider provider);
+        void UpdateProducts(IParser provider);
     }
 }

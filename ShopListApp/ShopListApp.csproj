@@ -8,6 +8,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interfaces\IFetchers\**" />
+    <Compile Remove="Interfaces\IListeners\**" />
+    <Compile Remove="Interfaces\ILoggers\**" />
+    <Compile Remove="Interfaces\IManagers\**" />
+    <Content Remove="Interfaces\IFetchers\**" />
+    <Content Remove="Interfaces\IListeners\**" />
+    <Content Remove="Interfaces\ILoggers\**" />
+    <Content Remove="Interfaces\IManagers\**" />
+    <EmbeddedResource Remove="Interfaces\IFetchers\**" />
+    <EmbeddedResource Remove="Interfaces\IListeners\**" />
+    <EmbeddedResource Remove="Interfaces\ILoggers\**" />
+    <EmbeddedResource Remove="Interfaces\IManagers\**" />
+    <None Remove="Interfaces\IFetchers\**" />
+    <None Remove="Interfaces\IListeners\**" />
+    <None Remove="Interfaces\ILoggers\**" />
+    <None Remove="Interfaces\IManagers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.72" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.12" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.13" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.13" />
@@ -18,6 +38,11 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.4.0" />
 	<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="RequirementHandlers\" />
+    <Folder Include="Requirements\" />
   </ItemGroup>
 
 </Project>

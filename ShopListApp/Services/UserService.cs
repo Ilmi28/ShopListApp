@@ -7,6 +7,7 @@ using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
 using ShopListApp.Models;
 using ShopListApp.Repositories;
+using ShopListApp.ViewModels;
 
 namespace ShopListApp.Services
 {
@@ -39,13 +40,17 @@ namespace ShopListApp.Services
             }
         }
 
-        public async Task DeleteUser(string id)
+        public async Task DeleteUser(string id, DeleteUserCommand cmd)
         {
             _ = id ?? throw new ArgumentNullException(nameof(id));
+            _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
             try
             {
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null)
+                    throw new UnauthorizedAccessException();
+                bool isPasswordCorrect = await _userManager.CheckPasswordAsync(user, cmd.Password);
+                if (!isPasswordCorrect)
                     throw new UnauthorizedAccessException();
                 var result = await _userManager.DeleteAsync(user);
                 if (!result.Succeeded)
@@ -62,22 +67,25 @@ namespace ShopListApp.Services
             }
         }
 
-        public async Task UpdateUser(string id, UpdateUserCommand updatedUser)
+        public async Task UpdateUser(string id, UpdateUserCommand cmd)
         {
             _ = id ?? throw new ArgumentNullException(nameof(id));
-            _ = updatedUser ?? throw new ArgumentNullException(nameof(updatedUser));
+            _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
             try
             {
                 var user = await _userManager.FindByIdAsync(id) ?? throw new UnauthorizedAccessException();
-                user.UserName = updatedUser.UserName ?? user.UserName;
-                user.Email = updatedUser.Email ?? user.Email;
+                user.UserName = cmd.UserName ?? user.UserName;
+                user.Email = cmd.Email ?? user.Email;
                 var result = await _userManager.UpdateAsync(user);
                 var passwordResult = await _userManager.ChangePasswordAsync(user, 
-                    updatedUser.CurrentPassword, 
-                    updatedUser.NewPassword ?? updatedUser.CurrentPassword);
+                    cmd.CurrentPassword, 
+                    cmd.NewPassword ?? cmd.CurrentPassword);
                 if (!result.Succeeded || !passwordResult.Succeeded)
                     throw new UnauthorizedAccessException();
-                await _logger.Log(Operation.Update, user);
+                int propertiesCount = typeof(UpdateUserCommand).GetProperties().Length;
+                int nullCount = GetLengthOfNullProperties(cmd);
+                if (nullCount < propertiesCount - 1)
+                    await _logger.Log(Operation.Update, user);
             }
             catch (UnauthorizedAccessException)
             {
@@ -89,7 +97,16 @@ namespace ShopListApp.Services
             }
         }
 
-        public async Task<User?> GetUserById(string id)
+        private int GetLengthOfNullProperties(UpdateUserCommand cmd)
+        {
+            int propertiesCount = typeof(UpdateUserCommand).GetProperties().Length;
+            int nullCount = typeof(UpdateUserCommand)
+                                .GetProperties()
+                                .Count(p => p.GetValue(cmd) == null);
+            return nullCount;
+        }
+
+        public async Task<UserView> GetUserById(string id)
         {
             _ = id ?? throw new ArgumentNullException(nameof(id));
             try
@@ -97,7 +114,12 @@ namespace ShopListApp.Services
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null)
                     throw new UnauthorizedAccessException();
-                return user;
+                var view = new UserView
+                {
+                    UserName = user.UserName!,
+                    Email = user.Email!
+                };
+                return view;
             }
             catch (UnauthorizedAccessException)
             {
