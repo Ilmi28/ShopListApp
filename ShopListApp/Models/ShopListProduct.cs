@@ -1,12 +1,14 @@
-﻿namespace ShopListApp.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ShopListApp.Models
 {
     public class ShopListProduct
     {
         public int Id { get; set; }
+        [ForeignKey("ShopList")]
         public int ShopListId { get; set; }
-        public required ShopList ShopList { get; set; }
+        [ForeignKey("Product")]
         public int ProductId { get; set; }
-        public required Product Product { get; set; }
         public bool IsDeleted { get; set; } = false;
     }
 }

@@ -68,7 +68,6 @@ namespace ShopListApp.Services
             {
                 UserId = user.Id,
                 RefreshTokenHash = refreshToken,
-                User = user,
                 ExpirationDate = DateTime.Now.AddDays(_tokenManager.GetRefreshTokenExpirationDays())
             };
             var result = await _tokenRepository.AddToken(token);

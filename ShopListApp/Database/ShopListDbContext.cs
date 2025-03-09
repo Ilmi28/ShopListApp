@@ -2,13 +2,15 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using ShopListApp.Interfaces;
 using ShopListApp.Models;
 
 namespace ShopListApp.Database
 {
     public class ShopListDbContext : IdentityDbContext<User>
     {
-        public ShopListDbContext(DbContextOptions<ShopListDbContext> options) : base(options)
+
+        public ShopListDbContext(DbContextOptions options) : base(options)
         {
         }
 
@@ -16,26 +18,30 @@ namespace ShopListApp.Database
         public DbSet<ShopList> ShopLists { get; set; }
         public DbSet<ShopListProduct> ShopListProducts { get; set; }
         public DbSet<Store> Stores { get; set; }
-        public DbSet<ShopListProductLog> ShopListProductLogs { get; set; }
+        public DbSet<ShopListLog> ShopListLogs { get; set; }
         public DbSet<UserLog> UserLogs { get; set; }
         public DbSet<Token> Tokens { get; set; }
         public DbSet<Category> Categories { get; set; }
 
-        private void AddCategories()
+        protected virtual void SeedData(ModelBuilder modelBuilder)
         {
-            Categories.Add(new Category { Name = "warzywa" });
-            Categories.Add(new Category { Name = "owoce" });
-            Categories.Add(new Category { Name = "pieczywa" });
-            Categories.Add(new Category { Name = "nabial i jajka" });
-            Categories.Add(new Category { Name = "mieso" });
-            Categories.Add(new Category { Name = "dania gotowe" });
-            Categories.Add(new Category { Name = "napoje" });
-            Categories.Add(new Category { Name = "mrozone" });
-            Categories.Add(new Category { Name = "artykuly spozywcze" });
-            Categories.Add(new Category { Name = "drogeria" });
-            Categories.Add(new Category { Name = "dla domu" });
-            Categories.Add(new Category { Name = "dla dzieci" });
-            Categories.Add(new Category { Name = "dla zwierzat" });
+            modelBuilder.Entity<Category>().HasData(
+                new Category { Id = 1, Name = "warzywa" },
+                new Category { Id = 2, Name = "owoce" },
+                new Category { Id = 3, Name = "pieczywa" },
+                new Category { Id = 4, Name = "nabial i jajka" },
+                new Category { Id = 5, Name = "mieso" },
+                new Category { Id = 6, Name = "dania gotowe" },
+                new Category { Id = 7, Name = "napoje" },
+                new Category { Id = 8, Name = "mrozone" },
+                new Category { Id = 9, Name = "artykuly spozywcze" },
+                new Category { Id = 10, Name = "drogeria" },
+                new Category { Id = 11, Name = "dla domu" },
+                new Category { Id = 12, Name = "dla dzieci" },
+                new Category { Id = 13, Name = "dla zwierzat" });
+
+            modelBuilder.Entity<Store>().HasData(
+                new Store { Id = 1, Name = "Biedronka" });
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -56,26 +62,9 @@ namespace ShopListApp.Database
             modelBuilder.Ignore<IdentityUserToken<Guid>>(); 
             modelBuilder.Ignore<IdentityRoleClaim<Guid>>();
 
-            modelBuilder.Entity<ShopListProductLog>().Property(x => x.Operation).HasConversion<string>();
+            modelBuilder.Entity<ShopListLog>().Property(x => x.Operation).HasConversion<string>();
             modelBuilder.Entity<UserLog>().Property(x => x.Operation).HasConversion<string>();
-
-            modelBuilder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "warzywa" },
-                new Category { Id = 2, Name = "owoce" },
-                new Category { Id = 3, Name = "pieczywa" },
-                new Category { Id = 4, Name = "nabial i jajka" },
-                new Category { Id = 5, Name = "mieso" },
-                new Category { Id = 6, Name = "dania gotowe" },
-                new Category { Id = 7, Name = "napoje" },
-                new Category { Id = 8, Name = "mrozone" },
-                new Category { Id = 9, Name = "artykuly spozywcze" },
-                new Category { Id = 10, Name = "drogeria" },
-                new Category { Id = 11, Name = "dla domu" },
-                new Category { Id = 12, Name = "dla dzieci" },
-                new Category { Id = 13, Name = "dla zwierzat" });
-
-            modelBuilder.Entity<Store>().HasData(
-                new Store { Id = 1, Name = "Biedronka" });
+            SeedData(modelBuilder);
         }
     }   
 }

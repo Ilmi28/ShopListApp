@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ShopListApp.Models
 {
@@ -6,8 +7,8 @@ namespace ShopListApp.Models
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-        public int UserId { get; set; }
-        public required User User { get; set; }
+        [ForeignKey("User")]
+        public required string UserId { get; set; }
         public bool IsDeleted { get; set; } = false;
     }
 }

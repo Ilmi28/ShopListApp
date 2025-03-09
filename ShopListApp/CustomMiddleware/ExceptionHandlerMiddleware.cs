@@ -67,6 +67,15 @@ namespace ShopListApp.CustomMiddleware
                     context.Response.StatusCode = 404;
                     await context.Response.WriteAsync("Product not found.");
                     return;
+                case ShopListNotFoundException:
+                    context.Response.StatusCode = 404;
+                    await context.Response.WriteAsync("Shopping list not found.");
+                    return;
+                case ShopListProductNotFoundException:
+                    context.Response.StatusCode = 404;
+                    await context.Response.WriteAsync("Product is not in shopping list");
+                    return;
+
             }
             context.Response.StatusCode = 500;
             await context.Response.WriteAsync("An error occurred. Please try again later.");

@@ -7,7 +7,7 @@ using ShopListApp.Interfaces;
 using ShopListApp.Managers;
 using ShopListApp.Models;
 using ShopListApp.Repositories;
-using ShopListAppTests.WebApplicationFactory;
+using ShopListAppTests.IntegrationTests.WebApplicationFactories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,16 +51,14 @@ namespace ShopListAppTests.IntegrationTests
                 Id = 1,
                 RefreshTokenHash = _tokenManager.GetHashRefreshToken("Xj4z8x+7Q0A=")!,
                 ExpirationDate = DateTime.Now.AddDays(1),
-                UserId = "123",
-                User = user
+                UserId = "123"
             };
             var token1 = new Token
             {
                 Id = 2,
                 RefreshTokenHash = _tokenManager.GetHashRefreshToken("K3N5TzFhMkM=")!,
                 ExpirationDate = DateTime.Now.AddDays(-1),
-                UserId = "123",
-                User = user
+                UserId = "123"
             };
             var token2 = new Token
             {
@@ -68,7 +66,6 @@ namespace ShopListAppTests.IntegrationTests
                 RefreshTokenHash = _tokenManager.GetHashRefreshToken("T1hKQ1VmcDg=")!,
                 ExpirationDate = DateTime.Now.AddDays(1),
                 UserId = "123",
-                User = user,
                 IsRevoked = true
             };
             _manager.CreateAsync(user, "Password123@").Wait();

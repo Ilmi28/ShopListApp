@@ -1,4 +1,5 @@
-﻿using ShopListApp.Commands;
+﻿using Microsoft.IdentityModel.Tokens;
+using ShopListApp.Commands;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
 using ShopListApp.Interfaces.IRepositories;
@@ -22,6 +23,10 @@ namespace ShopListApp.StoreObserver
         }
         public async Task Update()
         {
+            var productsForDeletion = new HashSet<int>();
+            var dbProducts = await _productRepository.GetAllProducts();
+            foreach ( var dbProduct in dbProducts )
+                productsForDeletion.Add(dbProduct.Id);
             var parsedProducts = await _parser.GetParsedProducts();
             foreach (var parsedProduct in parsedProducts)
             {
@@ -32,9 +37,12 @@ namespace ShopListApp.StoreObserver
                 }
                 else
                 {
+                    productsForDeletion.Remove(existingProduct.Id);
                     await UpdateParsedProductInDb(parsedProduct, existingProduct);
                 }
             }
+            foreach (var id in productsForDeletion)
+                await _productRepository.RemoveProduct(id);
         }
 
         private async Task AddParsedProductToDb(ParseProductCommand cmd)
@@ -46,9 +54,7 @@ namespace ShopListApp.StoreObserver
                 Name = cmd.Name,
                 Price = cmd.Price,
                 CategoryId = category?.Id,
-                Category = category,
                 StoreId = cmd.StoreId,
-                Store = store,
                 ImageUrl = cmd.ImageUrl,
             };
             await _productRepository.AddProduct(product);
@@ -63,9 +69,7 @@ namespace ShopListApp.StoreObserver
                 Name = cmd.Name,
                 Price = cmd.Price,
                 CategoryId = category?.Id,
-                Category = category,
                 StoreId = cmd.StoreId,
-                Store = store,
                 ImageUrl = cmd.ImageUrl,
             };
             await _productRepository.UpdateProduct(existingProduct.Id, product);

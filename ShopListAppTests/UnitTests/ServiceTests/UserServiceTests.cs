@@ -153,7 +153,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             };
             _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
             _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(true);
-            _mockManager.Setup(x => x.UpdateAsync(It.IsAny<User>())).ThrowsAsync(new Exception());
+            _mockManager.Setup(x => x.DeleteAsync(It.IsAny<User>())).ThrowsAsync(new Exception());
 
             Func<Task> task = async () => await _userService.DeleteUser(id, cmd);
 

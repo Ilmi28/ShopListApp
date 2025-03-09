@@ -2,6 +2,7 @@
 using ShopListApp.Database;
 using ShopListApp.Interfaces.IRepositories;
 using ShopListApp.Models;
+using ShopListApp.ViewModels;
 using System.Runtime.CompilerServices;
 
 namespace ShopListApp.Repositories

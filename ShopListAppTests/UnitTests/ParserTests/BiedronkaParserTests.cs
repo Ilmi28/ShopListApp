@@ -1,7 +1,7 @@
 ﻿using ShopListApp.Commands;
 using ShopListApp.DataProviders;
 using ShopListAppTests.Comparers;
-using ShopListAppTests.UnitTests.ParserTests.HtmlFetcherStubs;
+using ShopListAppTests.Stubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;

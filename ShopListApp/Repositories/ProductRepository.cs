@@ -39,10 +39,8 @@ namespace ShopListApp.Repositories
             product.Name = updatedProduct.Name;
             product.Price = updatedProduct.Price;
             product.StoreId = updatedProduct.StoreId;
-            product.Store = updatedProduct.Store;
             product.ImageUrl = updatedProduct.ImageUrl;
             product.CategoryId = updatedProduct.CategoryId;
-            product.Category = updatedProduct.Category;
             await _context.SaveChangesAsync();
             return true;
         }

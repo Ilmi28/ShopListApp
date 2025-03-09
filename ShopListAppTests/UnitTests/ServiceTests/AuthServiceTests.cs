@@ -224,7 +224,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 RefreshToken = "refreshToken"
             };
             _mockTokenManager.Setup(x => x.GetHashRefreshToken(cmd.RefreshToken)).Returns("hash");
-            _mockTokenRepository.Setup(x => x.GetToken("hash")).ReturnsAsync(new Token { UserId = "1", User = new User(), RefreshTokenHash = "hash" });
+            _mockTokenRepository.Setup(x => x.GetToken("hash")).ReturnsAsync(new Token { UserId = "1", RefreshTokenHash = "hash" });
             _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(new User());
             _mockTokenManager.Setup(x => x.GenerateAccessToken(It.IsAny<User>())).Returns("token");
 

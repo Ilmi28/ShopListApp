@@ -7,8 +7,8 @@ using ShopListApp.Commands;
 using ShopListApp.Database;
 using ShopListApp.Interfaces;
 using ShopListApp.Models;
-using ShopListAppTests.WebApplicationFactories;
-using ShopListAppTests.WebApplicationFactory;
+using ShopListAppTests.IntegrationTests.WebApplicationFactories;
+using ShopListAppTests.Stubs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,14 +23,14 @@ namespace ShopListAppTests.IntegrationTests
     public class UserTests : IClassFixture<UserWebApplicationFactory>
     {
         private readonly HttpClient _client;
-        private readonly ShopListDbContext _context;
+        private readonly TestDbContext _context;
         private readonly UserManager<User> _manager;
         private readonly ITokenManager _tokenManager;
         public UserTests(UserWebApplicationFactory factory)
         {
             _client = factory.CreateClient();
             var scope = factory.Services.CreateScope();
-            _context = scope.ServiceProvider.GetRequiredService<ShopListDbContext>();
+            _context = scope.ServiceProvider.GetRequiredService<TestDbContext>();
             _manager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
             _tokenManager = scope.ServiceProvider.GetRequiredService<ITokenManager>();
             _context.Database.EnsureDeleted();

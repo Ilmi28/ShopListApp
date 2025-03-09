@@ -5,23 +5,23 @@ using ShopListApp.Models;
 
 namespace ShopListApp.Loggers
 {
-    public class ShopListProductLogger : IDbLogger<ShopListProduct>
+    public class ShopListLogger : IDbLogger<ShopListProduct>
     {
         private readonly ShopListDbContext _context;
-        public ShopListProductLogger(ShopListDbContext context)
+        public ShopListLogger(ShopListDbContext context)
         {
             _context = context;
         }
         public async Task Log(Operation operation, ShopListProduct loggedObject)
         {
-            var log = new ShopListProductLog
+            var log = new ShopListLog
             {
-                ShopListId = loggedObject.ShopListId,
+                ShopListId = loggedObject.Id,
                 ProductId = loggedObject.ProductId,
                 Operation = operation
             };
 
-            await _context.ShopListProductLogs.AddAsync(log);
+            await _context.ShopListLogs.AddAsync(log);
             await _context.SaveChangesAsync();
         }
     }

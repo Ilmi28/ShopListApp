@@ -36,7 +36,6 @@ namespace ShopListApp.Repositories
                 return false;
             shopList.Name = updatedShopList.Name;
             shopList.UserId = updatedShopList.UserId;
-            shopList.User = updatedShopList.User;
             await _context.SaveChangesAsync();
             return true;
         }

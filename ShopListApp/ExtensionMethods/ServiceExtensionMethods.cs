@@ -39,13 +39,14 @@ namespace ShopListApp.ExtensionMethods
             services.AddTransient<IAuthService, AuthService>();
             services.AddTransient<IStoreService, StoreService>();
             services.AddTransient<IProductService, ProductService>();
+            services.AddTransient<IShopListService, ShopListService>();
 
         }
 
         public static void AddLoggers(this IServiceCollection services)
         {
             services.AddTransient<IDbLogger<User>, UserLogger>();
-            services.AddTransient<IDbLogger<ShopListProduct>, ShopListProductLogger>();
+            services.AddTransient<IDbLogger<ShopListProduct>, ShopListLogger>();
         }
 
         public static void AddManagers(this IServiceCollection services)

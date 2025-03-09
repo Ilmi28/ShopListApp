@@ -28,11 +28,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="UnitTests\ParserTests\HtmlFetcherStubs\HtmlTestData\" />
+    <Folder Include="TestData\" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="UnitTests\ParserTests\HtmlFetcherStubs\HtmlTestData\BiedronkaPage.html">
+    <None Update="TestData\BiedronkaPage.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
