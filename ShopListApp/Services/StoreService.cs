@@ -9,11 +9,9 @@ namespace ShopListApp.Services
     public class StoreService : IStoreService
     {
         private IStoreRepository _storeRepository;
-        private ICategoryRepository _categoryRepository;
-        public StoreService(IStoreRepository storeRepository, ICategoryRepository categoryRepository)
+        public StoreService(IStoreRepository storeRepository)
         {
             _storeRepository = storeRepository;
-            _categoryRepository = categoryRepository;
         }
 
         public async Task<ICollection<StoreView>> GetStores()

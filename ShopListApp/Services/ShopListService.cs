@@ -14,23 +14,18 @@ namespace ShopListApp.Services
     {
         private readonly IShopListRepository _shopListRepository;
         private readonly IProductRepository _productRepository;
-        private readonly ICategoryRepository _categoryRepository;
         private readonly IShopListProductRepository _shopListProductRepository;
-        private readonly IStoreRepository _storeRepository;
-        private readonly IDbLogger<ShopListProduct> _logger;
+        private readonly IDbLogger<ShopList> _logger;
         private readonly UserManager<User> _userManager;
 
         public ShopListService(IShopListRepository shopListRepository, IShopListProductRepository shopListProductRepository,
-                                IProductRepository productRepository, UserManager<User> userManager, 
-                                ICategoryRepository categoryRepository, IStoreRepository storeRepository,
-                                IDbLogger<ShopListProduct> logger)
+                                IProductRepository productRepository, UserManager<User> userManager,
+                                IDbLogger<ShopList> logger)
         {
             _shopListRepository = shopListRepository;
             _shopListProductRepository = shopListProductRepository;
             _productRepository = productRepository;
             _userManager = userManager;
-            _categoryRepository = categoryRepository;
-            _storeRepository = storeRepository;
             _logger = logger;
         }
 
@@ -42,29 +37,31 @@ namespace ShopListApp.Services
                 var product = await _productRepository.GetProductById(productId) ?? throw new ProductNotFoundException();
                 var shopListProduct = new ShopListProduct
                 {
-                    ShopListId = shopListId,
-                    ProductId = productId,
+                    ShopList = shopList,
+                    Product = product
                 };
                 await _shopListProductRepository.AddShopListProduct(shopListProduct);
-                await _logger.Log(Operation.Create, shopListProduct);
+                await _logger.Log(Operation.Update, shopList);
             }
             catch (ShopListNotFoundException) { throw; }
             catch (ProductNotFoundException) { throw; }
             catch { throw new DatabaseErrorException(); }
         }
 
-        public async Task CreateShopList(CreateShopListCommand cmd)
+        public async Task CreateShopList(string userId, CreateShopListCommand cmd)
         {
+            _ = userId ?? throw new ArgumentNullException();
             _ = cmd ?? throw new ArgumentNullException();
             try
             {
-                var user = await _userManager.FindByIdAsync(cmd.UserId) ?? throw new UserNotFoundException();
+                var user = await _userManager.FindByIdAsync(userId) ?? throw new UserNotFoundException();
                 var shopList = new ShopList
                 {
                     Name = cmd.Name,
-                    UserId = cmd.UserId,
+                    User = user
                 };
                 await _shopListRepository.AddShopList(shopList);
+                await _logger.Log(Operation.Create, shopList);
             }
             catch (UserNotFoundException) { throw; }
             catch { throw new DatabaseErrorException(); }
@@ -75,47 +72,50 @@ namespace ShopListApp.Services
             bool result;
             try
             {
-                var shopListProductsIds = await _shopListProductRepository.GetProductIdsForShopList(shopListId);
-                foreach (int productId in shopListProductsIds)
+                var shopList = await _shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException();
+                var shopListProducts = await _shopListProductRepository.GetProductsForShopList(shopListId);
+                foreach (var product in shopListProducts)
                 {
-                    result = await _shopListProductRepository.RemoveShopListProduct(shopListId, productId);
+                    result = await _shopListProductRepository.RemoveShopListProduct(shopListId, product.Id);
                     if (!result) throw new ShopListProductNotFoundException();
                 }
                 result = await _shopListRepository.RemoveShopList(shopListId);
                 if (!result) throw new ShopListNotFoundException();
+                await _logger.Log(Operation.Delete, shopList);
+
             }
             catch (ShopListNotFoundException) { throw; }
             catch { throw new DatabaseErrorException(); }
         }
 
-        public async Task<ICollection<ProductView>> GetShopListProducts(int shopListId)
+        public async Task<ShopListView> GetShopListById(int shopListId)
         {
             try
             {
                 var shopList = await _shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException();
-                var shopListProductsIds = await _shopListProductRepository.GetProductIdsForShopList(shopListId);
+                var shopListProducts = await _shopListProductRepository.GetProductsForShopList(shopListId);
                 var productViews = new List<ProductView>();
-                foreach (int productId in shopListProductsIds)
+                foreach (var product in shopListProducts)
                 {
-                    var product = await _productRepository.GetProductById(productId) ?? throw new ProductNotFoundException();
-                    var category = await _categoryRepository.GetCategoryById(product.CategoryId) ?? throw new CategoryNotFoundException();
-                    var store = await _storeRepository.GetStoreById(product.StoreId) ?? throw new StoreNotFoundException();
                     productViews.Add(new ProductView
                     {
                         Id = product.Id,
                         Name = product.Name,
                         Price = product.Price,
-                        CategoryId = product.CategoryId,
-                        CategoryName = category.Name,
-                        StoreId = product.StoreId,
-                        StoreName = store.Name,
+                        CategoryId = product.Category?.Id,
+                        CategoryName = product.Category?.Name,
+                        StoreId = product.Store.Id,
+                        StoreName = product.Store.Name,
                         ImageUrl = product.ImageUrl
                     });
                 }
-                return productViews;
+                var shopListView = new ShopListView
+                {
+                    Name = shopList.Name,
+                    Products = productViews
+                };
+                return shopListView;
             }
-            catch (ProductNotFoundException) { throw; }
-            catch (CategoryNotFoundException) { throw; }
             catch (ShopListNotFoundException) { throw; }
             catch { throw new DatabaseErrorException(); }
         }
@@ -124,14 +124,37 @@ namespace ShopListApp.Services
         {
             try
             {
+                var shopList = await _shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException();
                 bool result = await _shopListProductRepository.RemoveShopListProduct(shopListId, productId);
                 if (!result) throw new ShopListProductNotFoundException();
+                await _logger.Log(Operation.Update, shopList);
             }
+            catch (ShopListNotFoundException) { throw; }
             catch (ShopListProductNotFoundException) { throw; }
             catch
             {
                 throw new DatabaseErrorException();
             }
+        }
+
+        public async Task UpdateShopList(int shopListId, UpdateShopListCommand cmd)
+        {
+            _ = cmd ?? throw new ArgumentNullException();
+            try
+            {
+                var shopList = await _shopListRepository.GetShopListById(shopListId)
+                    ?? throw new ShopListNotFoundException();
+                var updatedShopList = new ShopList
+                {
+                    Name = cmd.Name,
+                    User = shopList.User
+                };
+                if (shopList == null) throw new ShopListNotFoundException();
+                var result = await _shopListRepository.UpdateShopList(shopListId, updatedShopList);
+                if (!result) throw new DatabaseErrorException();
+            }
+            catch (ShopListNotFoundException) { throw; }
+            catch { throw new DatabaseErrorException(); }
         }
     }
 }

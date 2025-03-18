@@ -38,39 +38,40 @@ namespace ShopListApp.Repositories
                 return false;
             product.Name = updatedProduct.Name;
             product.Price = updatedProduct.Price;
-            product.StoreId = updatedProduct.StoreId;
+            product.Store = updatedProduct.Store;
             product.ImageUrl = updatedProduct.ImageUrl;
-            product.CategoryId = updatedProduct.CategoryId;
+            product.Category = updatedProduct.Category;
             await _context.SaveChangesAsync();
             return true;
         }
 
         public async Task<Product?> GetProductById(int id)
         {
-            return await _context.Products.FindAsync(id);
+            return await _context.Products.Include(x => x.Store).Include(x => x.Category)
+                .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<ICollection<Product>> GetProductsByCategoryId(int categoryId)
         {
-            var products = await _context.Products.Where(x => x.CategoryId == categoryId).ToListAsync();
+            var products = await _context.Products.Include(x => x.Store).Include(x => x.Category).Where(x => x.Category != null && x.Category.Id == categoryId).ToListAsync();
             return products;
         }
 
         public async Task<ICollection<Product>> GetProductsByStoreId(int storeId)
         {
-            var products = await _context.Products.Where(x => x.StoreId == storeId).ToListAsync();
+            var products = await _context.Products.Include(x => x.Store).Include(x => x.Category).Where(x => x.Store.Id == storeId).ToListAsync();
             return products;
         }
 
         public async Task<ICollection<Product>> GetAllProducts()
         {
-            var products = await _context.Products.ToListAsync();
+            var products = await _context.Products.Include(x => x.Store).Include(x => x.Category).ToListAsync();
             return products;
         }
 
         public async Task<Product?> GetProductByName(string name)
         {
-            return await _context.Products.FirstOrDefaultAsync(x => x.Name == name);
+            return await _context.Products.Include(x => x.Store).Include(x => x.Category).FirstOrDefaultAsync(x => x.Name == name);
         }
     }
 }

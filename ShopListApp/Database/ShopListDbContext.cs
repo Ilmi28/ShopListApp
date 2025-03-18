@@ -50,10 +50,9 @@ namespace ShopListApp.Database
 
             modelBuilder.Entity<ShopListProduct>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<ShopList>().HasQueryFilter(x => !x.IsDeleted);
-            modelBuilder.Entity<Product>().HasQueryFilter(x => !x.IsDeleted).
-                                            HasIndex(x => new { x.Name, x.StoreId }).IsUnique();
             modelBuilder.Entity<Store>().HasQueryFilter(x => !x.IsDeleted);
             modelBuilder.Entity<Category>().HasIndex(x => x.Name).IsUnique();
+            modelBuilder.Entity<Product>().HasQueryFilter(x => !x.IsDeleted);
 
             modelBuilder.Ignore<IdentityRole>();  
             modelBuilder.Ignore<IdentityUserRole<Guid>>(); 

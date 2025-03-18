@@ -66,7 +66,7 @@ namespace ShopListApp.Services
         {
             var token = new Token
             {
-                UserId = user.Id,
+                User = user,
                 RefreshTokenHash = refreshToken,
                 ExpirationDate = DateTime.Now.AddDays(_tokenManager.GetRefreshTokenExpirationDays())
             };
@@ -115,7 +115,7 @@ namespace ShopListApp.Services
                                                         ?? throw new UnauthorizedAccessException();
                 var token = await _tokenRepository.GetToken(hash)
                                                         ?? throw new UnauthorizedAccessException();
-                var user = await _userManager.FindByIdAsync(token.UserId)
+                var user = await _userManager.FindByIdAsync(token.User.Id)
                                                         ?? throw new UnauthorizedAccessException();
                 var identityToken = _tokenManager.GenerateAccessToken(user);
                 return identityToken;

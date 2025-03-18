@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using ShopListApp.Database;
 using ShopListApp.Models;
 using ShopListAppTests.IntegrationTests.WebApplicationFactories;
@@ -34,10 +35,10 @@ namespace ShopListAppTests.IntegrationTests
             var category2 = _context.Categories.First(x => x.Id == 2);
             _context.Products.AddRange(new List<Product>
             {
-                new Product { Id = 1, Name = "Ziemniak myty jadalny 2 kg", Price = 7.99m, CategoryId = 1, StoreId = 1 },
-                new Product { Id = 2, Name = "Papryka Czerwona luz", Price = 15.99m, CategoryId = 1, StoreId = 1 },
-                new Product { Id = 3, Name = "Ogórki szklarniowe kg", Price = 13.99m, CategoryId = 1, StoreId = 1 },
-                new Product { Id = 4, Name = "Banany 1kg", Price = 4.99m, CategoryId = 2, StoreId = 1 },
+                new Product { Id = 1, Name = "Ziemniak myty jadalny 2 kg", Price = 7.99m, Category = category1, Store = store },
+                new Product { Id = 2, Name = "Papryka Czerwona luz", Price = 15.99m, Category = category1, Store = store },
+                new Product { Id = 3, Name = "Ogórki szklarniowe kg", Price = 13.99m, Category = category1, Store = store },
+                new Product { Id = 4, Name = "Banany 1kg", Price = 4.99m, Category = category2, Store = store },
             });
             _context.SaveChanges();
         }
@@ -61,7 +62,7 @@ namespace ShopListAppTests.IntegrationTests
         public async Task GetProductsByCategory_CategoryFound_ReturnsAllProductsWithCategory()
         {
             var result = await _client.GetAsync("/api/product/get-by-category/1");
-            var dbProducts = _context.Products.Where(x => x.CategoryId == 1).ToList();
+            var dbProducts = _context.Products.Where(x => x.Category!.Id == 1).ToList();
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
             Assert.Equal(3, dbProducts.Count);
             Assert.Equal(1, dbProducts[0].Id);
@@ -80,7 +81,7 @@ namespace ShopListAppTests.IntegrationTests
         public async Task GetProductsByStore_StoreFound_ReturnsAllProductsWithStore()
         {
             var result = await _client.GetAsync("/api/product/get-by-store/1");
-            var dbProducts = _context.Products.Where(x => x.StoreId == 1).ToList();
+            var dbProducts = _context.Products.Where(x => x.Store.Id == 1).ToList();
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
             Assert.Equal(4, dbProducts.Count);
             Assert.Equal(1, dbProducts[0].Id);

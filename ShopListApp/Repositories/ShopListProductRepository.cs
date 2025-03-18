@@ -23,8 +23,8 @@ namespace ShopListApp.Repositories
 
         public async Task<bool> RemoveShopListProduct(int shopListId, int productId)
         {
-            var shopListProduct = await _context.ShopListProducts.FirstOrDefaultAsync(x => x.ShopListId == shopListId
-                && x.ProductId == productId);
+            var shopListProduct = await _context.ShopListProducts.FirstOrDefaultAsync(x => x.ShopList.Id == shopListId
+                && x.Product.Id == productId);
             if (shopListProduct == null) 
                 return false;
             shopListProduct.IsDeleted = true;
@@ -32,9 +32,10 @@ namespace ShopListApp.Repositories
             return true;
         }
 
-        public async Task<ICollection<int>> GetProductIdsForShopList(int shopListId)
+        public async Task<ICollection<Product>> GetProductsForShopList(int shopListId)
         {
-            return await _context.ShopListProducts.Where(x => x.ShopListId == shopListId).Select(x => x.ProductId).ToListAsync();
+            return await _context.ShopListProducts.Where(x => x.ShopList.Id == shopListId)
+                .Select(x => x.Product).ToListAsync();
         }
 
     }

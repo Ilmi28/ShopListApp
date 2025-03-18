@@ -15,13 +15,11 @@ namespace ShopListAppTests.UnitTests.ServiceTests
     {
         private StoreService _storeService;
         private Mock<IStoreRepository> _mockStoreRepository;
-        private Mock<ICategoryRepository> _mockCategoryRepository;
 
         public StoreServiceTests()
         {
             _mockStoreRepository = new Mock<IStoreRepository>();
-            _mockCategoryRepository = new Mock<ICategoryRepository>();
-            _storeService = new StoreService(_mockStoreRepository.Object, _mockCategoryRepository.Object);
+            _storeService = new StoreService(_mockStoreRepository.Object);
         }
 
         [Fact]

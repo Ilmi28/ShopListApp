@@ -39,7 +39,7 @@ namespace ShopListApp.Services
             try
             {
                 var products = await _productRepository.GetAllProducts();
-                var productViews = await GetProductViewsList(products);
+                var productViews = GetProductViewsList(products);
                 return productViews;
             }
             catch { throw new DatabaseErrorException(); }
@@ -52,7 +52,7 @@ namespace ShopListApp.Services
                 _ = await _categoryRepository.GetCategoryById(categoryId)
                     ?? throw new CategoryNotFoundException();
                 var products = await _productRepository.GetProductsByCategoryId(categoryId);
-                var productViews = await GetProductViewsList(products);
+                var productViews = GetProductViewsList(products);
                 return productViews;
             }
             catch (CategoryNotFoundException) { throw; }
@@ -66,7 +66,7 @@ namespace ShopListApp.Services
                 _ = await _storeRepository.GetStoreById(storeId)
                     ?? throw new StoreNotFoundException();
                 var products = await _productRepository.GetProductsByStoreId(storeId);
-                var productViews = await GetProductViewsList(products);
+                var productViews = GetProductViewsList(products);
                 return productViews;
             }
             catch (StoreNotFoundException) { throw; }
@@ -102,24 +102,20 @@ namespace ShopListApp.Services
             catch { throw new DatabaseErrorException(); }
         }
 
-        private async Task<ICollection<ProductView>> GetProductViewsList(ICollection<Product> products)
+        private ICollection<ProductView> GetProductViewsList(ICollection<Product> products)
         {
             var productViews = new List<ProductView>();
             foreach (var product in products)
             {
-                var store = await _storeRepository.GetStoreById(product.StoreId)
-                    ?? throw new StoreNotFoundException();
-                var category = await _categoryRepository.GetCategoryById(product.CategoryId)
-                    ?? throw new CategoryNotFoundException();
                 var productView = new ProductView
                 {
                     Id = product.Id,  
                     Name = product.Name,
                     Price = product.Price,
-                    StoreId = product.StoreId,
-                    StoreName = store.Name,
-                    CategoryId = product.CategoryId,
-                    CategoryName = category?.Name,
+                    StoreId = product.Store.Id,
+                    StoreName = product.Store.Name,
+                    CategoryId = product.Category?.Id,
+                    CategoryName = product.Category?.Name,
                     ImageUrl = product.ImageUrl,
                 };
                 productViews.Add(productView);
@@ -132,17 +128,15 @@ namespace ShopListApp.Services
             try
             {
                 var product = await _productRepository.GetProductById(id) ?? throw new ProductNotFoundException();
-                var category = await _categoryRepository.GetCategoryById(product.CategoryId);
-                var store = await _storeRepository.GetStoreById(product.StoreId) ?? throw new StoreNotFoundException();
                 var productView = new ProductView
                 {
                     Id = product.Id,
                     Name = product.Name,
                     Price = product.Price,
-                    StoreId = product.StoreId,
-                    CategoryId = product.CategoryId,
-                    CategoryName = category?.Name,
-                    StoreName = store.Name,
+                    StoreId = product.Store.Id,
+                    CategoryId = product.Category?.Id,
+                    CategoryName = product.Category?.Name,
+                    StoreName = product.Store.Name,
                     ImageUrl = product.ImageUrl,
                 };
                 return productView;

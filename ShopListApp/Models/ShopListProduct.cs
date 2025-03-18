@@ -5,10 +5,10 @@ namespace ShopListApp.Models
     public class ShopListProduct
     {
         public int Id { get; set; }
-        [ForeignKey("ShopList")]
-        public int ShopListId { get; set; }
-        [ForeignKey("Product")]
-        public int ProductId { get; set; }
+        [ForeignKey("ShopListId")]
+        public required ShopList ShopList { get; set; }
+        [ForeignKey("ProductId")]
+        public required Product Product { get; set; }
         public bool IsDeleted { get; set; } = false;
     }
 }

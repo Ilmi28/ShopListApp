@@ -223,9 +223,10 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             {
                 RefreshToken = "refreshToken"
             };
+            var user = new User { Id = "1" };
             _mockTokenManager.Setup(x => x.GetHashRefreshToken(cmd.RefreshToken)).Returns("hash");
-            _mockTokenRepository.Setup(x => x.GetToken("hash")).ReturnsAsync(new Token { UserId = "1", RefreshTokenHash = "hash" });
-            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(new User());
+            _mockTokenRepository.Setup(x => x.GetToken("hash")).ReturnsAsync(new Token {User = user, RefreshTokenHash = "hash" });
+            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(user);
             _mockTokenManager.Setup(x => x.GenerateAccessToken(It.IsAny<User>())).Returns("token");
 
             string jwtToken = await _authService.RefreshAccessToken(cmd);

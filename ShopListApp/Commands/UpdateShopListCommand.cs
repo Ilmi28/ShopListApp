@@ -2,7 +2,7 @@
 
 namespace ShopListApp.Commands
 {
-    public class CreateShopListCommand
+    public class UpdateShopListCommand
     {
         [Required]
         [MinLength(3)]

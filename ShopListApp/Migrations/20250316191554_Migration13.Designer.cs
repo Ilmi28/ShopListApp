@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ShopListApp.Database;
 
@@ -11,9 +12,11 @@ using ShopListApp.Database;
 namespace ShopListApp.Migrations
 {
     [DbContext(typeof(ShopListDbContext))]
-    partial class ShopListDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250316191554_Migration13")]
+    partial class Migration13
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -287,6 +290,9 @@ namespace ShopListApp.Migrations
                     b.Property<string>("Operation")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("ProductId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ShopListId")
                         .HasColumnType("int");

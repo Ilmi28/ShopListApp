@@ -16,6 +16,7 @@ using ShopListApp.Loggers;
 using ShopListApp.Managers;
 using ShopListApp.Models;
 using ShopListApp.Repositories;
+using ShopListApp.Requirements;
 using ShopListApp.Services;
 using System.Text;
 
@@ -46,7 +47,7 @@ namespace ShopListApp.ExtensionMethods
         public static void AddLoggers(this IServiceCollection services)
         {
             services.AddTransient<IDbLogger<User>, UserLogger>();
-            services.AddTransient<IDbLogger<ShopListProduct>, ShopListLogger>();
+            services.AddTransient<IDbLogger<ShopList>, ShopListLogger>();
         }
 
         public static void AddManagers(this IServiceCollection services)

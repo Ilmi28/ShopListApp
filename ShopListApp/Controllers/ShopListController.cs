@@ -1,52 +1,68 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ShopListApp.Commands;
 using ShopListApp.Interfaces.IServices;
+using System.Security.Claims;
 
 namespace ShopListApp.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/shoplist")]
     public class ShopListController : ControllerBase
     {
         private readonly IShopListService _shopListService;
-        public ShopListController(IShopListService shopListService)
+        private readonly IAuthorizationService _authorizationService;
+        public ShopListController(IShopListService shopListService, IAuthorizationService authorizationService)
         {
             _shopListService = shopListService;
+            _authorizationService = authorizationService;
         }
 
         [HttpPost("create")]
-        public IActionResult CreateShopList([FromBody] CreateShopListCommand cmd)
+        public async Task<IActionResult> CreateShopList([FromBody] CreateShopListCommand cmd)
         {
-            _shopListService.CreateShopList(cmd);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
+            await _shopListService.CreateShopList(userId, cmd);
             return Ok();
         }
 
         [HttpDelete("delete/{shopListId}")]
-        public IActionResult DeleteShopList(int shopListId)
+        public async Task<IActionResult> DeleteShopList(int shopListId)
         {
-            _shopListService.DeleteShopList(shopListId);
+            await _shopListService.DeleteShopList(shopListId);
             return Ok();
         }
 
         [HttpPatch("update/delete-product/{shopListId}/{productId}")]
-        public IActionResult AddProductToShopList(int shopListId, int productId)
+        public async Task<IActionResult> AddProductToShopList(int shopListId, int productId)
         {
-            _shopListService.AddProductToShopList(shopListId, productId);
+            await _shopListService.AddProductToShopList(shopListId, productId);
             return Ok();
         }
 
         [HttpPatch("update/add-product/{shopListId}/{productId}")]
-        public IActionResult RemoveProductFromShopList(int shopListId, int productId)
+        public async Task<IActionResult> RemoveProductFromShopList(int shopListId, int productId)
         {
-            _shopListService.RemoveProductFromShopList(shopListId, productId);
+            await _shopListService.RemoveProductFromShopList(shopListId, productId);
             return Ok();
         }
 
         [HttpGet("get/{shopListId}")]
-        public IActionResult GetShopListProducts(int shopListId)
+        public async Task<IActionResult> GetShopListProducts(int shopListId)
         {
-            var products = _shopListService.GetShopListProducts(shopListId);
-            return Ok(products);
+            var shopList = await _shopListService.GetShopListById(shopListId);
+            return Ok(shopList);
+        }
+
+        [HttpPut("update/{shopListId}")]
+        public async Task<IActionResult> UpdateShopList(int shopListId, [FromBody] UpdateShopListCommand cmd)
+        {
+            var shopList = await _shopListService.GetShopListById(shopListId);
+            var result = await _authorizationService.AuthorizeAsync(User, shopList, "ShopListOwnerPolicy");
+            if (!result.Succeeded) return Forbid();
+            await _shopListService.UpdateShopList(shopListId, cmd);
+            return Ok();
         }
     }
 }

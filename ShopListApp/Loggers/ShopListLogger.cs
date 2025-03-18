@@ -5,19 +5,18 @@ using ShopListApp.Models;
 
 namespace ShopListApp.Loggers
 {
-    public class ShopListLogger : IDbLogger<ShopListProduct>
+    public class ShopListLogger : IDbLogger<ShopList>
     {
         private readonly ShopListDbContext _context;
         public ShopListLogger(ShopListDbContext context)
         {
             _context = context;
         }
-        public async Task Log(Operation operation, ShopListProduct loggedObject)
+        public async Task Log(Operation operation, ShopList loggedObject)
         {
             var log = new ShopListLog
             {
                 ShopListId = loggedObject.Id,
-                ProductId = loggedObject.ProductId,
                 Operation = operation
             };
 

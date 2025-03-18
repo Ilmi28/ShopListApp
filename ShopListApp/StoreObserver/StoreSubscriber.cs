@@ -53,14 +53,14 @@ namespace ShopListApp.StoreObserver
             {
                 Name = cmd.Name,
                 Price = cmd.Price,
-                CategoryId = category?.Id,
-                StoreId = cmd.StoreId,
+                Category = category,
+                Store = store,
                 ImageUrl = cmd.ImageUrl,
             };
             await _productRepository.AddProduct(product);
         }
 
-        private async Task UpdateParsedProductInDb(ParseProductCommand cmd, Product existingProduct)
+        private async Task<bool> UpdateParsedProductInDb(ParseProductCommand cmd, Product existingProduct)
         {
             var category = await _categoryRepository.GetCategoryByName(cmd.CategoryName);
             var store = await _storeRepository.GetStoreById(cmd.StoreId) ?? throw new StoreNotFoundException();
@@ -68,11 +68,11 @@ namespace ShopListApp.StoreObserver
             {
                 Name = cmd.Name,
                 Price = cmd.Price,
-                CategoryId = category?.Id,
-                StoreId = cmd.StoreId,
+                Category = category,
+                Store = store,
                 ImageUrl = cmd.ImageUrl,
             };
-            await _productRepository.UpdateProduct(existingProduct.Id, product);
+            return await _productRepository.UpdateProduct(existingProduct.Id, product);
         }
     }
 }

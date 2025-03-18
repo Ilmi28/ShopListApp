@@ -15,6 +15,7 @@ using ShopListApp.Interfaces;
 using ShopListApp.Managers;
 using ShopListApp.Models;
 using ShopListApp.Repositories;
+using ShopListApp.Requirements;
 using System.Text;
 using static System.Net.WebRequestMethods;
 
@@ -48,6 +49,10 @@ namespace ShopListApp
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGenWithAuthorization();
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("ShopListOwnerPolicy", policy => policy.Requirements.Add(new ShopListOwnerRequirement()));
+            });
 
         }
 

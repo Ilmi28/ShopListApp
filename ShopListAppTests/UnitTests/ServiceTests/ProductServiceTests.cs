@@ -37,9 +37,9 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             var category = new Category { Id = 1, Name = "Category1" };
             var products = new List<Product>
             {
-                new Product { Id = 1, Name = "Product1", Price = 1.99m, CategoryId = 1, StoreId = 1 },
-                new Product { Id = 2, Name = "Product2", Price = 2.99m, CategoryId = 1, StoreId = 1 },
-                new Product { Id = 3, Name = "Product3", Price = 3.99m, CategoryId = 1, StoreId = 1 }
+                new Product { Id = 1, Name = "Product1", Price = 1.99m, Category = category, Store = store },
+                new Product { Id = 2, Name = "Product2", Price = 2.99m, Category = category, Store = store },
+                new Product { Id = 3, Name = "Product3", Price = 3.99m, Category = category, Store = store }
             };
             _mockProductRepository.Setup(x => x.GetAllProducts()).ReturnsAsync(products);
             _mockStoreRepository.Setup(x => x.GetStoreById(1)).ReturnsAsync(store);
@@ -73,15 +73,16 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public async Task GetProductsByCategoryId_ValidCategoryId_ReturnsProducts()
         {
             var store = new Store { Id = 1, Name = "Store1" };
+            var category = new Category { Id = 1, Name = "Category1" };
             var products = new List<Product>
             {
-                new Product { Id = 1, Name = "Product1", Price = 1.99m, CategoryId = 1, StoreId = 1 },
-                new Product { Id = 2, Name = "Product2", Price = 2.99m, CategoryId = 1, StoreId = 1 },
-                new Product { Id = 3, Name = "Product3", Price = 3.99m, CategoryId = 1, StoreId = 1 }
+                new Product { Id = 1, Name = "Product1", Price = 1.99m, Category = category, Store = store },
+                new Product { Id = 2, Name = "Product2", Price = 2.99m, Category = category, Store = store },
+                new Product { Id = 3, Name = "Product3", Price = 3.99m, Category = category, Store = store }
             };
             _mockProductRepository.Setup(x => x.GetProductsByCategoryId(1)).ReturnsAsync(products);
             _mockStoreRepository.Setup(x => x.GetStoreById(1)).ReturnsAsync(store);
-            _mockCategoryRepository.Setup(x => x.GetCategoryById(1)).ReturnsAsync(new Category { Id = 1, Name = "Category1" });
+            _mockCategoryRepository.Setup(x => x.GetCategoryById(1)).ReturnsAsync(category);
 
             var result = await _productService.GetProductsByCategoryId(1);
 
@@ -112,9 +113,9 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             var category = new Category { Id = 1, Name = "Category1" };
             var products = new List<Product>
             {
-                new Product { Id = 1, Name = "Product1", Price = 1.99m, CategoryId = 1, StoreId = 1 },
-                new Product { Id = 2, Name = "Product2", Price = 2.99m, CategoryId = 1, StoreId = 1 },
-                new Product { Id = 3, Name = "Product3", Price = 3.99m, CategoryId = 1, StoreId = 1 }
+                new Product { Id = 1, Name = "Product1", Price = 1.99m, Category = category, Store = store },
+                new Product { Id = 2, Name = "Product2", Price = 2.99m, Category = category, Store = store },
+                new Product { Id = 3, Name = "Product3", Price = 3.99m, Category = category, Store = store }
             };
             _mockProductRepository.Setup(x => x.GetProductsByStoreId(1)).ReturnsAsync(products);
             _mockStoreRepository.Setup(x => x.GetStoreById(1)).ReturnsAsync(store);
