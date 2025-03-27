@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using ShopListApp.Commands;
-using ShopListApp.Database;
-using ShopListApp.Interfaces;
+using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Interfaces.Identity;
+using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.Models;
 using ShopListAppTests.IntegrationTests.WebApplicationFactories;
 using System.Net;
@@ -38,26 +40,27 @@ namespace ShopListAppTests.IntegrationTests
                 UserName = "test",
                 Email = "test@gmail.com"
             };
+
             var token = new Token
             {
                 Id = 1,
                 RefreshTokenHash = _tokenManager.GetHashRefreshToken("Xj4z8x+7Q0A=")!,
                 ExpirationDate = DateTime.Now.AddDays(1),
-                User = user
+                UserId = user.Id
             };
             var token1 = new Token
             {
                 Id = 2,
                 RefreshTokenHash = _tokenManager.GetHashRefreshToken("K3N5TzFhMkM=")!,
                 ExpirationDate = DateTime.Now.AddDays(-1),
-                User = user
+                UserId = user.Id
             };
             var token2 = new Token
             {
                 Id = 3,
                 RefreshTokenHash = _tokenManager.GetHashRefreshToken("T1hKQ1VmcDg=")!,
                 ExpirationDate = DateTime.Now.AddDays(1),
-                User = user,
+                UserId = user.Id,
                 IsRevoked = true
             };
             _manager.CreateAsync(user, "Password123@").Wait();

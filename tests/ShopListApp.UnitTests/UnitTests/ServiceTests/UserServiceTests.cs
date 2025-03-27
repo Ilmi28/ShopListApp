@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Moq;
 using ShopListApp.Commands;
+using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Exceptions;
-using ShopListApp.Interfaces;
 using ShopListApp.Models;
 using ShopListApp.Repositories;
 using ShopListApp.Services;
@@ -16,14 +18,14 @@ namespace ShopListAppTests.UnitTests.ServiceTests
 {
     public class UserServiceTests
     {
-        private Mock<UserManager<User>> _mockManager;
-        private Mock<IDbLogger<User>> _mockLogger;
+        private Mock<IUserManager> _mockManager;
+        private Mock<IDbLogger<UserDto>> _mockLogger;
         private UserService _userService;
         public UserServiceTests()
         {
             var store = new Mock<IUserStore<User>>();
-            _mockManager = new Mock<UserManager<User>>(store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
-            _mockLogger = new Mock<IDbLogger<User>>();
+            _mockManager = new Mock<IUserManager>();
+            _mockLogger = new Mock<IDbLogger<UserDto>>();
             _userService = new UserService(_mockLogger.Object, _mockManager.Object);
         }
 
@@ -36,7 +38,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 Email = "test@gmail.com",
                 Password = "Password123@"
             };
-            _mockManager.Setup(x => x.CreateAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(IdentityResult.Success);
+            _mockManager.Setup(x => x.CreateAsync(It.IsAny<UserDto>(), cmd.Password)).ReturnsAsync(true);
 
             var task = _userService.CreateUser(cmd);
 
@@ -62,7 +64,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 Email = "test@gmail.com",
                 Password = "Password123@"
             };
-            _mockManager.Setup(x => x.CreateAsync(It.IsAny<User>(), cmd.Password)).ThrowsAsync(new Exception());
+            _mockManager.Setup(x => x.CreateAsync(It.IsAny<UserDto>(), cmd.Password)).ThrowsAsync(new Exception());
 
             Func<Task> task = async () => await _userService.CreateUser(cmd);
 
@@ -77,10 +79,16 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             {
                 Password = "Password123@"
             };
-            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
-            _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
-            _mockManager.Setup(x => x.DeleteAsync(It.IsAny<User>())).ReturnsAsync(IdentityResult.Success);
-            _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(true);
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(userDto);
+            _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<UserDto>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true);
+            _mockManager.Setup(x => x.DeleteAsync(It.IsAny<UserDto>())).ReturnsAsync(true);
+            _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<UserDto>(), cmd.Password)).ReturnsAsync(true);
 
             var task = _userService.DeleteUser(id, cmd);
 
@@ -95,7 +103,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             {
                 Password = "Password123@"
             };
-            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((User?)null);
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((UserDto?)null);
 
             Func<Task> task = async () => await _userService.DeleteUser(id, cmd);
 
@@ -110,8 +118,8 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             {
                 Password = "Password123@"
             };
-            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((User?)null);
-            _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(false);
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((UserDto?)null);
+            _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<UserDto>(), cmd.Password)).ReturnsAsync(false);
 
             Func<Task> task = async () => await _userService.DeleteUser(id, cmd);
 
@@ -151,9 +159,15 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             {
                 Password = "Password123@"
             };
-            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
-            _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(true);
-            _mockManager.Setup(x => x.DeleteAsync(It.IsAny<User>())).ThrowsAsync(new Exception());
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(userDto);
+            _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<UserDto>(), cmd.Password)).ReturnsAsync(true);
+            _mockManager.Setup(x => x.DeleteAsync(It.IsAny<UserDto>())).ThrowsAsync(new Exception());
 
             Func<Task> task = async () => await _userService.DeleteUser(id, cmd);
 
@@ -169,9 +183,15 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 UserName = "updated",
                 CurrentPassword = "Password123@"
             };
-            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
-            _mockManager.Setup(x => x.UpdateAsync(It.IsAny<User>())).ReturnsAsync(IdentityResult.Success);
-            _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(userDto);
+            _mockManager.Setup(x => x.UpdateAsync(It.IsAny<UserDto>())).ReturnsAsync(true);
+            _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<UserDto>(), It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(true);
 
             var task = _userService.UpdateUser(id, cmd);
 
@@ -187,7 +207,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 UserName = "updated",
                 CurrentPassword = "Password123@"
             };
-            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((User?)null);
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((UserDto?)null);
 
             Func<Task> task = async () => await _userService.UpdateUser(id, cmd);
 
@@ -203,8 +223,8 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 UserName = "updated",
                 CurrentPassword = "Password123@"
             };
-            _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<User>(), It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(IdentityResult.Failed(new IdentityError { }));
+            _mockManager.Setup(x => x.ChangePasswordAsync(It.IsAny<UserDto>(), It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync(false);
 
             Func<Task> task = async () => await _userService.UpdateUser(id, cmd);
 
@@ -236,8 +256,14 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 UserName = "updated",
                 CurrentPassword = "Password123@"
             };
-            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(new User { Id = "1" });
-            _mockManager.Setup(x => x.UpdateAsync(It.IsAny<User>())).ThrowsAsync(new Exception());
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(userDto);
+            _mockManager.Setup(x => x.UpdateAsync(It.IsAny<UserDto>())).ThrowsAsync(new Exception());
 
             Func<Task> task = async () => await _userService.UpdateUser(id, cmd);
 
@@ -248,7 +274,13 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public async Task GetUserById_UserFound_ReturnsUser()
         {
             string id = "1";
-            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync(new User { Id = "1", UserName = "test" });
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync(userDto);
 
             var userView = await _userService.GetUserById(id);
 
@@ -259,7 +291,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public async Task GetUserById_UserNotFound_ThrowsUnathorizedAccessException()
         {
             string id = "1";
-            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((User?)null);
+            _mockManager.Setup(x => x.FindByIdAsync(id)).ReturnsAsync((UserDto?)null);
 
             Func<Task> task = async () => await _userService.GetUserById(id);
 

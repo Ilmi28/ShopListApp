@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ShopListApp.Database;
+using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.Interfaces.IRepositories;
 using ShopListApp.Models;
 

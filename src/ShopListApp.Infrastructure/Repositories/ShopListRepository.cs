@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ShopListApp.Database;
 using ShopListApp.Exceptions;
+using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.Interfaces.IRepositories;
 using ShopListApp.Models;
 
@@ -36,19 +36,19 @@ namespace ShopListApp.Repositories
             if (shopList == null) 
                 return false;
             shopList.Name = updatedShopList.Name;
-            shopList.User = updatedShopList.User;
+            shopList.UserId = updatedShopList.UserId;
             await _context.SaveChangesAsync();
             return true;
         }
 
         public async Task<ShopList?> GetShopListById(int id)
         {
-            return await _context.ShopLists.Include(x => x.User).FirstOrDefaultAsync(x => x.Id == id);
+            return await _context.ShopLists.FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<ICollection<ShopList>> GetShopListsByUser(string userId)
         {
-            return await _context.ShopLists.Include(x => x.User).Where(x => x.User.Id == userId).ToListAsync();
+            return await _context.ShopLists.Where(x => x.UserId == userId).ToListAsync();
         }
     }
 }

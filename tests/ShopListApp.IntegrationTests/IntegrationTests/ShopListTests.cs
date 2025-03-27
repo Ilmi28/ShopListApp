@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using ShopListApp.Commands;
-using ShopListApp.Database;
-using ShopListApp.Interfaces;
+using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces.Identity;
+using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.Models;
 using ShopListApp.ViewModels;
 using ShopListAppTests.IntegrationTests.WebApplicationFactories;
@@ -64,8 +65,8 @@ namespace ShopListAppTests.IntegrationTests
             };
             _context.Products.AddRange(products);
             _context.SaveChanges();
-            var shopList = new ShopList { Id = 1, Name = "Lista zakupów", User = user };
-            var shopList2 = new ShopList { Id = 2, Name = "Lista zakupów 2", User = otherUser };
+            var shopList = new ShopList { Id = 1, Name = "Lista zakupów", UserId = user.Id };
+            var shopList2 = new ShopList { Id = 2, Name = "Lista zakupów 2", UserId = otherUser.Id };
             _context.ShopLists.Add(shopList);
             _context.ShopLists.Add(shopList2);
             _context.SaveChanges();
@@ -87,7 +88,13 @@ namespace ShopListAppTests.IntegrationTests
             {
                 Name = "Test shop list"
             };
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PostAsJsonAsync("api/shoplist/create", cmd);
@@ -123,7 +130,13 @@ namespace ShopListAppTests.IntegrationTests
             {
                 Name = name!
             };
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
             var result = await _client.PostAsJsonAsync("api/shoplist/create", cmd);
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -133,7 +146,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task CreateShopList_NullRequest_ReturnsBadRequest()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PostAsJsonAsync("api/shoplist/create", (CreateShopListCommand?)null);
@@ -148,7 +167,13 @@ namespace ShopListAppTests.IntegrationTests
             {
                 Name = "Test shop list"
             };
-            string jwtToken = _tokenManager.GenerateAccessToken(new User { Id = "3" });
+            var userDto = new UserDto
+            {
+                Id = "3",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
             var result = await _client.PostAsJsonAsync("api/shoplist/create", cmd);
             Assert.Equal(HttpStatusCode.Unauthorized, result.StatusCode);
@@ -158,7 +183,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task DeleteShopList_OwnerAndAuthorized_ReturnsOK()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.DeleteAsync($"api/shoplist/delete/1");
@@ -174,7 +205,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task DeleteShopList_InvalidIdAndAuthorized_ReturnsNotFound()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.DeleteAsync($"api/shoplist/delete/3");
@@ -194,7 +231,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task DeleteShopList_UserNotOwner_ReturnsForbidden()
         {
             var user = await _userManager.FindByIdAsync("2");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.DeleteAsync($"api/shoplist/delete/1");
@@ -206,7 +249,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task AddProductToShopList_ProductAlreadyInShopListAndAuthorizedWIthQuantity_ReturnsOKAndAddsQuantity()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/add-product/1/1?quantity=2", null!);
@@ -222,7 +271,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task AddProductToShopList_ProductAlreadyInShopListAndAuthorizedWIthoutQuantity_ReturnsOKAndAddsOneQuantity()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/add-product/1/1", null!);
@@ -238,7 +293,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task AddProductToShopList_ProductNotInShopListAndAuthorizedWithQuantity_ReturnsOKAndAddsNewShopListProduct()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/add-product/1/3?quantity=2", null!);
@@ -254,7 +315,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task AddProductToShopList_ProductNotInShopListAndAuthorizedWithoutQuantity_ReturnsOKAndAddsNewShopListProductWIthOneQuantity()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/add-product/1/3", null!);
@@ -270,7 +337,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task AddProductToShopList_NonPositiveQuantity_ReturnsBadRequest()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/add-product/1/1?quantity=0", null!);
@@ -284,7 +357,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task AddProductToShopList_ShopListOrProductDoesntExist_ReturnsNotFound(int shopListId, int productId)
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/add-product/{shopListId}/{productId}?quantity=1", null!);
@@ -306,7 +385,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task AddProductToShopList_UserNotOwner_ReturnsForbidden()
         {
             var user = await _userManager.FindByIdAsync("2");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/add-product/1/1?quantity=1", null!);
@@ -318,7 +403,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task RemoveProductFromShopList_ProductInShopListAndAuthorizedWithoutQuantity_ReturnsOKAndRemovesProductEntirely()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/delete-product/1/1", null!);
@@ -332,7 +423,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task RemoveProductFromShopList_ProductInShopListAndAuthorizedWithQuantity_ReturnsOKAndRemovesProductQuantity()
         {
             var user = await _userManager.FindByIdAsync("2");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/delete-product/2/1?quantity=2", null!);
@@ -347,7 +444,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task RemoveProductFromShopList_ProductInShopListAndAuthorizedWithoutQuantity_ReturnsOkAndRemovesEntireProduct()
         {
             var user = await _userManager.FindByIdAsync("2");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/delete-product/2/1", null!);
@@ -361,7 +464,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task RemoveProductFromShopList_ProductNotInShopList_ReturnsNotFound()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/delete-product/1/3", null!);
@@ -373,7 +482,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task RemoveProductFromShopList_ProductInShopListButWrongUser_ReturnsForbidden()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/delete-product/2/1", null!);
@@ -385,7 +500,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task RemoveProductFromShopList_NonPositiveQuantity_ReturnsBadRequest()
         {
             var user = await _userManager.FindByIdAsync("2");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/delete-product/2/1?quantity=0", null!);
@@ -407,7 +528,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task RemoveProductFromShopList_UserNotOwner_ReturnsForbidden()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PatchAsync($"api/shoplist/update/delete-product/2/1", null!);
@@ -419,12 +546,18 @@ namespace ShopListAppTests.IntegrationTests
         public async Task GetShopList_AuthorizedAndValidId_ReturnsShopList()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.GetAsync("api/shoplist/get/1");
 
-            var shopList = await result.Content.ReadFromJsonAsync<ShopListView>();
+            var shopList = await result.Content.ReadFromJsonAsync<ShopListResponse>();
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
             Assert.Equal("Lista zakupów", shopList!.Name);
         }
@@ -443,7 +576,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task GetShopList_AuthorizedAndShopListDoesntExist_ReturnsNotFound()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
             var result = await _client.GetAsync("api/shoplist/get/3");
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
@@ -453,7 +592,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task GetShopList_UserNotOwner_ReturnsForbidden()
         {
             var user = await _userManager.FindByIdAsync("2");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.GetAsync("api/shoplist/get/1");
@@ -479,7 +624,13 @@ namespace ShopListAppTests.IntegrationTests
             {
                 Name = "Updated shop list"
             };
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PutAsJsonAsync("api/shoplist/update/1", cmd);
@@ -498,7 +649,13 @@ namespace ShopListAppTests.IntegrationTests
             {
                 Name = "Updated shop list"
             };
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PutAsJsonAsync("api/shoplist/update/3", cmd);
@@ -514,7 +671,13 @@ namespace ShopListAppTests.IntegrationTests
             {
                 Name = "Updated shop list"
             };
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.PutAsJsonAsync("api/shoplist/update/1", cmd);
@@ -539,12 +702,18 @@ namespace ShopListAppTests.IntegrationTests
         public async Task GetAllShopLists_Authorized_ReturnsShopLists()
         {
             var user = await _userManager.FindByIdAsync("1");
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var result = await _client.GetAsync("api/shoplist/get-all");
 
-            var shopLists = await result.Content.ReadFromJsonAsync<List<ShopListView>>();
+            var shopLists = await result.Content.ReadFromJsonAsync<List<ShopListResponse>>();
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
             Assert.Single(shopLists!);
         }

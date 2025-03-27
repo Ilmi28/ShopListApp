@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Presentation;
 using ShopListApp;
-using ShopListApp.Database;
+using ShopListApp.Infrastructure.Database.Context;
 using ShopListAppTests.Stubs;
 using System;
 using System.Collections.Generic;

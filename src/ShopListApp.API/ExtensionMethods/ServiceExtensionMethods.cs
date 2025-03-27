@@ -9,7 +9,14 @@ using Microsoft.OpenApi.Models;
 using ShopListApp.Application.AuthorizationPolicies.RequirementHandlers;
 using ShopListApp.Application.AuthorizationPolicies.Requirements;
 using ShopListApp.Application.HtmlFetchers;
-using ShopListApp.Database;
+using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Interfaces.Identity;
+using ShopListApp.Core.Interfaces.ILogger;
+using ShopListApp.Core.Interfaces.Parsing;
+using ShopListApp.Core.Interfaces.StoreObserver;
+using ShopListApp.Infrastructure.Database.Context;
+using ShopListApp.Infrastructure.Database.Identity;
 using ShopListApp.Interfaces;
 using ShopListApp.Interfaces.IRepositories;
 using ShopListApp.Interfaces.IServices;
@@ -18,6 +25,7 @@ using ShopListApp.Managers;
 using ShopListApp.Models;
 using ShopListApp.Repositories;
 using ShopListApp.Services;
+using ShopListApp.StoreObserver;
 using System.Text;
 
 namespace ShopListApp.ExtensionMethods
@@ -46,13 +54,14 @@ namespace ShopListApp.ExtensionMethods
 
         public static void AddLoggers(this IServiceCollection services)
         {
-            services.AddTransient<IDbLogger<User>, UserLogger>();
+            services.AddTransient<IDbLogger<UserDto>, UserLogger>();
             services.AddTransient<IDbLogger<ShopList>, ShopListLogger>();
         }
 
         public static void AddManagers(this IServiceCollection services)
         {
             services.AddTransient<ITokenManager, JwtTokenManager>();
+            services.AddTransient<IUserManager, UserManager>();
         }
 
         public static void AddParsing(this IServiceCollection services)
@@ -61,9 +70,13 @@ namespace ShopListApp.ExtensionMethods
             services.AddHttpClient();
         }
 
-        public static void AddIdentityDbContext(this IServiceCollection services)
+        public static void AddStoreObserver(this IServiceCollection services)
         {
-            var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
+            services.AddTransient<IStorePublisher, StorePublisher>();
+        }
+
+        public static void AddIdentityDbContext(this IServiceCollection services, IConfiguration configuration)
+        {
             var connString = Environment.GetEnvironmentVariable("ShopListAppConnectionString") 
                 ?? configuration!.GetConnectionString("DefaultConnection")
                 ?? String.Empty;
@@ -74,7 +87,7 @@ namespace ShopListApp.ExtensionMethods
             services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ShopListDbContext>();
         }
 
-        public static void AddJwtBearer(this IServiceCollection services)
+        public static void AddJwtBearer(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddAuthentication(options =>
             {
@@ -83,7 +96,6 @@ namespace ShopListApp.ExtensionMethods
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-                var configuration = services.BuildServiceProvider().GetService<IConfiguration>();
                 var tokenConfiguration = configuration!.GetSection("TokenConfiguration");
                 string secretKey = Environment.GetEnvironmentVariable("JwtSecretKey")
                     ?? tokenConfiguration.GetValue<string>("SecretKey")

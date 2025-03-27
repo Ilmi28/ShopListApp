@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Moq;
 using ShopListApp.Commands;
+using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Exceptions;
-using ShopListApp.Interfaces;
 using ShopListApp.Interfaces.IRepositories;
 using ShopListApp.Models;
 using ShopListApp.Services;
@@ -21,7 +23,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         private Mock<IShopListProductRepository> _mockShopListProductRepository;
         private Mock<IProductRepository> _mockProductRepository;
         private Mock<IDbLogger<ShopList>> _mockLogger;
-        private Mock<UserManager<User>> _mockUserManager;
+        private Mock<IUserManager> _mockUserManager;
         public ShopListServiceTests()
         {
             var store = new Mock<IUserStore<User>>();
@@ -29,7 +31,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             _mockShopListProductRepository = new Mock<IShopListProductRepository>();
             _mockProductRepository = new Mock<IProductRepository>();
             _mockLogger = new Mock<IDbLogger<ShopList>>();
-            _mockUserManager = new Mock<UserManager<User>>(store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
+            _mockUserManager = new Mock<IUserManager>();
             _shopListService = new ShopListService(_mockShopListRepository.Object,
                 _mockShopListProductRepository.Object,
                 _mockProductRepository.Object,
@@ -41,8 +43,13 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public void CreateShopList_ValidInput_CreatesShopList()
         {
             var cmd = new CreateShopListCommand { Name = "ShopList1" };
-            var user = new User { Id = "1", UserName = "User1" };
-            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(user);
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(userDto);
             _mockShopListRepository.Setup(x => x.AddShopList(It.IsAny<ShopList>())).Returns(Task.CompletedTask);
 
             var result = _shopListService.CreateShopList("1", cmd);
@@ -54,7 +61,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public async Task CreateShopList_InvalidUserId_ThrowsUnathorizedAccessException()
         {
             var cmd = new CreateShopListCommand { Name = "ShopList1" };
-            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync((User?)null);
+            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync((UserDto?)null);
             _mockShopListRepository.Setup(x => x.AddShopList(It.IsAny<ShopList>())).Returns(Task.CompletedTask);
 
             Func<Task> task = () => _shopListService.CreateShopList("1", cmd);
@@ -66,8 +73,13 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public async Task CreateShopList_DatabaseError_ThrowsDatabaseErrorException()
         {
             var cmd = new CreateShopListCommand { Name = "ShopList1" };
-            var user = new User { Id = "1", UserName = "User1" };
-            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(user);
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(userDto);
             _mockShopListRepository.Setup(x => x.AddShopList(It.IsAny<ShopList>())).ThrowsAsync(new Exception());
 
             Func<Task> task = () => _shopListService.CreateShopList("1", cmd);
@@ -98,10 +110,9 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public void AddProductToShopList_ValidArgs_AddsProduct()
         {
-            var user = new User { Id = "1", UserName = "User1" };
             var store = new Store { Id = 1, Name = "Store1" };
             var category = new Category { Name = "Category1" };
-            var shopList = new ShopList { Id = 1, Name = "ShopList1", User = user };
+            var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
             var product = new Product { Id = 1, Name = "Product1", Category = category, Store = store };
             _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync(shopList);
             _mockProductRepository.Setup(x => x.GetProductById(1)).ReturnsAsync(product);
@@ -114,10 +125,9 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task AddProductToShopList_InvalidShopListId_ThrowsShopListNotFoundException()
         {
-            var user = new User { Id = "1", UserName = "User1" };
             var store = new Store { Id = 1, Name = "Store1" };
             var category = new Category { Name = "Category1" };
-            var shopList = new ShopList { Id = 1, Name = "ShopList1", User = user };
+            var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
             var product = new Product { Id = 1, Name = "Product1", Category = category, Store = store };
             _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync((ShopList?)null);
 
@@ -129,10 +139,9 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task AddProductToShopList_InvalidProductId_ThrowsProductNotFoundException()
         {
-            var user = new User { Id = "1", UserName = "User1" };
             var store = new Store { Id = 1, Name = "Store1" };
             var category = new Category { Name = "Category1" };
-            var shopList = new ShopList { Id = 1, Name = "ShopList1", User = user };
+            var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
             var product = new Product { Id = 1, Name = "Product1", Category = category, Store = store };
             _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync((ShopList?)null);
 
@@ -144,10 +153,9 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task AddProductToShopList_DatabaseError_ThrowsDatabaseErrorException()
         {
-            var user = new User { Id = "1", UserName = "User1" };
             var store = new Store { Id = 1, Name = "Store1" };
             var category = new Category { Name = "Category1" };
-            var shopList = new ShopList { Id = 1, Name = "ShopList1", User = user };
+            var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
             var product = new Product { Id = 1, Name = "Product1", Category = category, Store = store };
             _mockShopListRepository.Setup(x => x.GetShopListById(1)).ThrowsAsync(new Exception());
 
@@ -167,7 +175,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 new Product { Id = 2, Name = "Product2", Store = store, Category = category },
                 new Product { Id = 3, Name = "Product3", Store = store, Category = category }
             };
-            var shopList = new ShopList { Id = 1, Name = "ShopList1", User = new User() };
+            var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
             _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync(shopList);
             _mockShopListProductRepository.Setup(x => x.GetProductsForShopList(1)).ReturnsAsync(shopListProducts);
             _mockShopListProductRepository.Setup(x => x.RemoveShopListProduct(1, 1)).ReturnsAsync(true);
@@ -194,7 +202,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task DeleteShopList_DatabaseError_ThrowsDatabaseErrorException()
         {
-            var shopList = new ShopList { Id = 1, Name = "ShopList1", User = new User() };
+            var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
             _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync(shopList);
             _mockShopListProductRepository.Setup(x => x.GetProductsForShopList(1)).ThrowsAsync(new Exception());
             Func<Task> task = () => _shopListService.DeleteShopList(1);
@@ -205,7 +213,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public async Task GetShopListById_ValidShopListId_ReturnsShopList()
         {
             var user = new User { Id = "1", UserName = "User1" };
-            var shopList = new ShopList { Id = 1, Name = "ShopList1", User = user };
+            var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
             var store = new Store { Id = 1, Name = "Store1" };
             var products = new List<Product>
             {
@@ -262,7 +270,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             {
                 Id = 1,
                 Name = "ShopList1",
-                User = new User()
+                UserId = "1"
             };
             var store = new Store { Id = 1, Name = "Store1" };
             var shopListProduct = new ShopListProduct
@@ -299,7 +307,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             {
                 Id = 1,
                 Name = "ShopList1",
-                User = new User()
+                UserId = "1"
             };
             _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync(shopList);
             _mockShopListProductRepository.Setup(x => x.RemoveShopListProduct(1, 1)).ReturnsAsync(false);
@@ -316,7 +324,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             {
                 Id = 1,
                 Name = "ShopList1",
-                User = new User()
+                UserId = "1"
             };
             var store = new Store { Id = 1, Name = "Store1" };
             var shopListProduct = new ShopListProduct
@@ -339,7 +347,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public void UpdateShopList_ValidInput_UpdatesShopList()
         {
-            var shopList = new ShopList { Id = 1, Name = "ShopList1", User = new User() };
+            var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
             var cmd = new UpdateShopListCommand { Name = "ShopList2" };
 
             _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync(shopList);
@@ -364,8 +372,8 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task UpdateShopList_DatabaseError_ThrowsDatabaseErrorException()
         {
-            var shopList = new ShopList { Id = 1, Name = "ShopList1", User = new User() };
-            var updatedShopList = new ShopList { Id = 1, Name = "ShopList2", User = new User() };
+            var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
+            var updatedShopList = new ShopList { Id = 1, Name = "ShopList2", UserId = "1" };
             var cmd = new UpdateShopListCommand { Name = "ShopList2" };
 
             _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync(shopList);
@@ -388,12 +396,17 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         public async Task GetShopListsForUser_ValidId_ReturnsShopLists()
         {
             var store = new Store { Id = 1, Name = "Store1" };
-            var user = new User { Id = "1", UserName = "User1" };
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
             var shopLists = new List<ShopList>
             {
-                new ShopList { Id = 1, Name = "ShopList1", User = user },
-                new ShopList { Id = 2, Name = "ShopList2", User = user },
-                new ShopList { Id = 3, Name = "ShopList3", User = user }
+                new ShopList { Id = 1, Name = "ShopList1", UserId = "1" },
+                new ShopList { Id = 2, Name = "ShopList2", UserId = "1" },
+                new ShopList { Id = 3, Name = "ShopList3", UserId = "1" }
             };
             var shopListProduct = new ShopListProduct
             {
@@ -402,7 +415,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 Product = new Product { Id = 1, Name = "Product1", Store = store },
                 Quantity = 1
             };
-            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(user);
+            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(userDto);
             _mockShopListRepository.Setup(x => x.GetShopListsByUser("1")).ReturnsAsync(shopLists);
             _mockShopListProductRepository.Setup(x => x.GetProductsForShopList(It.IsAny<int>())).ReturnsAsync(new List<Product>());
             _mockShopListProductRepository.Setup(x => x.GetShopListProduct(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(shopListProduct);
@@ -418,7 +431,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task GetShopListsForUser_InvalidUserId_ThrowsUnauthorizedAccessException()
         {
-            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync((User?)null);
+            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync((UserDto?)null);
             Func<Task> task = () => _shopListService.GetShopListsForUser("1");
             await Assert.ThrowsAsync<UnauthorizedAccessException>(task);
         }
@@ -433,8 +446,13 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task GetShopListsForUser_DatabaseError_ThrowsDatabaseErrorException()
         {
-            var user = new User { Id = "1", UserName = "User1" };
-            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(user);
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(userDto);
             _mockShopListRepository.Setup(x => x.GetShopListsByUser("1")).ThrowsAsync(new Exception());
             Func<Task> task = () => _shopListService.GetShopListsForUser("1");
             await Assert.ThrowsAsync<DatabaseErrorException>(task);

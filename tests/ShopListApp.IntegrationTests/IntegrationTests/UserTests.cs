@@ -4,8 +4,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Linq;
 using ShopListApp.Commands;
-using ShopListApp.Database;
-using ShopListApp.Interfaces;
+using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces.Identity;
 using ShopListApp.Models;
 using ShopListAppTests.IntegrationTests.WebApplicationFactories;
 using ShopListAppTests.Stubs;
@@ -61,7 +61,13 @@ namespace ShopListAppTests.IntegrationTests
         {
             var user = await _manager.FindByIdAsync("1");
             string? oldHashPassword = user!.PasswordHash;
-            string jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
             var cmd = new UpdateUserCommand
             {
@@ -73,9 +79,8 @@ namespace ShopListAppTests.IntegrationTests
 
             var response = await _client.PutAsJsonAsync("api/user/update", cmd);
 
-
-            await _context.Entry(user).ReloadAsync();
-            var updatedUser = await _manager.FindByIdAsync("1");
+            await _context.Entry(user!).ReloadAsync();
+            var updatedUser = await _manager.FindByIdAsync(userDto.Id);
             var userLogCount = _context.UserLogs.Count();
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -96,7 +101,13 @@ namespace ShopListAppTests.IntegrationTests
                 NewPassword = null
             };
             var oldUser = await _manager.FindByIdAsync("1");
-            var jwtToken = _tokenManager.GenerateAccessToken(oldUser!);
+            var userDto = new UserDto
+            {
+                Id = oldUser!.Id,
+                UserName = oldUser.UserName!,
+                Email = oldUser.Email!
+            };
+            var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var response = await _client.PutAsJsonAsync("api/user/update", cmd);
@@ -117,7 +128,13 @@ namespace ShopListAppTests.IntegrationTests
         {
             UpdateUserCommand? cmd = null;
             var user = await _manager.FindByIdAsync("1");
-            var jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var response = await _client.PutAsJsonAsync("api/user/update", cmd);
@@ -138,7 +155,13 @@ namespace ShopListAppTests.IntegrationTests
             };
 
             var user = await _manager.FindByIdAsync("1");
-            var jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var response = await _client.PutAsJsonAsync("api/user/update", cmd);
@@ -161,7 +184,13 @@ namespace ShopListAppTests.IntegrationTests
                 NewPassword = password
             };
             var user = await _manager.FindByIdAsync("1");
-            var jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var response = await _client.PutAsJsonAsync("api/user/update", cmd);
@@ -196,7 +225,13 @@ namespace ShopListAppTests.IntegrationTests
                 Password = "Password123@"
             };
             var user = await _manager.FindByIdAsync("1");
-            var jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var request = new HttpRequestMessage
@@ -222,7 +257,13 @@ namespace ShopListAppTests.IntegrationTests
                 Password = "InvalidPassword123@"
             };
             var user = await _manager.FindByIdAsync("1");
-            var jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
             var request = new HttpRequestMessage
             {
@@ -243,7 +284,13 @@ namespace ShopListAppTests.IntegrationTests
         {
             DeleteUserCommand? cmd = null;
             var user = await _manager.FindByIdAsync("1");
-            var jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
             var request = new HttpRequestMessage
             {
@@ -281,7 +328,13 @@ namespace ShopListAppTests.IntegrationTests
         public async Task GetUser_ValidToken_ReturnsOK()
         {
             var user = await _manager.FindByIdAsync("1");
-            var jwtToken = _tokenManager.GenerateAccessToken(user!);
+            var userDto = new UserDto
+            {
+                Id = user!.Id,
+                UserName = user.UserName!,
+                Email = user.Email!
+            };
+            var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
             var response = await _client.GetAsync("api/user/get");

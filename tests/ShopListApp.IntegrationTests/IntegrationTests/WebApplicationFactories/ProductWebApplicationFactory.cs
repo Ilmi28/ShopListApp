@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Presentation;
-using ShopListApp.Database;
-using ShopListApp.Interfaces;
+using ShopListApp.Core.Interfaces.Parsing;
+using ShopListApp.Infrastructure.Database.Context;
 using ShopListAppTests.Stubs;
 
 namespace ShopListAppTests.IntegrationTests.WebApplicationFactories

@@ -14,15 +14,15 @@ namespace ShopListApp.Services
             _storeRepository = storeRepository;
         }
 
-        public async Task<ICollection<StoreView>> GetStores()
+        public async Task<ICollection<StoreResponse>> GetStores()
         {
             try
             {
                 var stores = await _storeRepository.GetStores();
-                var storeViews = new List<StoreView>();
+                var storeViews = new List<StoreResponse>();
                 foreach (var store in stores)
                 {
-                    var storeView = new StoreView
+                    var storeView = new StoreResponse
                     {
                         Id = store.Id,
                         Name = store.Name,
@@ -37,12 +37,12 @@ namespace ShopListApp.Services
             }
         }
 
-        public async Task<StoreView> GetStoreById(int id)
+        public async Task<StoreResponse> GetStoreById(int id)
         {
             try
             {
                 var store = await _storeRepository.GetStoreById(id) ?? throw new StoreNotFoundException();
-                var storeView = new StoreView
+                var storeView = new StoreResponse
                 {
                     Id = store.Id,
                     Name = store.Name,

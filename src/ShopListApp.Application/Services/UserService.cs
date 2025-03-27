@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ShopListApp.Commands;
+using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Enums;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
@@ -10,9 +13,9 @@ namespace ShopListApp.Services
 {
     public class UserService : IUserService
     {
-        private IDbLogger<User> _logger;
-        private UserManager<User> _userManager;
-        public UserService(IDbLogger<User> logger, UserManager<User> userManager)
+        private IDbLogger<UserDto> _logger;
+        private IUserManager _userManager;
+        public UserService(IDbLogger<UserDto> logger, IUserManager userManager)
         {
             _logger = logger;
             _userManager = userManager;
@@ -21,8 +24,9 @@ namespace ShopListApp.Services
         public async Task CreateUser(CreateUserCommand cmd)
         {
             _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
-            var user = new User
+            var user = new UserDto
             {
+                Id = Guid.NewGuid().ToString(),
                 UserName = cmd.UserName,
                 Email = cmd.Email,
             };
@@ -50,9 +54,9 @@ namespace ShopListApp.Services
                 if (!isPasswordCorrect)
                     throw new UnauthorizedAccessException();
                 var result = await _userManager.DeleteAsync(user);
-                if (!result.Succeeded)
+                if (!result)
                     throw new UnauthorizedAccessException();
-                await _logger.Log(Operation.Delete, new User { Id = id });
+                await _logger.Log(Operation.Delete, user);
             }
             catch (UnauthorizedAccessException)
             {
@@ -77,7 +81,7 @@ namespace ShopListApp.Services
                 var passwordResult = await _userManager.ChangePasswordAsync(user, 
                     cmd.CurrentPassword, 
                     cmd.NewPassword ?? cmd.CurrentPassword);
-                if (!result.Succeeded || !passwordResult.Succeeded)
+                if (!result || !passwordResult)
                     throw new UnauthorizedAccessException();
                 int propertiesCount = typeof(UpdateUserCommand).GetProperties().Length;
                 int nullCount = GetLengthOfNullProperties(cmd);
@@ -103,7 +107,7 @@ namespace ShopListApp.Services
             return nullCount;
         }
 
-        public async Task<UserView> GetUserById(string id)
+        public async Task<UserResponse> GetUserById(string id)
         {
             _ = id ?? throw new ArgumentNullException(nameof(id));
             try
@@ -111,7 +115,7 @@ namespace ShopListApp.Services
                 var user = await _userManager.FindByIdAsync(id);
                 if (user == null)
                     throw new UnauthorizedAccessException();
-                var view = new UserView
+                var view = new UserResponse
                 {
                     UserName = user.UserName!,
                     Email = user.Email!

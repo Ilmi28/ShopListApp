@@ -8,6 +8,6 @@ namespace ShopListApp.Interfaces
         Task CreateUser(CreateUserCommand cmd);
         Task DeleteUser(string id, DeleteUserCommand cmd);
         Task UpdateUser(string id, UpdateUserCommand updatedUser);
-        Task<UserView> GetUserById(string id);
+        Task<UserResponse> GetUserById(string id);
     }
 }

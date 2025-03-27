@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using ShopListApp.Database;
+using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.Models;
 using ShopListAppTests.IntegrationTests.WebApplicationFactories;
 using ShopListAppTests.Stubs;

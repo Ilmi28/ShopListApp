@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Moq;
 using ShopListApp.Commands;
+using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Interfaces.Identity;
+using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
 using ShopListApp.Models;
@@ -11,15 +15,15 @@ namespace ShopListAppTests.UnitTests.ServiceTests
     public class AuthServiceTests
     {
         private AuthService _authService;
-        private Mock<UserManager<User>> _mockUserManager;
-        private Mock<IDbLogger<User>> _mockLogger;
+        private Mock<IUserManager> _mockUserManager;
+        private Mock<IDbLogger<UserDto>> _mockLogger;
         private Mock<ITokenManager> _mockTokenManager;
         private Mock<ITokenRepository> _mockTokenRepository;
         public AuthServiceTests()
         {
             var store = new Mock<IUserStore<User>>();
-            _mockUserManager = new Mock<UserManager<User>>(store.Object, null!, null!, null!, null!, null!, null!, null!, null!);
-            _mockLogger = new Mock<IDbLogger<User>>();
+            _mockUserManager = new Mock<IUserManager>();
+            _mockLogger = new Mock<IDbLogger<UserDto>>();
             _mockTokenManager = new Mock<ITokenManager>();
             _mockTokenRepository = new Mock<ITokenRepository>();
             _authService = new AuthService(_mockUserManager.Object, _mockLogger.Object, _mockTokenManager.Object, _mockTokenRepository.Object);
@@ -34,9 +38,9 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 Email = "test@gmail.com",
                 Password = "Password123@"
             };
-            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.Email)).ReturnsAsync((User?)null);
-            _mockUserManager.Setup(x => x.CreateAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(IdentityResult.Success);
-            _mockTokenManager.Setup(x => x.GenerateAccessToken(It.IsAny<User>())).Returns("token");
+            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.Email)).ReturnsAsync((UserDto?)null);
+            _mockUserManager.Setup(x => x.CreateAsync(It.IsAny<UserDto>(), cmd.Password)).ReturnsAsync(true);
+            _mockTokenManager.Setup(x => x.GenerateAccessToken(It.IsAny<UserDto>())).Returns("token");
             _mockTokenManager.Setup(x => x.GenerateRefreshToken()).Returns("refreshToken");
             _mockTokenManager.Setup(x => x.GetHashRefreshToken("refreshToken")).Returns("hashedRefreshToken");
             _mockTokenRepository.Setup(x => x.AddToken(It.IsAny<Token>())).ReturnsAsync(true);
@@ -56,7 +60,13 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 Email = "test@gmail.com",
                 Password = "Password123@"
             };
-            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.Email)).ReturnsAsync(new User());
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.Email)).ReturnsAsync(userDto);
 
             Func<Task> task = async () => await _authService.RegisterUser(cmd);
 
@@ -72,7 +82,13 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 Email = "test@gmail.com",
                 Password = "Password123@"
             };
-            _mockUserManager.Setup(x => x.FindByNameAsync(cmd.UserName)).ReturnsAsync(new User());
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockUserManager.Setup(x => x.FindByNameAsync(cmd.UserName)).ReturnsAsync(userDto);
 
             Func<Task> task = async () => await _authService.RegisterUser(cmd);
 
@@ -98,8 +114,8 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 Email = "test@gmail.com",
                 Password = "Password123@"
             };
-            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.Email)).ReturnsAsync((User?)null);
-            _mockUserManager.Setup(x => x.CreateAsync(It.IsAny<User>(), cmd.Password)).ThrowsAsync(new Exception());
+            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.Email)).ReturnsAsync((UserDto?)null);
+            _mockUserManager.Setup(x => x.CreateAsync(It.IsAny<UserDto>(), cmd.Password)).ThrowsAsync(new Exception());
 
             Func<Task> task = async () => await _authService.RegisterUser(cmd);
 
@@ -114,10 +130,15 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 UserIdentifier = "test@gmail.com",
                 Password = "Password123@"
             };
-
-            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync(new User());
-            _mockUserManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(true);
-            _mockTokenManager.Setup(x => x.GenerateAccessToken(It.IsAny<User>())).Returns("token");
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync(userDto);
+            _mockUserManager.Setup(x => x.CheckPasswordAsync(It.IsAny<UserDto>(), cmd.Password)).ReturnsAsync(true);
+            _mockTokenManager.Setup(x => x.GenerateAccessToken(It.IsAny<UserDto>())).Returns("token");
             _mockTokenManager.Setup(x => x.GenerateRefreshToken()).Returns("refreshToken");
             _mockTokenManager.Setup(x => x.GetHashRefreshToken("refreshToken")).Returns("hashedRefreshToken");
             _mockTokenRepository.Setup(x => x.AddToken(It.IsAny<Token>())).ReturnsAsync(true);
@@ -136,10 +157,15 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 UserIdentifier = "test@gmail.com",
                 Password = "Password123@"
             };
-
-            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync(new User());
-            _mockUserManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(true);
-            _mockTokenManager.Setup(x => x.GenerateAccessToken(It.IsAny<User>())).Returns("token");
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync(userDto);
+            _mockUserManager.Setup(x => x.CheckPasswordAsync(It.IsAny<UserDto>(), cmd.Password)).ReturnsAsync(true);
+            _mockTokenManager.Setup(x => x.GenerateAccessToken(It.IsAny<UserDto>())).Returns("token");
             _mockTokenManager.Setup(x => x.GenerateRefreshToken()).Returns("refreshToken");
             _mockTokenManager.Setup(x => x.GetHashRefreshToken("refreshToken")).Returns("hashedRefreshToken");
             _mockTokenRepository.Setup(x => x.AddToken(It.IsAny<Token>())).ReturnsAsync(true);
@@ -159,8 +185,8 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 Password = "Password123@"
             };
 
-            _mockUserManager.Setup(x => x.FindByNameAsync(cmd.UserIdentifier)).ReturnsAsync((User?)null);
-            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync((User?)null);
+            _mockUserManager.Setup(x => x.FindByNameAsync(cmd.UserIdentifier)).ReturnsAsync((UserDto?)null);
+            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync((UserDto?)null);
 
             Func<Task> task = async () => await _authService.LoginUser(cmd);
 
@@ -175,9 +201,14 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 UserIdentifier = "test",
                 Password = "Password123@"
             };
-
-            _mockUserManager.Setup(x => x.FindByNameAsync(cmd.UserIdentifier)).ReturnsAsync(new User());
-            _mockUserManager.Setup(x => x.CheckPasswordAsync(It.IsAny<User>(), cmd.Password)).ReturnsAsync(false);
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
+            _mockUserManager.Setup(x => x.FindByNameAsync(cmd.UserIdentifier)).ReturnsAsync(userDto);
+            _mockUserManager.Setup(x => x.CheckPasswordAsync(It.IsAny<UserDto>(), cmd.Password)).ReturnsAsync(false);
 
             Func<Task> task = async () => await _authService.LoginUser(cmd);
 
@@ -202,7 +233,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
                 UserIdentifier = "test",
                 Password = "Password123@"
             };
-            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync((User?)null);
+            _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync((UserDto?)null);
             _mockUserManager.Setup(x => x.FindByNameAsync(cmd.UserIdentifier)).ThrowsAsync(new Exception());
 
             Func<Task> task = async () => await _authService.LoginUser(cmd);
@@ -217,11 +248,16 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             {
                 RefreshToken = "refreshToken"
             };
-            var user = new User { Id = "1" };
+            var userDto = new UserDto
+            {
+                Id = "1",
+                UserName = "test",
+                Email = "test@gmail.com"
+            };
             _mockTokenManager.Setup(x => x.GetHashRefreshToken(cmd.RefreshToken)).Returns("hash");
-            _mockTokenRepository.Setup(x => x.GetToken("hash")).ReturnsAsync(new Token {User = user, RefreshTokenHash = "hash" });
-            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(user);
-            _mockTokenManager.Setup(x => x.GenerateAccessToken(It.IsAny<User>())).Returns("token");
+            _mockTokenRepository.Setup(x => x.GetToken("hash")).ReturnsAsync(new Token { UserId = userDto.Id, RefreshTokenHash = "hash" });
+            _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(userDto);
+            _mockTokenManager.Setup(x => x.GenerateAccessToken(It.IsAny<UserDto>())).Returns("token");
 
             string jwtToken = await _authService.RefreshAccessToken(cmd);
 

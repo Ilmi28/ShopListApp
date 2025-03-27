@@ -1,6 +1,6 @@
-﻿using ShopListApp.Database;
+﻿using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Enums;
-using ShopListApp.Interfaces;
+using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.Models;
 
 namespace ShopListApp.Loggers

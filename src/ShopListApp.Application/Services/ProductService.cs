@@ -1,39 +1,31 @@
 ﻿using HtmlAgilityPack;
-using ShopListApp.DataProviders;
+using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces.StoreObserver;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
 using ShopListApp.Interfaces.IRepositories;
 using ShopListApp.Interfaces.IServices;
 using ShopListApp.Models;
-using ShopListApp.StoreObserver;
 using ShopListApp.ViewModels;
 
 namespace ShopListApp.Services
 {
     public class ProductService : IProductService
     {
-        private readonly StorePublisher _storePublisher = new();
+        private readonly IStorePublisher _storePublisher;
         private readonly IProductRepository _productRepository;
         private readonly IStoreRepository _storeRepository;
         private readonly ICategoryRepository _categoryRepository;
-        private readonly IHtmlFetcher<HtmlNode, HtmlDocument> _htmlFetcher;
         public ProductService(IProductRepository productRepository, IStoreRepository storeRepository, 
-            ICategoryRepository categoryRepository, IHtmlFetcher<HtmlNode, HtmlDocument> htmlFetcher)
+            ICategoryRepository categoryRepository, IStorePublisher storePublisher)
         {
+            _storePublisher = storePublisher;
             _productRepository = productRepository;
             _storeRepository = storeRepository;
             _categoryRepository = categoryRepository;
-            _htmlFetcher = htmlFetcher;
-            InitializeSubscribers();
         }
 
-        private void InitializeSubscribers()
-        {
-            var biedronkaParser = new BiedronkaParser(_htmlFetcher);
-            _storePublisher.Subscribe(new StoreSubscriber(biedronkaParser, _productRepository, _categoryRepository, _storeRepository));
-        }
-
-        public async Task<ICollection<ProductView>> GetAllProducts()
+        public async Task<ICollection<ProductResponse>> GetAllProducts()
         {
             try
             {
@@ -44,7 +36,7 @@ namespace ShopListApp.Services
             catch { throw new DatabaseErrorException(); }
         }
 
-        public async Task<ICollection<ProductView>> GetProductsByCategoryId(int categoryId)
+        public async Task<ICollection<ProductResponse>> GetProductsByCategoryId(int categoryId)
         {
             try
             {
@@ -58,7 +50,7 @@ namespace ShopListApp.Services
             catch { throw new DatabaseErrorException(); }
         }
 
-        public async Task<ICollection<ProductView>> GetProductsByStoreId(int storeId)
+        public async Task<ICollection<ProductResponse>> GetProductsByStoreId(int storeId)
         {
             try
             {
@@ -76,20 +68,21 @@ namespace ShopListApp.Services
         {
             try
             {
+                _storePublisher.AddSubscribers();
                 await _storePublisher.Notify();
             }
             catch { throw new FetchingErrorException(); }
         }
 
-        public async Task<ICollection<CategoryView>> GetCategories()
+        public async Task<ICollection<CategoryResponse>> GetCategories()
         {
             try
             {
                 var categories = await _categoryRepository.GetAllCategories();
-                var categoryViews = new List<CategoryView>();
+                var categoryViews = new List<CategoryResponse>();
                 foreach (var category in categories)
                 {
-                    var categoryView = new CategoryView
+                    var categoryView = new CategoryResponse
                     {
                         Id = category.Id,
                         Name = category.Name,
@@ -101,12 +94,12 @@ namespace ShopListApp.Services
             catch { throw new DatabaseErrorException(); }
         }
 
-        private ICollection<ProductView> GetProductViewsList(ICollection<Product> products)
+        private ICollection<ProductResponse> GetProductViewsList(ICollection<Product> products)
         {
-            var productViews = new List<ProductView>();
+            var productViews = new List<ProductResponse>();
             foreach (var product in products)
             {
-                var productView = new ProductView
+                var productView = new ProductResponse
                 {
                     Id = product.Id,  
                     Name = product.Name,
@@ -122,12 +115,12 @@ namespace ShopListApp.Services
             return productViews;
         }
 
-        public async Task<ProductView?> GetProductById(int id)
+        public async Task<ProductResponse?> GetProductById(int id)
         {
             try
             {
                 var product = await _productRepository.GetProductById(id) ?? throw new ProductNotFoundException();
-                var productView = new ProductView
+                var productView = new ProductResponse
                 {
                     Id = product.Id,
                     Name = product.Name,

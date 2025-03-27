@@ -7,8 +7,7 @@ namespace ShopListApp.Models
     {
         public int Id { get; set; }
         public required string Name { get; set; }
-        [ForeignKey("UserId")]
-        public required User User { get; set; }
+        public required string UserId { get; set; }
         public bool IsDeleted { get; set; } = false;
     }
 }

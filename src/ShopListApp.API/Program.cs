@@ -26,12 +26,13 @@ namespace Presentation
             builder.Services.AddLoggers();
             builder.Services.AddManagers();
             builder.Services.AddParsing();
-            builder.Services.AddIdentityDbContext();
-            builder.Services.AddJwtBearer();
+            builder.Services.AddIdentityDbContext(builder.Configuration);
+            builder.Services.AddJwtBearer(builder.Configuration);
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGenWithAuthorization();
             builder.Services.AddAuthorizationWithHandlers();
+            builder.Services.AddStoreObserver();
 
         }
 

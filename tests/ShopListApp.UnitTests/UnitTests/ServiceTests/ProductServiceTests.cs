@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Moq;
+using ShopListApp.Core.Interfaces.StoreObserver;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
 using ShopListApp.Interfaces.IRepositories;
@@ -19,15 +20,15 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         private Mock<IProductRepository> _mockProductRepository;
         private Mock<IStoreRepository> _mockStoreRepository;
         private Mock<ICategoryRepository> _mockCategoryRepository;
-        private Mock<IHtmlFetcher<HtmlNode, HtmlDocument>> _stubHtmlFetcher;
+        private Mock<IStorePublisher> _mockStorePublisher;
         public ProductServiceTests()
         {
             _mockProductRepository = new Mock<IProductRepository>();
             _mockStoreRepository = new Mock<IStoreRepository>();
             _mockCategoryRepository = new Mock<ICategoryRepository>();
-            _stubHtmlFetcher = new Mock<IHtmlFetcher<HtmlNode, HtmlDocument>>();
+            _mockStorePublisher = new Mock<IStorePublisher>();
             _productService = new ProductService(_mockProductRepository.Object, _mockStoreRepository.Object, 
-                _mockCategoryRepository.Object, _stubHtmlFetcher.Object);
+                _mockCategoryRepository.Object, _mockStorePublisher.Object);
         }
 
         [Fact]

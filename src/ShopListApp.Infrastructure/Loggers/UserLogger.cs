@@ -1,18 +1,19 @@
-﻿using ShopListApp.Database;
+﻿using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Enums;
-using ShopListApp.Interfaces;
+using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.Models;
 
 namespace ShopListApp.Loggers
 {
-    public class UserLogger : IDbLogger<User>
+    public class UserLogger : IDbLogger<UserDto>
     {
         private readonly ShopListDbContext _context;
         public UserLogger(ShopListDbContext context)
         {
             _context = context;
         }
-        public async Task Log(Operation operation, User loggedObject)
+        public async Task Log(Operation operation, UserDto loggedObject)
         {
             var log = new UserLog
             {

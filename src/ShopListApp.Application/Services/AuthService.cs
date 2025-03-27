@@ -1,5 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ShopListApp.Commands;
+using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Interfaces.Identity;
+using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Enums;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
@@ -10,12 +14,12 @@ namespace ShopListApp.Services
 {
     public class AuthService : IAuthService
     {
-        private UserManager<User> _userManager;
-        private IDbLogger<User> _logger;
+        private IUserManager _userManager;
+        private IDbLogger<UserDto> _logger;
         private ITokenManager _tokenManager;
         private ITokenRepository _tokenRepository;
-        public AuthService(UserManager<User> userManager, 
-            IDbLogger<User> logger,
+        public AuthService(IUserManager userManager, 
+            IDbLogger<UserDto> logger,
             ITokenManager tokenManager, 
             ITokenRepository tokenRepository)
         {
@@ -28,8 +32,9 @@ namespace ShopListApp.Services
         public async Task<(string identityToken, string refreshToken)> RegisterUser(CreateUserCommand cmd)
         {
             _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
-            var user = new User
+            var user = new UserDto
             {
+                Id = Guid.NewGuid().ToString(),
                 UserName = cmd.UserName,
                 Email = cmd.Email,
             };
@@ -60,11 +65,11 @@ namespace ShopListApp.Services
             }
         }
 
-        private async Task CreateRefreshTokenInDb(string refreshToken, User user)
+        private async Task CreateRefreshTokenInDb(string refreshToken, UserDto user)
         {
             var token = new Token
             {
-                User = user,
+                UserId = user.Id,
                 RefreshTokenHash = refreshToken,
                 ExpirationDate = DateTime.Now.AddDays(_tokenManager.GetRefreshTokenExpirationDays())
             };
@@ -113,7 +118,7 @@ namespace ShopListApp.Services
                                                         ?? throw new UnauthorizedAccessException();
                 var token = await _tokenRepository.GetToken(hash)
                                                         ?? throw new UnauthorizedAccessException();
-                var user = await _userManager.FindByIdAsync(token.User.Id)
+                var user = await _userManager.FindByIdAsync(token.UserId)
                                                         ?? throw new UnauthorizedAccessException();
                 var identityToken = _tokenManager.GenerateAccessToken(user);
                 return identityToken;
