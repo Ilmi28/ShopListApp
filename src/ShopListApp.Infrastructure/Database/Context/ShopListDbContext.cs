@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using ShopListApp.Infrastructure.Database.Identity.AppUser;
 using ShopListApp.Interfaces;
 using ShopListApp.Models;
 using System.Reflection;

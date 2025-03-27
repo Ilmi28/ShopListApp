@@ -1,4 +1,5 @@
-﻿using ShopListApp.Commands;
+﻿using ShopListApp.Core.Commands.Create;
+using ShopListApp.Core.Commands.Update;
 using ShopListApp.ViewModels;
 
 namespace ShopListApp.Interfaces.IServices

@@ -1,4 +1,4 @@
-﻿namespace ShopListApp.Commands
+﻿namespace ShopListApp.Core.Commands.Other
 {
     public class FetchCategoryCommand
     {

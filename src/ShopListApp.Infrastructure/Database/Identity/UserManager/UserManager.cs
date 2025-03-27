@@ -1,22 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces;
-using ShopListApp.Models;
+using ShopListApp.Infrastructure.Database.Identity.AppUser;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShopListApp.Infrastructure.Database.Identity
+namespace ShopListApp.Infrastructure.Database.Identity.UserManager
 {
-    public class UserManager : IUserManager
+    public class UserManager(UserManager<User> userManager) : IUserManager
     {
-        private readonly UserManager<User> _userManager;
-        public UserManager(UserManager<User> userManager)
-        {
-            _userManager = userManager;
-        }
+        private readonly UserManager<User> _userManager = userManager;
+
         public async Task<bool> ChangePasswordAsync(UserDto user, string currentPassword, string newPassword)
         {
             var dbUser = await _userManager.FindByIdAsync(user.Id); 

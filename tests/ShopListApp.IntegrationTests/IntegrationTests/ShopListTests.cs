@@ -1,23 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Create;
+using ShopListApp.Core.Commands.Update;
 using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces.Identity;
 using ShopListApp.Infrastructure.Database.Context;
+using ShopListApp.Infrastructure.Database.Identity.AppUser;
 using ShopListApp.Models;
 using ShopListApp.ViewModels;
 using ShopListAppTests.IntegrationTests.WebApplicationFactories;
-using ShopListAppTests.Stubs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ShopListAppTests.IntegrationTests
+namespace ShopListApp.IntegrationTests.IntegrationTests
 {
     public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
     {

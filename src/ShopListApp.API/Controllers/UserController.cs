@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Delete;
 using ShopListApp.Interfaces;
 using ShopListApp.Managers;
 using ShopListApp.Models;

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ShopListApp.Commands
+namespace ShopListApp.Core.Commands.Delete
 {
     public class DeleteUserCommand
     {

@@ -1,4 +1,5 @@
 ﻿using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Delete;
 using ShopListApp.ViewModels;
 
 namespace ShopListApp.Interfaces

@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Moq;
 using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Delete;
 using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces;
 using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Exceptions;
-using ShopListApp.Models;
+using ShopListApp.Infrastructure.Database.Identity.AppUser;
 using ShopListApp.Repositories;
 using ShopListApp.Services;
 using System;

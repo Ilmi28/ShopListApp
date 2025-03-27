@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Auth;
 using ShopListApp.Interfaces.IServices;
 
 namespace ShopListApp.Controllers

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Create;
+using ShopListApp.Core.Commands.Update;
 using ShopListApp.Filters;
 using ShopListApp.Interfaces.IServices;
 using System.Security.Claims;

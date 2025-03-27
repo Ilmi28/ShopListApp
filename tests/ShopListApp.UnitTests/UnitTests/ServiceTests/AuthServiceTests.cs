@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Moq;
 using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Auth;
 using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces;
 using ShopListApp.Core.Interfaces.Identity;
 using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Exceptions;
+using ShopListApp.Infrastructure.Database.Identity.AppUser;
 using ShopListApp.Interfaces;
 using ShopListApp.Models;
 using ShopListApp.Services;
@@ -21,7 +23,6 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         private Mock<ITokenRepository> _mockTokenRepository;
         public AuthServiceTests()
         {
-            var store = new Mock<IUserStore<User>>();
             _mockUserManager = new Mock<IUserManager>();
             _mockLogger = new Mock<IDbLogger<UserDto>>();
             _mockTokenManager = new Mock<ITokenManager>();
@@ -68,7 +69,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             };
             _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.Email)).ReturnsAsync(userDto);
 
-            Func<Task> task = async () => await _authService.RegisterUser(cmd);
+            async Task task() => await _authService.RegisterUser(cmd);
 
             await Assert.ThrowsAsync<UserWithEmailAlreadyExistsException>(task);
         }

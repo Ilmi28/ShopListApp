@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
+using ShopListApp.API.ExtensionMethods;
 using ShopListApp.Application.AuthorizationPolicies.RequirementHandlers;
 using ShopListApp.Application.AuthorizationPolicies.Requirements;
 using ShopListApp.Application.HtmlFetchers;
@@ -16,7 +17,8 @@ using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Core.Interfaces.Parsing;
 using ShopListApp.Core.Interfaces.StoreObserver;
 using ShopListApp.Infrastructure.Database.Context;
-using ShopListApp.Infrastructure.Database.Identity;
+using ShopListApp.Infrastructure.Database.Identity.AppUser;
+using ShopListApp.Infrastructure.Database.Identity.UserManager;
 using ShopListApp.Interfaces;
 using ShopListApp.Interfaces.IRepositories;
 using ShopListApp.Interfaces.IServices;
@@ -28,7 +30,7 @@ using ShopListApp.Services;
 using ShopListApp.StoreObserver;
 using System.Text;
 
-namespace ShopListApp.ExtensionMethods
+namespace ShopListApp.API.ExtensionMethods
 {
     public static class ServiceExtensionMethods
     {
@@ -79,7 +81,7 @@ namespace ShopListApp.ExtensionMethods
         {
             var connString = Environment.GetEnvironmentVariable("ShopListAppConnectionString") 
                 ?? configuration!.GetConnectionString("DefaultConnection")
-                ?? String.Empty;
+                ?? string.Empty;
             services.AddDbContext<ShopListDbContext>(options =>
             {
                 options.UseSqlServer(connString);
@@ -99,7 +101,7 @@ namespace ShopListApp.ExtensionMethods
                 var tokenConfiguration = configuration!.GetSection("TokenConfiguration");
                 string secretKey = Environment.GetEnvironmentVariable("JwtSecretKey")
                     ?? tokenConfiguration.GetValue<string>("SecretKey")
-                    ?? String.Empty;
+                    ?? string.Empty;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
@@ -138,10 +140,8 @@ namespace ShopListApp.ExtensionMethods
 
         public static void AddAuthorizationWithHandlers(this IServiceCollection services)
         {
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("ShopListOwnerPolicy", policy => policy.Requirements.Add(new ShopListOwnerRequirement()));
-            });
+            services.AddAuthorizationBuilder()
+                .AddPolicy("ShopListOwnerPolicy", policy => policy.Requirements.Add(new ShopListOwnerRequirement()));
             services.AddScoped<IAuthorizationHandler, ShopListOwnerAuthorizationHandler>();
         }
     }

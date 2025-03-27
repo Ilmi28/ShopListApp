@@ -1,17 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Auth;
 using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces;
 using ShopListApp.Core.Interfaces.Identity;
 using ShopListApp.Infrastructure.Database.Context;
+using ShopListApp.Infrastructure.Database.Identity.AppUser;
 using ShopListApp.Models;
 using ShopListAppTests.IntegrationTests.WebApplicationFactories;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 
-namespace ShopListAppTests.IntegrationTests
+namespace ShopListApp.IntegrationTests.IntegrationTests
 {
     public class AuthTests : IClassFixture<AuthWebApplicationFactory>
     {
@@ -134,7 +136,7 @@ namespace ShopListAppTests.IntegrationTests
         [InlineData("test1", "test1@gmail.com", "password")]
         public async Task RegisterUser_InvalidInput_ReturnsBadRequest(string username, string email, string password)
         {
-            CreateUserCommand cmd = new CreateUserCommand
+            CreateUserCommand cmd = new()
             {
                 UserName = username,
                 Email = email,
@@ -151,7 +153,7 @@ namespace ShopListAppTests.IntegrationTests
         [InlineData("test@gmail.com", "Password123@")]
         public async Task LoginUser_ValidInput_ReturnsOK(string userIdentifier, string password)
         {
-            LoginUserCommand cmd = new LoginUserCommand()
+            LoginUserCommand cmd = new()
             {
                 UserIdentifier = userIdentifier,
                 Password = password

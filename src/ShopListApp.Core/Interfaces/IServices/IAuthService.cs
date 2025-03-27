@@ -1,4 +1,5 @@
 ﻿using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Auth;
 
 namespace ShopListApp.Interfaces.IServices
 {

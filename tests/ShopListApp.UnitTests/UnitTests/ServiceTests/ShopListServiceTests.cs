@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Moq;
-using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Create;
+using ShopListApp.Core.Commands.Update;
 using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces;
 using ShopListApp.Core.Interfaces.ILogger;
 using ShopListApp.Exceptions;
+using ShopListApp.Infrastructure.Database.Identity.AppUser;
 using ShopListApp.Interfaces.IRepositories;
 using ShopListApp.Models;
 using ShopListApp.Services;
@@ -223,7 +225,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             };
             var shopListProducts = new List<ShopListProduct>
             {
-                new ShopListProduct { Product = products[0], ShopList = shopList },
+                new() { Product = products[0], ShopList = shopList },
                 new ShopListProduct { Product = products[1], ShopList = shopList },
                 new ShopListProduct { Product = products[2], ShopList = shopList }
             };

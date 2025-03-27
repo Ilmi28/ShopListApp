@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
-namespace ShopListApp.Models
+namespace ShopListApp.Infrastructure.Database.Identity.AppUser
 {
     public class User : IdentityUser
     {
