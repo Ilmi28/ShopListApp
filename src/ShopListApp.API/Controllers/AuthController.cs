@@ -18,22 +18,22 @@ namespace ShopListApp.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody] CreateUserCommand cmd)
         {
-            (string accessToken, string refreshToken) = await _authService.RegisterUser(cmd);
-            return Ok(new { accessToken, refreshToken });
+            var response = await _authService.RegisterUser(cmd);
+            return Ok(response);
         }
 
         [HttpPost("login")]
         public async Task<IActionResult> LoginUser([FromBody] LoginUserCommand cmd)
         {
-            (string accessToken, string refreshToken) = await _authService.LoginUser(cmd);
-            return Ok(new { accessToken, refreshToken });
+            var response = await _authService.LoginUser(cmd);
+            return Ok(response);
         }
 
         [HttpPost("refresh")]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenCommand cmd)
         {
-            string accessToken = await _authService.RefreshAccessToken(cmd);
-            return Ok(new { accessToken });
+            string identityToken = await _authService.RefreshAccessToken(cmd);
+            return Ok(new { identityToken });
         }
     }
 }

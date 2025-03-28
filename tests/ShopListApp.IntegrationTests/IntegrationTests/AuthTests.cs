@@ -87,7 +87,7 @@ namespace ShopListApp.IntegrationTests.IntegrationTests
             var content = await response.Content.ReadAsStringAsync();
             var json = JsonDocument.Parse(content);
 
-            string? accessToken = json.RootElement.GetProperty("accessToken").GetString();
+            string? accessToken = json.RootElement.GetProperty("identityToken").GetString();
             string? refreshToken = json.RootElement.GetProperty("refreshToken").GetString();
             int userCount = _context.Users.Count();
             int tokenCount = _context.Tokens.Count();
@@ -163,7 +163,7 @@ namespace ShopListApp.IntegrationTests.IntegrationTests
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             var json = JsonDocument.Parse(content);
-            string? accessToken = json.RootElement.GetProperty("accessToken").GetString();
+            string? accessToken = json.RootElement.GetProperty("identityToken").GetString();
             string? refreshToken = json.RootElement.GetProperty("refreshToken").GetString();
             int tokenCount = _context.Tokens.Count();
             int revokedTokenCount = _context.Tokens.Where(x => x.IsRevoked).Count();
@@ -218,7 +218,7 @@ namespace ShopListApp.IntegrationTests.IntegrationTests
             response.EnsureSuccessStatusCode();
             var content = await response.Content.ReadAsStringAsync();
             var json = JsonDocument.Parse(content);
-            string? accessToken = json.RootElement.GetProperty("accessToken").GetString();
+            string? accessToken = json.RootElement.GetProperty("identityToken").GetString();
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             Assert.False(string.IsNullOrEmpty(accessToken));

@@ -4,6 +4,7 @@ using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces;
 using ShopListApp.Core.Interfaces.Identity;
 using ShopListApp.Core.Interfaces.ILogger;
+using ShopListApp.Core.Responses;
 using ShopListApp.Enums;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;
@@ -29,7 +30,7 @@ namespace ShopListApp.Services
             _tokenRepository = tokenRepository;
         }
 
-        public async Task<(string identityToken, string refreshToken)> RegisterUser(CreateUserCommand cmd)
+        public async Task<LoginRegisterResponse> RegisterUser(CreateUserCommand cmd)
         {
             _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
             var user = new UserDto
@@ -53,7 +54,7 @@ namespace ShopListApp.Services
                     ?? throw new DatabaseErrorException();
                 await CreateRefreshTokenInDb(hashRefreshToken, user);
                 await _logger.Log(Operation.Register, user);
-                return (identityToken, refreshToken);
+                return new LoginRegisterResponse { IdentityToken = identityToken, RefreshToken = refreshToken };
             }
             catch (UserAlreadyExistsException)
             {
@@ -78,7 +79,7 @@ namespace ShopListApp.Services
                 throw new DatabaseErrorException();
         }
 
-        public async Task<(string, string)> LoginUser(LoginUserCommand cmd)
+        public async Task<LoginRegisterResponse> LoginUser(LoginUserCommand cmd)
         {
             _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
             try
@@ -97,7 +98,7 @@ namespace ShopListApp.Services
                     ?? throw new UnauthorizedAccessException();
                 await CreateRefreshTokenInDb(hashRefreshToken, user);
                 await _logger.Log(Operation.Login, user);
-                return (identityToken, refreshToken);
+                return new LoginRegisterResponse { IdentityToken = identityToken, RefreshToken = refreshToken };
             }
             catch (UnauthorizedAccessException)
             {

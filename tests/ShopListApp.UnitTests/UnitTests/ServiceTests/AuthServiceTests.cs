@@ -46,10 +46,10 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             _mockTokenManager.Setup(x => x.GetHashRefreshToken("refreshToken")).Returns("hashedRefreshToken");
             _mockTokenRepository.Setup(x => x.AddToken(It.IsAny<Token>())).ReturnsAsync(true);
 
-            (string jwtToken, string refreshToken) = await _authService.RegisterUser(cmd);
+            var response = await _authService.RegisterUser(cmd);
 
-            Assert.Equal("token", jwtToken);
-            Assert.Equal("refreshToken", refreshToken);
+            Assert.Equal("token", response.IdentityToken);
+            Assert.Equal("refreshToken", response.RefreshToken);
         }
 
         [Fact]
@@ -144,10 +144,10 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             _mockTokenManager.Setup(x => x.GetHashRefreshToken("refreshToken")).Returns("hashedRefreshToken");
             _mockTokenRepository.Setup(x => x.AddToken(It.IsAny<Token>())).ReturnsAsync(true);
 
-            (string jwtToken, string refreshToken) = await _authService.LoginUser(cmd);
+            var response = await _authService.LoginUser(cmd);
 
-            Assert.Equal("token", jwtToken);
-            Assert.Equal("refreshToken", refreshToken);
+            Assert.Equal("token", response.IdentityToken);
+            Assert.Equal("refreshToken", response.RefreshToken);
         }
 
         [Fact]
@@ -171,10 +171,10 @@ namespace ShopListAppTests.UnitTests.ServiceTests
             _mockTokenManager.Setup(x => x.GetHashRefreshToken("refreshToken")).Returns("hashedRefreshToken");
             _mockTokenRepository.Setup(x => x.AddToken(It.IsAny<Token>())).ReturnsAsync(true);
 
-            (string jwtToken, string refreshToken) = await _authService.LoginUser(cmd);
+            var response = await _authService.LoginUser(cmd);
 
-            Assert.Equal("token", jwtToken);
-            Assert.Equal("refreshToken", refreshToken);
+            Assert.Equal("token", response.IdentityToken);
+            Assert.Equal("refreshToken", response.RefreshToken);
         }
 
         [Fact]
