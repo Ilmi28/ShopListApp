@@ -30,7 +30,7 @@ namespace ShopListApp.Services
             _tokenRepository = tokenRepository;
         }
 
-        public async Task<LoginRegisterResponse> RegisterUser(CreateUserCommand cmd)
+        public async Task<LoginRegisterResponse> RegisterUser(RegisterUserCommand cmd)
         {
             _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
             var user = new UserDto

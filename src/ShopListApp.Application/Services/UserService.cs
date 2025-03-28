@@ -1,4 +1,5 @@
 ﻿using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Auth;
 using ShopListApp.Core.Commands.Delete;
 using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces;
@@ -21,7 +22,7 @@ namespace ShopListApp.Services
             _userManager = userManager;
         }
 
-        public async Task CreateUser(CreateUserCommand cmd)
+        public async Task CreateUser(RegisterUserCommand cmd)
         {
             _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
             var user = new UserDto

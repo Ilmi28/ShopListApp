@@ -75,7 +75,7 @@ namespace ShopListApp.IntegrationTests.IntegrationTests
         [Fact]
         public async Task RegisterUser_ValidUser_ReturnsOKAndTokens()
         {
-            var cmd = new CreateUserCommand
+            var cmd = new Commands.RegisterUserCommand
             {
                 UserName = "test1",
                 Email = "test1@gmail.com",
@@ -106,7 +106,7 @@ namespace ShopListApp.IntegrationTests.IntegrationTests
         [InlineData("test1", "test@gmail.com", "User with this email already exists")]
         public async Task RegisterUser_UserAlreadyExists_ReturnsBadRequest(string username, string email, string errorMessage)
         {
-            var cmd = new CreateUserCommand
+            var cmd = new Commands.RegisterUserCommand
             {
                 UserName = username,
                 Email = email,
@@ -123,7 +123,7 @@ namespace ShopListApp.IntegrationTests.IntegrationTests
         [Fact]
         public async Task RegisterUser_NullRequest_ReturnsBadRequest()
         {
-            CreateUserCommand? cmd = null;
+            RegisterUserCommand? cmd = null;
 
             var response = await _client.PostAsJsonAsync("/api/auth/register", cmd);
 
@@ -136,7 +136,7 @@ namespace ShopListApp.IntegrationTests.IntegrationTests
         [InlineData("test1", "test1@gmail.com", "password")]
         public async Task RegisterUser_InvalidInput_ReturnsBadRequest(string username, string email, string password)
         {
-            CreateUserCommand cmd = new()
+            RegisterUserCommand cmd = new()
             {
                 UserName = username,
                 Email = email,

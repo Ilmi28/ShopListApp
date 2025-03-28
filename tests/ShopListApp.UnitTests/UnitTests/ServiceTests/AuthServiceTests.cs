@@ -33,7 +33,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task RegisterUser_ValidUser_ReturnsTokens()
         {
-            CreateUserCommand cmd = new CreateUserCommand
+            RegisterUserCommand cmd = new ShopListApp.Commands.RegisterUserCommand
             {
                 UserName = "test",
                 Email = "test@gmail.com",
@@ -55,7 +55,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task RegisterUser_UserWithEmailExists_ThrowsUserWithEmailAlreadyExistsException()
         {
-            CreateUserCommand cmd = new CreateUserCommand
+            RegisterUserCommand cmd = new ShopListApp.Commands.RegisterUserCommand
             {
                 UserName = "test",
                 Email = "test@gmail.com",
@@ -77,7 +77,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task RegisterUser_UserWithUserNameExists_ThrowsUserWithUserNameAlreadyExistsException()
         {
-            CreateUserCommand cmd = new CreateUserCommand
+            RegisterUserCommand cmd = new ShopListApp.Commands.RegisterUserCommand
             {
                 UserName = "test",
                 Email = "test@gmail.com",
@@ -99,7 +99,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task RegisterUser_NullArg_ThrowsArgumentNullException()
         {
-            CreateUserCommand cmd = null!;
+            RegisterUserCommand cmd = null!;
 
             Func<Task> task = async () => await _authService.RegisterUser(cmd);
 
@@ -109,7 +109,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task RegisterUser_DatabaseError_ThrowsDatabaseErrorException()
         {
-            CreateUserCommand cmd = new CreateUserCommand
+            RegisterUserCommand cmd = new ShopListApp.Commands.RegisterUserCommand
             {
                 UserName = "test",
                 Email = "test@gmail.com",

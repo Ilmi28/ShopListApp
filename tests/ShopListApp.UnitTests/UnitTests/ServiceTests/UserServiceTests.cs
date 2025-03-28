@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Moq;
 using ShopListApp.Commands;
+using ShopListApp.Core.Commands.Auth;
 using ShopListApp.Core.Commands.Delete;
 using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces;
@@ -33,7 +34,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public void CreateUser_ValidUser_CreatesUser()
         {
-            CreateUserCommand cmd = new CreateUserCommand
+            RegisterUserCommand cmd = new RegisterUserCommand
             {
                 UserName = "test",
                 Email = "test@gmail.com",
@@ -49,7 +50,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task CreateUser_NullUser_ThrowsArgumentNullException()
         {
-            CreateUserCommand cmd = null!;
+            RegisterUserCommand cmd = null!;
 
             Func<Task> task = async () => await _userService.CreateUser(cmd);
 
@@ -59,7 +60,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task CreateUser_DatabaseError_ThrowsDatabaseErrorException()
         {
-            CreateUserCommand cmd = new CreateUserCommand
+            RegisterUserCommand cmd = new RegisterUserCommand
             {
                 UserName = "test",
                 Email = "test@gmail.com",

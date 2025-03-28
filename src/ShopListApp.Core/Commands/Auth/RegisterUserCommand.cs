@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ShopListApp.Commands
+namespace ShopListApp.Core.Commands.Auth
 {
-    public class CreateUserCommand
+    public class RegisterUserCommand
     {
         [Required]
         [MinLength(3)]

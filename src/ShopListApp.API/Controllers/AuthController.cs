@@ -16,7 +16,7 @@ namespace ShopListApp.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> RegisterUser([FromBody] CreateUserCommand cmd)
+        public async Task<IActionResult> RegisterUser([FromBody] RegisterUserCommand cmd)
         {
             var response = await _authService.RegisterUser(cmd);
             return Ok(response);
