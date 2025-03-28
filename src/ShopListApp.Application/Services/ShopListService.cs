@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using ShopListApp.Core.Commands.Create;
+﻿using ShopListApp.Core.Commands.Create;
 using ShopListApp.Core.Commands.Update;
 using ShopListApp.Core.Interfaces;
 using ShopListApp.Core.Interfaces.ILogger;

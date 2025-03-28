@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using ShopListApp.Commands;
+﻿using ShopListApp.Commands;
 using ShopListApp.Core.Commands.Delete;
 using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces;

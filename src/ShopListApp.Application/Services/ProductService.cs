@@ -1,5 +1,4 @@
-﻿using HtmlAgilityPack;
-using ShopListApp.Core.Dtos;
+﻿using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces.StoreObserver;
 using ShopListApp.Exceptions;
 using ShopListApp.Interfaces;

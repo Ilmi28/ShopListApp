@@ -1,11 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
-using ShopListApp.Core.Dtos;
-using ShopListApp.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ShopListApp.Core.Dtos;
 
 namespace ShopListApp.Core.Interfaces
 {
