@@ -33,7 +33,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task RegisterUser_ValidUser_ReturnsTokens()
         {
-            RegisterUserCommand cmd = new ShopListApp.Commands.RegisterUserCommand
+            RegisterUserCommand cmd = new RegisterUserCommand
             {
                 UserName = "test",
                 Email = "test@gmail.com",
@@ -55,7 +55,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task RegisterUser_UserWithEmailExists_ThrowsUserWithEmailAlreadyExistsException()
         {
-            RegisterUserCommand cmd = new ShopListApp.Commands.RegisterUserCommand
+            RegisterUserCommand cmd = new RegisterUserCommand
             {
                 UserName = "test",
                 Email = "test@gmail.com",
@@ -77,7 +77,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task RegisterUser_UserWithUserNameExists_ThrowsUserWithUserNameAlreadyExistsException()
         {
-            RegisterUserCommand cmd = new ShopListApp.Commands.RegisterUserCommand
+            RegisterUserCommand cmd = new RegisterUserCommand
             {
                 UserName = "test",
                 Email = "test@gmail.com",
@@ -109,7 +109,7 @@ namespace ShopListAppTests.UnitTests.ServiceTests
         [Fact]
         public async Task RegisterUser_DatabaseError_ThrowsDatabaseErrorException()
         {
-            RegisterUserCommand cmd = new ShopListApp.Commands.RegisterUserCommand
+            RegisterUserCommand cmd = new RegisterUserCommand
             {
                 UserName = "test",
                 Email = "test@gmail.com",

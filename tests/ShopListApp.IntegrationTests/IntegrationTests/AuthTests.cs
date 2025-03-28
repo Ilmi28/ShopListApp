@@ -75,7 +75,7 @@ namespace ShopListApp.IntegrationTests.IntegrationTests
         [Fact]
         public async Task RegisterUser_ValidUser_ReturnsOKAndTokens()
         {
-            var cmd = new Commands.RegisterUserCommand
+            var cmd = new RegisterUserCommand
             {
                 UserName = "test1",
                 Email = "test1@gmail.com",
@@ -106,7 +106,7 @@ namespace ShopListApp.IntegrationTests.IntegrationTests
         [InlineData("test1", "test@gmail.com", "User with this email already exists")]
         public async Task RegisterUser_UserAlreadyExists_ReturnsBadRequest(string username, string email, string errorMessage)
         {
-            var cmd = new Commands.RegisterUserCommand
+            var cmd = new RegisterUserCommand
             {
                 UserName = username,
                 Email = email,
