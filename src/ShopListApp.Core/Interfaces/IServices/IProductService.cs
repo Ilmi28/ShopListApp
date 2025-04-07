@@ -1,6 +1,6 @@
-﻿using ShopListApp.ViewModels;
+﻿using ShopListApp.Core.Responses;
 
-namespace ShopListApp.Interfaces.IServices
+namespace ShopListApp.Core.Interfaces.IServices
 {
     public interface IProductService
     {

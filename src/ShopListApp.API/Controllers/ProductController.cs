@@ -1,13 +1,7 @@
-﻿using HtmlAgilityPack;
-using Microsoft.AspNetCore.Mvc;
-using ShopListApp.Commands;
-using ShopListApp.Interfaces;
-using ShopListApp.Interfaces.IServices;
-using ShopListApp.Models;
-using ShopListApp.ViewModels;
-using System.Text;
+﻿using Microsoft.AspNetCore.Mvc;
+using ShopListApp.Core.Interfaces.IServices;
 
-namespace ShopListApp.Controllers
+namespace ShopListApp.API.Controllers
 {
     [ApiController]
     [Route("api/product")]

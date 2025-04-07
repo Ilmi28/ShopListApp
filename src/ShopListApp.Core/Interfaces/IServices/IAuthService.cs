@@ -1,8 +1,7 @@
-﻿using ShopListApp.Commands;
-using ShopListApp.Core.Commands.Auth;
+﻿using ShopListApp.Core.Commands.Auth;
 using ShopListApp.Core.Responses;
 
-namespace ShopListApp.Interfaces.IServices
+namespace ShopListApp.Core.Interfaces.IServices
 {
     public interface IAuthService
     {

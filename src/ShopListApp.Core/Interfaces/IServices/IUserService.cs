@@ -1,9 +1,9 @@
-﻿using ShopListApp.Commands;
-using ShopListApp.Core.Commands.Auth;
+﻿using ShopListApp.Core.Commands.Auth;
 using ShopListApp.Core.Commands.Delete;
-using ShopListApp.ViewModels;
+using ShopListApp.Core.Commands.Update;
+using ShopListApp.Core.Responses;
 
-namespace ShopListApp.Interfaces
+namespace ShopListApp.Core.Interfaces.IServices
 {
     public interface IUserService
     {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ShopListApp.Core.Interfaces.StoreObserver
+﻿namespace ShopListApp.Core.Interfaces.StoreObserver
 {
     public interface IStorePublisher
     {

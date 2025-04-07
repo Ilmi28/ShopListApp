@@ -1,12 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using ShopListApp.Core.Dtos;
-using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Interfaces.Identity;
 using ShopListApp.Infrastructure.Database.Identity.AppUser;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ShopListApp.Infrastructure.Database.Identity.UserManager
 {

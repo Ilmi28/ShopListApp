@@ -1,4 +1,4 @@
-﻿namespace ShopListApp.Models
+﻿namespace ShopListApp.Core.Models
 {
     public class Category
     {

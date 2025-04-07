@@ -1,17 +1,15 @@
-﻿using ShopListApp.Commands;
-using ShopListApp.Core.Commands.Auth;
+﻿using ShopListApp.Core.Commands.Auth;
 using ShopListApp.Core.Dtos;
-using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Enums;
+using ShopListApp.Core.Exceptions;
 using ShopListApp.Core.Interfaces.Identity;
 using ShopListApp.Core.Interfaces.ILogger;
+using ShopListApp.Core.Interfaces.IRepositories;
+using ShopListApp.Core.Interfaces.IServices;
+using ShopListApp.Core.Models;
 using ShopListApp.Core.Responses;
-using ShopListApp.Enums;
-using ShopListApp.Exceptions;
-using ShopListApp.Interfaces;
-using ShopListApp.Interfaces.IServices;
-using ShopListApp.Models;
 
-namespace ShopListApp.Services
+namespace ShopListApp.Application.Services
 {
     public class AuthService : IAuthService
     {

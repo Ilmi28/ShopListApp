@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using ShopListApp.Application.AuthorizationPolicies.Requirements;
-using ShopListApp.Models;
-using ShopListApp.ViewModels;
+using ShopListApp.Core.Responses;
+using ShopListApp.Infrastructure.Database.Identity.AuthorizationPolicies.Requirements;
 using System.Security.Claims;
 
-namespace ShopListApp.Application.AuthorizationPolicies.RequirementHandlers
+namespace ShopListApp.Infrastructure.Database.Identity.AuthorizationPolicies.RequirementHandlers
 {
     public class ShopListOwnerAuthorizationHandler : AuthorizationHandler<ShopListOwnerRequirement, ShopListResponse>
     {

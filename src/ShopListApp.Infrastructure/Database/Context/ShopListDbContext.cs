@@ -1,12 +1,8 @@
-﻿
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Identity.AppUser;
-using ShopListApp.Interfaces;
-using ShopListApp.Models;
-using System.Reflection;
 
 namespace ShopListApp.Infrastructure.Database.Context
 {

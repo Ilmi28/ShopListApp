@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace ShopListApp.Application.AuthorizationPolicies.Requirements
+namespace ShopListApp.Infrastructure.Database.Identity.AuthorizationPolicies.Requirements
 {
     public class ShopListOwnerRequirement : IAuthorizationRequirement
     { 

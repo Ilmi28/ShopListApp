@@ -1,18 +1,11 @@
-﻿using HtmlAgilityPack;
-using Moq;
+﻿using Moq;
+using ShopListApp.Application.Services;
+using ShopListApp.Core.Exceptions;
+using ShopListApp.Core.Interfaces.IRepositories;
 using ShopListApp.Core.Interfaces.StoreObserver;
-using ShopListApp.Exceptions;
-using ShopListApp.Interfaces;
-using ShopListApp.Interfaces.IRepositories;
-using ShopListApp.Models;
-using ShopListApp.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using ShopListApp.Core.Models;
 
-namespace ShopListAppTests.UnitTests.ServiceTests
+namespace ShopListApp.UnitTests.UnitTests.ServiceTests
 {
     public class ProductServiceTests
     {

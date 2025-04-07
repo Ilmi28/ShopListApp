@@ -1,6 +1,6 @@
-﻿using ShopListApp.Commands;
+﻿using ShopListApp.Core.Commands.Other;
 
-namespace ShopListAppTests.Comparers
+namespace ShopListApp.TestUtilities.Comparers
 {
     public class ParsedProductComparer : IEqualityComparer<ParseProductCommand>
     {

@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Presentation;
+using ShopListApp.API;
 using ShopListApp.Infrastructure.Database.Context;
-using ShopListAppTests.Stubs;
+using ShopListApp.TestUtilities.Stubs;
 
-namespace ShopListAppTests.IntegrationTests.WebApplicationFactories
+namespace ShopListApp.IntegrationTests.IntegrationTests.WebApplicationFactories
 {
     public class StoreWebApplicationFactory : WebApplicationFactory<Program>
     {

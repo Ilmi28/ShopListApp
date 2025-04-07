@@ -1,18 +1,14 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Moq;
-using ShopListApp.Commands;
+﻿using Moq;
+using ShopListApp.Application.Services;
 using ShopListApp.Core.Commands.Auth;
 using ShopListApp.Core.Dtos;
-using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Exceptions;
 using ShopListApp.Core.Interfaces.Identity;
 using ShopListApp.Core.Interfaces.ILogger;
-using ShopListApp.Exceptions;
-using ShopListApp.Infrastructure.Database.Identity.AppUser;
-using ShopListApp.Interfaces;
-using ShopListApp.Models;
-using ShopListApp.Services;
+using ShopListApp.Core.Interfaces.IRepositories;
+using ShopListApp.Core.Models;
 
-namespace ShopListAppTests.UnitTests.ServiceTests
+namespace ShopListApp.UnitTests.UnitTests.ServiceTests
 {
     public class AuthServiceTests
     {

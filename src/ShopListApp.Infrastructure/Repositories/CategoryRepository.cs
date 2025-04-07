@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ShopListApp.Core.Interfaces.IRepositories;
+using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Context;
-using ShopListApp.Interfaces.IRepositories;
-using ShopListApp.Models;
 
-namespace ShopListApp.Repositories
+namespace ShopListApp.Infrastructure.Repositories
 {
     public class CategoryRepository : ICategoryRepository
     {

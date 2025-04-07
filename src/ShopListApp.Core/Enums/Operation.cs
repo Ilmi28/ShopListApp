@@ -1,4 +1,4 @@
-﻿namespace ShopListApp.Enums
+﻿namespace ShopListApp.Core.Enums
 {
     public enum Operation
     {

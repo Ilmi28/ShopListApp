@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace ShopListApp.ViewModels
+﻿namespace ShopListApp.Core.Responses
 {
     public class UserResponse
     {

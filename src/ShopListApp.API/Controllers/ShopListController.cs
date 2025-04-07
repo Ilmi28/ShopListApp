@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ShopListApp.API.Filters;
 using ShopListApp.Core.Commands.Create;
 using ShopListApp.Core.Commands.Update;
-using ShopListApp.Filters;
-using ShopListApp.Interfaces.IServices;
+using ShopListApp.Core.Interfaces.IServices;
 using System.Security.Claims;
 
-namespace ShopListApp.Controllers
+namespace ShopListApp.API.Controllers
 {
     [Authorize]
     [ApiController]
@@ -52,7 +52,7 @@ namespace ShopListApp.Controllers
 
         [HttpPatch("update/delete-product/{shopListId}/{productId}")]
         [QuantityFilter]
-        public async Task<IActionResult> RemoveProductFromShopList(int shopListId, int productId, [FromQuery] int quantity = Int32.MaxValue)
+        public async Task<IActionResult> RemoveProductFromShopList(int shopListId, int productId, [FromQuery] int quantity = int.MaxValue)
         {
             var shopList = await _shopListService.GetShopListById(shopListId);
             var result = await _authorizationService.AuthorizeAsync(User, shopList, "ShopListOwnerPolicy");

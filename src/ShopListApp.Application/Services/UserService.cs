@@ -1,16 +1,15 @@
-﻿using ShopListApp.Commands;
-using ShopListApp.Core.Commands.Auth;
+﻿using ShopListApp.Core.Commands.Auth;
 using ShopListApp.Core.Commands.Delete;
+using ShopListApp.Core.Commands.Update;
 using ShopListApp.Core.Dtos;
-using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Enums;
+using ShopListApp.Core.Exceptions;
+using ShopListApp.Core.Interfaces.Identity;
 using ShopListApp.Core.Interfaces.ILogger;
-using ShopListApp.Enums;
-using ShopListApp.Exceptions;
-using ShopListApp.Interfaces;
-using ShopListApp.Models;
-using ShopListApp.ViewModels;
+using ShopListApp.Core.Interfaces.IServices;
+using ShopListApp.Core.Responses;
 
-namespace ShopListApp.Services
+namespace ShopListApp.Application.Services
 {
     public class UserService : IUserService
     {

@@ -2,7 +2,7 @@
 using ShopListApp.Core.Interfaces.Parsing;
 using System.Text;
 
-namespace ShopListApp.Application.HtmlFetchers
+namespace ShopListApp.Infrastructure.HtmlFetchers
 {
     public class HAPHtmlFetcher : IHtmlFetcher<HtmlNode, HtmlDocument>
     {

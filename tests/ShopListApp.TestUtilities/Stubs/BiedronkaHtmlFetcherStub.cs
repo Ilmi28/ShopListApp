@@ -1,6 +1,6 @@
-﻿using ShopListApp.Application.HtmlFetchers;
+﻿using ShopListApp.Infrastructure.HtmlFetchers;
 
-namespace ShopListAppTests.Stubs
+namespace ShopListApp.TestUtilities.Stubs
 {
     public class BiedronkaHtmlFetcherStub : HAPHtmlFetcher
     {

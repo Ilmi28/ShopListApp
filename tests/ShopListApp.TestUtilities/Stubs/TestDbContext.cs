@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Context;
-using ShopListApp.Models;
 
-namespace ShopListAppTests.Stubs
+namespace ShopListApp.TestUtilities.Stubs
 {
     public class TestDbContext : ShopListDbContext
     {

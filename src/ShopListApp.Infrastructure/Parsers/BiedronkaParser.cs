@@ -1,13 +1,9 @@
 ﻿using HtmlAgilityPack;
-using ShopListApp.Commands;
-using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Commands.Other;
 using ShopListApp.Core.Interfaces.Parsing;
-using ShopListApp.Interfaces;
-using ShopListApp.Models;
-using System.Net.Http;
 using System.Text;
 
-namespace ShopListApp.DataProviders
+namespace ShopListApp.Infrastructure.Parsers
 {
     public class BiedronkaParser : IParser
     {
@@ -90,7 +86,7 @@ namespace ShopListApp.DataProviders
         private decimal? ParsePrice(HtmlDocument htmlDoc)
         {
             string? intHtml = _htmlFetcher.GetElementsByClassName(htmlDoc, "price-tile__sales").FirstOrDefault()!.InnerHtml;
-            if (String.IsNullOrWhiteSpace(intHtml)) return null;
+            if (string.IsNullOrWhiteSpace(intHtml)) return null;
             var sb = new StringBuilder();
             foreach (char chr in intHtml)
             {

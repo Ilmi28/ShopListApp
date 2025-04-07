@@ -1,6 +1,6 @@
 ﻿using ShopListApp.Core.Dtos;
 
-namespace ShopListApp.Core.Interfaces
+namespace ShopListApp.Core.Interfaces.Identity
 {
     public interface IUserManager
     {

@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace ShopListApp.Models
+﻿namespace ShopListApp.Core.Models
 {
     public class ShopList
     {

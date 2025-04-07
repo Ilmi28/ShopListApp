@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ShopListApp.Commands;
 using ShopListApp.Core.Commands.Auth;
-using ShopListApp.Interfaces.IServices;
+using ShopListApp.Core.Interfaces.IServices;
 
-namespace ShopListApp.Controllers
+namespace ShopListApp.API.Controllers
 {
     [ApiController]
     [Route("api/auth")]

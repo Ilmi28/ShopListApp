@@ -1,5 +1,4 @@
 ﻿using ShopListApp.Core.Dtos;
-using ShopListApp.Models;
 
 namespace ShopListApp.Core.Interfaces.Identity
 {

@@ -1,8 +1,9 @@
-﻿using ShopListApp.Commands;
-using ShopListApp.Exceptions;
-using ShopListApp.Interfaces;
-using ShopListApp.Interfaces.IRepositories;
-using ShopListApp.Models;
+﻿using ShopListApp.Core.Commands.Other;
+using ShopListApp.Core.Exceptions;
+using ShopListApp.Core.Interfaces.IRepositories;
+using ShopListApp.Core.Interfaces.Parsing;
+using ShopListApp.Core.Interfaces.StoreObserver;
+using ShopListApp.Core.Models;
 
 namespace ShopListApp.Application.StoreSubscibers
 {

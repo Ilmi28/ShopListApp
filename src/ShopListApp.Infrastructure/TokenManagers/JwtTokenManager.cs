@@ -1,15 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ShopListApp.Core.Dtos;
 using ShopListApp.Core.Interfaces.Identity;
-using ShopListApp.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace ShopListApp.Managers
+namespace ShopListApp.Infrastructure.TokenManagers
 {
     public class JwtTokenManager : ITokenManager
     {
@@ -25,7 +23,7 @@ namespace ShopListApp.Managers
             string audience = "https://localhost:7101";
             string secretKey = Environment.GetEnvironmentVariable("SecretJwtKey") 
                 ?? tokenConfig.GetValue<string>("SecretKey") 
-                ?? String.Empty;
+                ?? string.Empty;
             int jwtExpireMinutes = tokenConfig.GetValue<int>("AccessTokenExpirationMinutes");
             DateTime jwtExpireDate = DateTime.Now.AddMinutes(jwtExpireMinutes);
             var symmKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));

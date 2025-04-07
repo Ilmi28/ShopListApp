@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace ShopListApp.Filters
+namespace ShopListApp.API.Filters
 {
     public class QuantityFilter : ActionFilterAttribute
     {

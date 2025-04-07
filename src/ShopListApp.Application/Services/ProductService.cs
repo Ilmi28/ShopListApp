@@ -1,13 +1,11 @@
-﻿using ShopListApp.Core.Dtos;
+﻿using ShopListApp.Core.Exceptions;
+using ShopListApp.Core.Interfaces.IRepositories;
+using ShopListApp.Core.Interfaces.IServices;
 using ShopListApp.Core.Interfaces.StoreObserver;
-using ShopListApp.Exceptions;
-using ShopListApp.Interfaces;
-using ShopListApp.Interfaces.IRepositories;
-using ShopListApp.Interfaces.IServices;
-using ShopListApp.Models;
-using ShopListApp.ViewModels;
+using ShopListApp.Core.Models;
+using ShopListApp.Core.Responses;
 
-namespace ShopListApp.Services
+namespace ShopListApp.Application.Services
 {
     public class ProductService : IProductService
     {

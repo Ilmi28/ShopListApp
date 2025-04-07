@@ -1,10 +1,10 @@
 ﻿using ShopListApp.Core.Dtos;
+using ShopListApp.Core.Enums;
 using ShopListApp.Core.Interfaces.ILogger;
-using ShopListApp.Enums;
+using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Context;
-using ShopListApp.Models;
 
-namespace ShopListApp.Loggers
+namespace ShopListApp.Infrastructure.Loggers
 {
     public class UserLogger : IDbLogger<UserDto>
     {

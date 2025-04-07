@@ -1,11 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using ShopListApp.Core.Interfaces.IRepositories;
+using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Context;
-using ShopListApp.Interfaces.IRepositories;
-using ShopListApp.Models;
-using ShopListApp.ViewModels;
-using System.Runtime.CompilerServices;
 
-namespace ShopListApp.Repositories
+namespace ShopListApp.Infrastructure.Repositories
 {
     public class ShopListProductRepository : IShopListProductRepository
     {

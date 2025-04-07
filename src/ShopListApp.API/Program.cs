@@ -1,8 +1,6 @@
-
 using ShopListApp.API.ExtensionMethods;
-using ShopListApp.ExtensionMethods;
 
-namespace Presentation
+namespace ShopListApp.API
 {
     public class Program
     {

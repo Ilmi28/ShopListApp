@@ -1,17 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Context;
-using ShopListApp.Models;
-using ShopListAppTests.IntegrationTests.WebApplicationFactories;
-using ShopListAppTests.Stubs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using ShopListApp.IntegrationTests.IntegrationTests.WebApplicationFactories;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ShopListAppTests.IntegrationTests
+namespace ShopListApp.IntegrationTests.IntegrationTests
 {
     public class ProductTests : IClassFixture<ProductWebApplicationFactory>
     {

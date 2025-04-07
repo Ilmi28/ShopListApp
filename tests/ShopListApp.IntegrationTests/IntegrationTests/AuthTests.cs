@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using ShopListApp.Commands;
 using ShopListApp.Core.Commands.Auth;
-using ShopListApp.Core.Dtos;
-using ShopListApp.Core.Interfaces;
 using ShopListApp.Core.Interfaces.Identity;
+using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.Infrastructure.Database.Identity.AppUser;
-using ShopListApp.Models;
-using ShopListAppTests.IntegrationTests.WebApplicationFactories;
+using ShopListApp.IntegrationTests.IntegrationTests.WebApplicationFactories;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;

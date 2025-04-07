@@ -1,15 +1,9 @@
-﻿using ShopListApp.Commands;
-using ShopListApp.DataProviders;
-using ShopListAppTests.Comparers;
-using ShopListAppTests.Stubs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ShopListApp.Core.Commands.Other;
+using ShopListApp.Infrastructure.Parsers;
+using ShopListApp.TestUtilities.Comparers;
+using ShopListApp.TestUtilities.Stubs;
 
-namespace ShopListAppTests.UnitTests.ParserTests
+namespace ShopListApp.UnitTests.UnitTests.ParserTests
 {
     public class BiedronkaParserTests
     {

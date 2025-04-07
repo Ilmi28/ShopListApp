@@ -1,12 +1,11 @@
 ﻿using HtmlAgilityPack;
 using ShopListApp.Application.StoreSubscibers;
+using ShopListApp.Core.Interfaces.IRepositories;
 using ShopListApp.Core.Interfaces.Parsing;
 using ShopListApp.Core.Interfaces.StoreObserver;
-using ShopListApp.DataProviders;
-using ShopListApp.Interfaces;
-using ShopListApp.Interfaces.IRepositories;
+using ShopListApp.Infrastructure.Parsers;
 
-namespace ShopListApp.StoreObserver
+namespace ShopListApp.Infrastructure.StorePublisher
 {
     public class StorePublisher : IStorePublisher
     {

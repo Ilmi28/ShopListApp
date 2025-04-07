@@ -1,4 +1,4 @@
-﻿namespace ShopListApp.Interfaces
+﻿namespace ShopListApp.Core.Interfaces.StoreObserver
 {
     public interface IStoreSubscriber
     {

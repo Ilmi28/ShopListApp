@@ -1,4 +1,4 @@
-﻿using ShopListApp.Enums;
+﻿using ShopListApp.Core.Enums;
 
 namespace ShopListApp.Core.Interfaces.ILogger
 {

@@ -1,6 +1,6 @@
-﻿using ShopListApp.Commands;
+﻿using ShopListApp.Core.Commands.Other;
 
-namespace ShopListApp.Interfaces
+namespace ShopListApp.Core.Interfaces.Parsing
 {
     public interface IParser
     {

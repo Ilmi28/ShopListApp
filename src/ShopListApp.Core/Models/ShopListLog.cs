@@ -1,6 +1,6 @@
-﻿using ShopListApp.Enums;
+﻿using ShopListApp.Core.Enums;
 
-namespace ShopListApp.Models
+namespace ShopListApp.Core.Models
 {
     public class ShopListLog
     {

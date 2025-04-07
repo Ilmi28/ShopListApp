@@ -1,6 +1,6 @@
-﻿using ShopListApp.Exceptions;
+﻿using ShopListApp.Core.Exceptions;
 
-namespace ShopListApp.CustomMiddleware
+namespace ShopListApp.API.Middleware
 {
     public class ExceptionHandlerMiddleware
     {

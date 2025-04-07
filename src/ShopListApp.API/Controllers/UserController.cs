@@ -1,19 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using ShopListApp.Commands;
 using ShopListApp.Core.Commands.Delete;
-using ShopListApp.Interfaces;
-using ShopListApp.Managers;
-using ShopListApp.Models;
-using ShopListApp.ViewModels;
-using System.IdentityModel.Tokens.Jwt;
-using System.Reflection.Metadata.Ecma335;
+using ShopListApp.Core.Commands.Update;
+using ShopListApp.Core.Interfaces.IServices;
 using System.Security.Claims;
-using System.Text;
 
-namespace ShopListApp.Controllers
+namespace ShopListApp.API.Controllers
 {
     [Authorize]
     [ApiController]

@@ -1,6 +1,6 @@
-﻿using ShopListApp.Models;
+﻿using ShopListApp.Core.Models;
 
-namespace ShopListApp.Interfaces
+namespace ShopListApp.Core.Interfaces.IRepositories
 {
     public interface ITokenRepository
     {

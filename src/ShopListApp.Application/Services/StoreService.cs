@@ -1,10 +1,9 @@
-﻿using ShopListApp.Exceptions;
-using ShopListApp.Interfaces.IRepositories;
-using ShopListApp.Interfaces.IServices;
-using ShopListApp.Models;
-using ShopListApp.ViewModels;
+﻿using ShopListApp.Core.Exceptions;
+using ShopListApp.Core.Interfaces.IRepositories;
+using ShopListApp.Core.Interfaces.IServices;
+using ShopListApp.Core.Responses;
 
-namespace ShopListApp.Services
+namespace ShopListApp.Application.Services
 {
     public class StoreService : IStoreService
     {

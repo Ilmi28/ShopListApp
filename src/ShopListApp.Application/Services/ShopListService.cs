@@ -1,15 +1,15 @@
 ﻿using ShopListApp.Core.Commands.Create;
 using ShopListApp.Core.Commands.Update;
-using ShopListApp.Core.Interfaces;
+using ShopListApp.Core.Enums;
+using ShopListApp.Core.Exceptions;
+using ShopListApp.Core.Interfaces.Identity;
 using ShopListApp.Core.Interfaces.ILogger;
-using ShopListApp.Enums;
-using ShopListApp.Exceptions;
-using ShopListApp.Interfaces.IRepositories;
-using ShopListApp.Interfaces.IServices;
-using ShopListApp.Models;
-using ShopListApp.ViewModels;
+using ShopListApp.Core.Interfaces.IRepositories;
+using ShopListApp.Core.Interfaces.IServices;
+using ShopListApp.Core.Models;
+using ShopListApp.Core.Responses;
 
-namespace ShopListApp.Services
+namespace ShopListApp.Application.Services
 {
     public class ShopListService : IShopListService
     {
@@ -136,7 +136,7 @@ namespace ShopListApp.Services
             catch { throw new DatabaseErrorException(); }
         }
 
-        public async Task RemoveProductFromShopList(int shopListId, int productId, int quantity = Int32.MaxValue)
+        public async Task RemoveProductFromShopList(int shopListId, int productId, int quantity = int.MaxValue)
         {
             try
             {
