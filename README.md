@@ -1,0 +1,1 @@
+ShopListApp is a simple web API for managing shopping lists. It features user authentication, profile management, product browsing, store listings, and personalized shop list creation. Users can register, log in, update their profile, and manage shopping lists by adding or removing products which are parsed directly from real websites using HTML scraping.
