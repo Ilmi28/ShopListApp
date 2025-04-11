@@ -1,8 +1,7 @@
-﻿namespace ShopListApp.Core.Commands.Other
+﻿namespace ShopListApp.Core.Commands.Other;
+
+public class FetchCategoryCommand
 {
-    public class FetchCategoryCommand
-    {
-        public required string Name { get; set; }
-        public int StoreId { get; set; }
-    }
+    public required string Name { get; set; }
+    public int StoreId { get; set; }
 }

@@ -8,23 +8,22 @@ using ShopListApp.API;
 using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.TestUtilities.Stubs;
 
-namespace ShopListApp.IntegrationTests.IntegrationTests.WebApplicationFactories
+namespace ShopListApp.IntegrationTests.IntegrationTests.WebApplicationFactories;
+
+public class AuthWebApplicationFactory : WebApplicationFactory<Program>
 {
-    public class AuthWebApplicationFactory : WebApplicationFactory<Program>
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        builder.ConfigureTestServices(services =>
         {
-            builder.ConfigureTestServices(services =>
-            {
-                services.RemoveAll<DbContextOptions<ShopListDbContext>>();
-                services.RemoveAll<ShopListDbContext>();
+            services.RemoveAll<DbContextOptions<ShopListDbContext>>();
+            services.RemoveAll<ShopListDbContext>();
 
-                services.AddDbContext<TestDbContext>(options =>
-                                   options.UseInMemoryDatabase("AuthTestDb"));
+            services.AddDbContext<TestDbContext>(options =>
+                               options.UseInMemoryDatabase("AuthTestDb"));
 
-                services.AddScoped<ShopListDbContext, TestDbContext>();
+            services.AddScoped<ShopListDbContext, TestDbContext>();
 
-            });
-        }
+        });
     }
 }

@@ -1,8 +1,7 @@
-﻿namespace ShopListApp.Core.Interfaces.StoreObserver
+﻿namespace ShopListApp.Core.Interfaces.StoreObserver;
+
+public interface IStorePublisher
 {
-    public interface IStorePublisher
-    {
-        void AddSubscribers();
-        Task Notify();
-    }
+    void AddSubscribers();
+    Task Notify();
 }

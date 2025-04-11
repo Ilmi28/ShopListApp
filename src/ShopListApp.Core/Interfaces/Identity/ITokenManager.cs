@@ -1,12 +1,11 @@
 ﻿using ShopListApp.Core.Dtos;
 
-namespace ShopListApp.Core.Interfaces.Identity
+namespace ShopListApp.Core.Interfaces.Identity;
+
+public interface ITokenManager
 {
-    public interface ITokenManager
-    {
-        string GenerateAccessToken(UserDto user);
-        int GetRefreshTokenExpirationDays();
-        string? GetHashRefreshToken(string refreshToken);
-        string GenerateRefreshToken();
-    }
+    string GenerateAccessToken(UserDto user);
+    int GetRefreshTokenExpirationDays();
+    string? GetHashRefreshToken(string refreshToken);
+    string GenerateRefreshToken();
 }

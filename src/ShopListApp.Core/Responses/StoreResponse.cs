@@ -1,8 +1,7 @@
-﻿namespace ShopListApp.Core.Responses
+﻿namespace ShopListApp.Core.Responses;
+
+public class StoreResponse
 {
-    public class StoreResponse
-    {
-        public int Id { get; set; }
-        public required string Name { get; set; }
-    }
+    public int Id { get; set; }
+    public required string Name { get; set; }
 }

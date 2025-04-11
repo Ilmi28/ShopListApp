@@ -1,8 +1,7 @@
-﻿namespace ShopListApp.Core.Responses
+﻿namespace ShopListApp.Core.Responses;
+
+public class LoginRegisterResponse
 {
-    public class LoginRegisterResponse
-    {
-        public required string IdentityToken { get; set; }
-        public required string RefreshToken { get; set; }
-    }
+    public required string IdentityToken { get; set; }
+    public required string RefreshToken { get; set; }
 }

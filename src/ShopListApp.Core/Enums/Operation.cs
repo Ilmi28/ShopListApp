@@ -1,12 +1,11 @@
-﻿namespace ShopListApp.Core.Enums
+﻿namespace ShopListApp.Core.Enums;
+
+public enum Operation
 {
-    public enum Operation
-    {
-        Create,
-        Update,
-        Delete,
-        Login,
-        Register,
-        Logout
-    }
+    Create,
+    Update,
+    Delete,
+    Login,
+    Register,
+    Logout
 }

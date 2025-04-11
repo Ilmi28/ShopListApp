@@ -1,7 +1,6 @@
-﻿namespace ShopListApp.Core.Commands.Auth
+﻿namespace ShopListApp.Core.Commands.Auth;
+
+public class RefreshTokenCommand
 {
-    public class RefreshTokenCommand
-    {
-        public required string RefreshToken { get; set; }
-    }
+    public required string RefreshToken { get; set; }
 }

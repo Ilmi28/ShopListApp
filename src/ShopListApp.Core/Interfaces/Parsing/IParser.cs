@@ -1,9 +1,8 @@
 ﻿using ShopListApp.Core.Commands.Other;
 
-namespace ShopListApp.Core.Interfaces.Parsing
+namespace ShopListApp.Core.Interfaces.Parsing;
+
+public interface IParser
 {
-    public interface IParser
-    {
-        Task<ICollection<ParseProductCommand>> GetParsedProducts();
-    }
+    Task<ICollection<ParseProductCommand>> GetParsedProducts();
 }

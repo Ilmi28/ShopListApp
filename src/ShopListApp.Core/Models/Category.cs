@@ -1,8 +1,7 @@
-﻿namespace ShopListApp.Core.Models
+﻿namespace ShopListApp.Core.Models;
+
+public class Category
 {
-    public class Category
-    {
-        public int Id { get; set; }
-        public required string Name { get; set; }
-    }
+    public int Id { get; set; }
+    public required string Name { get; set; }
 }

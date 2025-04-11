@@ -28,119 +28,118 @@ using ShopListApp.Infrastructure.StorePublisher;
 using ShopListApp.Infrastructure.TokenManagers;
 using System.Text;
 
-namespace ShopListApp.API.ExtensionMethods
+namespace ShopListApp.API.ExtensionMethods;
+
+public static class ServiceExtensionMethods
 {
-    public static class ServiceExtensionMethods
+    public static void AddRepositories(this IServiceCollection services)
     {
-        public static void AddRepositories(this IServiceCollection services)
-        {
-            services.AddTransient<IProductRepository, ProductRepository>();
-            services.AddTransient<ICategoryRepository, CategoryRepository>();
-            services.AddTransient<IShopListProductRepository, ShopListProductRepository>();
-            services.AddTransient<IShopListRepository, ShopListRepository>();
-            services.AddTransient<IStoreRepository, StoreRepository>();
-            services.AddTransient<ITokenRepository, TokenRepository>();
-        }
+        services.AddTransient<IProductRepository, ProductRepository>();
+        services.AddTransient<ICategoryRepository, CategoryRepository>();
+        services.AddTransient<IShopListProductRepository, ShopListProductRepository>();
+        services.AddTransient<IShopListRepository, ShopListRepository>();
+        services.AddTransient<IStoreRepository, StoreRepository>();
+        services.AddTransient<ITokenRepository, TokenRepository>();
+    }
 
-        public static void AddServices(this IServiceCollection services)
-        {
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IAuthService, AuthService>();
-            services.AddTransient<IStoreService, StoreService>();
-            services.AddTransient<IProductService, ProductService>();
-            services.AddTransient<IShopListService, ShopListService>();
+    public static void AddServices(this IServiceCollection services)
+    {
+        services.AddTransient<IUserService, UserService>();
+        services.AddTransient<IAuthService, AuthService>();
+        services.AddTransient<IStoreService, StoreService>();
+        services.AddTransient<IProductService, ProductService>();
+        services.AddTransient<IShopListService, ShopListService>();
 
-        }
+    }
 
-        public static void AddLoggers(this IServiceCollection services)
-        {
-            services.AddTransient<IDbLogger<UserDto>, UserLogger>();
-            services.AddTransient<IDbLogger<ShopList>, ShopListLogger>();
-        }
+    public static void AddLoggers(this IServiceCollection services)
+    {
+        services.AddTransient<IDbLogger<UserDto>, UserLogger>();
+        services.AddTransient<IDbLogger<ShopList>, ShopListLogger>();
+    }
 
-        public static void AddManagers(this IServiceCollection services)
-        {
-            services.AddTransient<ITokenManager, JwtTokenManager>();
-            services.AddTransient<IUserManager, UserManager>();
-        }
+    public static void AddManagers(this IServiceCollection services)
+    {
+        services.AddTransient<ITokenManager, JwtTokenManager>();
+        services.AddTransient<IUserManager, UserManager>();
+    }
 
-        public static void AddParsing(this IServiceCollection services)
-        {
-            services.AddTransient<IHtmlFetcher<HtmlNode, HtmlDocument>, HAPHtmlFetcher>();
-            services.AddHttpClient();
-        }
+    public static void AddParsing(this IServiceCollection services)
+    {
+        services.AddTransient<IHtmlFetcher<HtmlNode, HtmlDocument>, HAPHtmlFetcher>();
+        services.AddHttpClient();
+    }
 
-        public static void AddStoreObserver(this IServiceCollection services)
-        {
-            services.AddTransient<IStorePublisher, StorePublisher>();
-        }
+    public static void AddStoreObserver(this IServiceCollection services)
+    {
+        services.AddTransient<IStorePublisher, StorePublisher>();
+    }
 
-        public static void AddIdentityDbContext(this IServiceCollection services, IConfiguration configuration)
+    public static void AddIdentityDbContext(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connString = Environment.GetEnvironmentVariable("ShopListAppConnectionString") 
+            ?? configuration!.GetConnectionString("DefaultConnection")
+            ?? string.Empty;
+        services.AddDbContext<ShopListDbContext>(options =>
         {
-            var connString = Environment.GetEnvironmentVariable("ShopListAppConnectionString") 
-                ?? configuration!.GetConnectionString("DefaultConnection")
+            options.UseSqlServer(connString);
+        });
+        services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ShopListDbContext>();
+    }
+
+    public static void AddJwtBearer(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options =>
+        {
+            var tokenConfiguration = configuration!.GetSection("TokenConfiguration");
+            string secretKey = Environment.GetEnvironmentVariable("JwtSecretKey")
+                ?? tokenConfiguration.GetValue<string>("SecretKey")
                 ?? string.Empty;
-            services.AddDbContext<ShopListDbContext>(options =>
+            options.TokenValidationParameters = new TokenValidationParameters
             {
-                options.UseSqlServer(connString);
-            });
-            services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ShopListDbContext>();
-        }
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = tokenConfiguration.GetValue<string>("Issuer"),
+                ValidAudience = tokenConfiguration.GetValue<string>("Audience"),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+            };
+        });
+    }
 
-        public static void AddJwtBearer(this IServiceCollection services, IConfiguration configuration)
+    public static void AddSwaggerGenWithAuthorization(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(x =>
         {
-            services.AddAuthentication(options =>
+            var security = new OpenApiSecurityScheme
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
-            {
-                var tokenConfiguration = configuration!.GetSection("TokenConfiguration");
-                string secretKey = Environment.GetEnvironmentVariable("JwtSecretKey")
-                    ?? tokenConfiguration.GetValue<string>("SecretKey")
-                    ?? string.Empty;
-                options.TokenValidationParameters = new TokenValidationParameters
+                Name = HeaderNames.Authorization,
+                Type = SecuritySchemeType.ApiKey,
+                In = ParameterLocation.Header,
+                Description = "JWT Authorization header",
+                Reference = new OpenApiReference
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = tokenConfiguration.GetValue<string>("Issuer"),
-                    ValidAudience = tokenConfiguration.GetValue<string>("Audience"),
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
-                };
-            });
-        }
+                    Id = JwtBearerDefaults.AuthenticationScheme,
+                    Type = ReferenceType.SecurityScheme
+                }
+            };
 
-        public static void AddSwaggerGenWithAuthorization(this IServiceCollection services)
-        {
-            services.AddSwaggerGen(x =>
-            {
-                var security = new OpenApiSecurityScheme
-                {
-                    Name = HeaderNames.Authorization,
-                    Type = SecuritySchemeType.ApiKey,
-                    In = ParameterLocation.Header,
-                    Description = "JWT Authorization header",
-                    Reference = new OpenApiReference
-                    {
-                        Id = JwtBearerDefaults.AuthenticationScheme,
-                        Type = ReferenceType.SecurityScheme
-                    }
-                };
+            x.AddSecurityDefinition(security.Reference.Id, security);
+            x.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {{security, Array.Empty<string>()}});
+        });
+    }
 
-                x.AddSecurityDefinition(security.Reference.Id, security);
-                x.AddSecurityRequirement(new OpenApiSecurityRequirement
-                    {{security, Array.Empty<string>()}});
-            });
-        }
-
-        public static void AddAuthorizationWithHandlers(this IServiceCollection services)
-        {
-            services.AddAuthorizationBuilder()
-                .AddPolicy("ShopListOwnerPolicy", policy => policy.Requirements.Add(new ShopListOwnerRequirement()));
-            services.AddScoped<IAuthorizationHandler, ShopListOwnerAuthorizationHandler>();
-        }
+    public static void AddAuthorizationWithHandlers(this IServiceCollection services)
+    {
+        services.AddAuthorizationBuilder()
+            .AddPolicy("ShopListOwnerPolicy", policy => policy.Requirements.Add(new ShopListOwnerRequirement()));
+        services.AddScoped<IAuthorizationHandler, ShopListOwnerAuthorizationHandler>();
     }
 }

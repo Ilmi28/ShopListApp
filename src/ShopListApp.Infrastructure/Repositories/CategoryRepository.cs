@@ -3,44 +3,37 @@ using ShopListApp.Core.Interfaces.IRepositories;
 using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Context;
 
-namespace ShopListApp.Infrastructure.Repositories
+namespace ShopListApp.Infrastructure.Repositories;
+
+public class CategoryRepository(ShopListDbContext context) : ICategoryRepository
 {
-    public class CategoryRepository : ICategoryRepository
+    public async Task<ICollection<Category>> GetAllCategories()
     {
-        private ShopListDbContext _context;
-        public CategoryRepository(ShopListDbContext context)
-        {
-            _context = context;
-        }
+        return await context.Categories.ToListAsync();
+    }
 
-        public async Task<ICollection<Category>> GetAllCategories()
-        {
-            return await _context.Categories.ToListAsync();
-        }
+    public async Task<Category?> GetCategoryById(int? id)
+    {
+        return await context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+    }
 
-        public async Task<Category?> GetCategoryById(int? id)
-        {
-            return await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
-        }
+    public async Task<Category?> GetCategoryByName(string? name)
+    {
+        return await context.Categories.FirstOrDefaultAsync(x => x.Name == name);
+    }
 
-        public async Task<Category?> GetCategoryByName(string? name)
-        {
-            return await _context.Categories.FirstOrDefaultAsync(x => x.Name == name);
-        }
+    public async Task AddCategory(Category category)
+    {
+        await context.Categories.AddAsync(category);
+    }
 
-        public async Task AddCategory(Category category)
-        {
-            await _context.Categories.AddAsync(category);
-        }
-
-        public async Task<bool> RemoveCategory(int id)
-        {
-            var category = await _context.Categories.FirstOrDefaultAsync(x => x.Id == id);
-            if (category == null)
-                return false;
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
-            return true;
-        }
+    public async Task<bool> RemoveCategory(int id)
+    {
+        var category = await context.Categories.FirstOrDefaultAsync(x => x.Id == id);
+        if (category == null)
+            return false;
+        context.Categories.Remove(category);
+        await context.SaveChangesAsync();
+        return true;
     }
 }

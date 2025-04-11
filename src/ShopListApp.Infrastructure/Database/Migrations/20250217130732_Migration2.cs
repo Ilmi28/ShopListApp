@@ -2,21 +2,20 @@
 
 #nullable disable
 
-namespace ShopListApp.Migrations
+namespace ShopListApp.Migrations;
+
+/// <inheritdoc />
+public partial class Migration2 : Migration
 {
     /// <inheritdoc />
-    public partial class Migration2 : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
 
-        }
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
 
-        }
     }
 }

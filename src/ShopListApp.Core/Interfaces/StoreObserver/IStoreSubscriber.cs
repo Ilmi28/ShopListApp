@@ -1,7 +1,6 @@
-﻿namespace ShopListApp.Core.Interfaces.StoreObserver
+﻿namespace ShopListApp.Core.Interfaces.StoreObserver;
+
+public interface IStoreSubscriber
 {
-    public interface IStoreSubscriber
-    {
-        Task Update();
-    }
+    Task Update();
 }

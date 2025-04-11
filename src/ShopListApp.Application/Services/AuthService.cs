@@ -9,127 +9,114 @@ using ShopListApp.Core.Interfaces.IServices;
 using ShopListApp.Core.Models;
 using ShopListApp.Core.Responses;
 
-namespace ShopListApp.Application.Services
+namespace ShopListApp.Application.Services;
+
+public class AuthService(IUserManager userManager,
+    IDbLogger<UserDto> logger,
+    ITokenManager tokenManager,
+    ITokenRepository tokenRepository) : IAuthService
 {
-    public class AuthService : IAuthService
+    public async Task<LoginRegisterResponse> RegisterUser(RegisterUserCommand cmd)
     {
-        private IUserManager _userManager;
-        private IDbLogger<UserDto> _logger;
-        private ITokenManager _tokenManager;
-        private ITokenRepository _tokenRepository;
-        public AuthService(IUserManager userManager, 
-            IDbLogger<UserDto> logger,
-            ITokenManager tokenManager, 
-            ITokenRepository tokenRepository)
+        _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
+        var user = new UserDto
         {
-            _userManager = userManager;
-            _logger = logger;
-            _tokenManager = tokenManager;
-            _tokenRepository = tokenRepository;
+            Id = Guid.NewGuid().ToString(),
+            UserName = cmd.UserName,
+            Email = cmd.Email,
+        };
+        try
+        {
+            var userByEmail = await userManager.FindByEmailAsync(cmd.Email);
+            var userByName = await userManager.FindByNameAsync(cmd.UserName);
+            if (userByEmail != null)
+                throw new UserWithEmailAlreadyExistsException();
+            if (userByName != null)
+                throw new UserWithUserNameAlreadyExistsException();
+            await userManager.CreateAsync(user, cmd.Password);
+            string identityToken = tokenManager.GenerateAccessToken(user);
+            string refreshToken = tokenManager.GenerateRefreshToken();
+            string hashRefreshToken = tokenManager.GetHashRefreshToken(refreshToken)
+                ?? throw new DatabaseErrorException();
+            await CreateRefreshTokenInDb(hashRefreshToken, user);
+            await logger.Log(Operation.Register, user);
+            return new LoginRegisterResponse { IdentityToken = identityToken, RefreshToken = refreshToken };
         }
-
-        public async Task<LoginRegisterResponse> RegisterUser(RegisterUserCommand cmd)
+        catch (UserAlreadyExistsException)
         {
-            _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
-            var user = new UserDto
-            {
-                Id = Guid.NewGuid().ToString(),
-                UserName = cmd.UserName,
-                Email = cmd.Email,
-            };
-            try
-            {
-                var userByEmail = await _userManager.FindByEmailAsync(cmd.Email);
-                var userByName = await _userManager.FindByNameAsync(cmd.UserName);
-                if (userByEmail != null)
-                    throw new UserWithEmailAlreadyExistsException();
-                if (userByName != null)
-                    throw new UserWithUserNameAlreadyExistsException();
-                await _userManager.CreateAsync(user, cmd.Password);
-                string identityToken = _tokenManager.GenerateAccessToken(user);
-                string refreshToken = _tokenManager.GenerateRefreshToken();
-                string hashRefreshToken = _tokenManager.GetHashRefreshToken(refreshToken)
-                    ?? throw new DatabaseErrorException();
-                await CreateRefreshTokenInDb(hashRefreshToken, user);
-                await _logger.Log(Operation.Register, user);
-                return new LoginRegisterResponse { IdentityToken = identityToken, RefreshToken = refreshToken };
-            }
-            catch (UserAlreadyExistsException)
-            {
-                throw;
-            }
-            catch
-            {
-                throw new DatabaseErrorException();
-            }
+            throw;
         }
-
-        private async Task CreateRefreshTokenInDb(string refreshToken, UserDto user)
+        catch
         {
-            var token = new Token
-            {
-                UserId = user.Id,
-                RefreshTokenHash = refreshToken,
-                ExpirationDate = DateTime.Now.AddDays(_tokenManager.GetRefreshTokenExpirationDays())
-            };
-            var result = await _tokenRepository.AddToken(token);
+            throw new DatabaseErrorException();
+        }
+    }
+
+    private async Task CreateRefreshTokenInDb(string refreshToken, UserDto user)
+    {
+        var token = new Token
+        {
+            UserId = user.Id,
+            RefreshTokenHash = refreshToken,
+            ExpirationDate = DateTime.Now.AddDays(tokenManager.GetRefreshTokenExpirationDays())
+        };
+        var result = await tokenRepository.AddToken(token);
+        if (!result)
+            throw new DatabaseErrorException();
+    }
+
+    public async Task<LoginRegisterResponse> LoginUser(LoginUserCommand cmd)
+    {
+        _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
+        try
+        {
+            var user = await userManager.FindByEmailAsync(cmd.UserIdentifier);
+            if (user == null)
+                user = await userManager.FindByNameAsync(cmd.UserIdentifier);
+            if (user == null)
+                throw new UnauthorizedAccessException();
+            var result = await userManager.CheckPasswordAsync(user, cmd.Password);
             if (!result)
-                throw new DatabaseErrorException();
+                throw new UnauthorizedAccessException();
+            string identityToken = tokenManager.GenerateAccessToken(user);
+            string refreshToken = tokenManager.GenerateRefreshToken();
+            string hashRefreshToken = tokenManager.GetHashRefreshToken(refreshToken) 
+                ?? throw new UnauthorizedAccessException();
+            await CreateRefreshTokenInDb(hashRefreshToken, user);
+            await logger.Log(Operation.Login, user);
+            return new LoginRegisterResponse { IdentityToken = identityToken, RefreshToken = refreshToken };
         }
-
-        public async Task<LoginRegisterResponse> LoginUser(LoginUserCommand cmd)
+        catch (UnauthorizedAccessException)
         {
-            _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
-            try
-            {
-                var user = await _userManager.FindByEmailAsync(cmd.UserIdentifier);
-                if (user == null)
-                    user = await _userManager.FindByNameAsync(cmd.UserIdentifier);
-                if (user == null)
-                    throw new UnauthorizedAccessException();
-                var result = await _userManager.CheckPasswordAsync(user, cmd.Password);
-                if (!result)
-                    throw new UnauthorizedAccessException();
-                string identityToken = _tokenManager.GenerateAccessToken(user);
-                string refreshToken = _tokenManager.GenerateRefreshToken();
-                string hashRefreshToken = _tokenManager.GetHashRefreshToken(refreshToken) 
-                    ?? throw new UnauthorizedAccessException();
-                await CreateRefreshTokenInDb(hashRefreshToken, user);
-                await _logger.Log(Operation.Login, user);
-                return new LoginRegisterResponse { IdentityToken = identityToken, RefreshToken = refreshToken };
-            }
-            catch (UnauthorizedAccessException)
-            {
-                throw;
-            }
-            catch
-            {
-                throw new DatabaseErrorException();
-            }
+            throw;
         }
-
-        public async Task<string> RefreshAccessToken(RefreshTokenCommand cmd)
+        catch
         {
-            _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
-            try
-            {
-                string hash = _tokenManager.GetHashRefreshToken(cmd.RefreshToken) 
-                                                        ?? throw new UnauthorizedAccessException();
-                var token = await _tokenRepository.GetToken(hash)
-                                                        ?? throw new UnauthorizedAccessException();
-                var user = await _userManager.FindByIdAsync(token.UserId)
-                                                        ?? throw new UnauthorizedAccessException();
-                var identityToken = _tokenManager.GenerateAccessToken(user);
-                return identityToken;
-            }
-            catch (UnauthorizedAccessException)
-            {
-                throw;
-            }
-            catch
-            {
-                throw new DatabaseErrorException();
-            }
+            throw new DatabaseErrorException();
+        }
+    }
+
+    public async Task<string> RefreshAccessToken(RefreshTokenCommand cmd)
+    {
+        _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
+        try
+        {
+            string hash = tokenManager.GetHashRefreshToken(cmd.RefreshToken) 
+                                                    ?? throw new UnauthorizedAccessException();
+            var token = await tokenRepository.GetToken(hash)
+                                                    ?? throw new UnauthorizedAccessException();
+            var user = await userManager.FindByIdAsync(token.UserId)
+                                                    ?? throw new UnauthorizedAccessException();
+            var identityToken = tokenManager.GenerateAccessToken(user);
+            return identityToken;
+        }
+        catch (UnauthorizedAccessException)
+        {
+            throw;
+        }
+        catch
+        {
+            throw new DatabaseErrorException();
         }
     }
 }

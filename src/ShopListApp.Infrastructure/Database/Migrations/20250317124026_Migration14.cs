@@ -2,27 +2,26 @@
 
 #nullable disable
 
-namespace ShopListApp.Migrations
+namespace ShopListApp.Migrations;
+
+/// <inheritdoc />
+public partial class Migration14 : Migration
 {
     /// <inheritdoc />
-    public partial class Migration14 : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "ProductId",
-                table: "ShopListLogs");
-        }
+        migrationBuilder.DropColumn(
+            name: "ProductId",
+            table: "ShopListLogs");
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<int>(
-                name: "ProductId",
-                table: "ShopListLogs",
-                type: "int",
-                nullable: true);
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.AddColumn<int>(
+            name: "ProductId",
+            table: "ShopListLogs",
+            type: "int",
+            nullable: true);
     }
 }

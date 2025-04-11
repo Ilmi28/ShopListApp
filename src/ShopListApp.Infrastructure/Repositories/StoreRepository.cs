@@ -3,24 +3,17 @@ using ShopListApp.Core.Interfaces.IRepositories;
 using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Context;
 
-namespace ShopListApp.Infrastructure.Repositories
+namespace ShopListApp.Infrastructure.Repositories;
+
+public class StoreRepository(ShopListDbContext context) : IStoreRepository
 {
-    public class StoreRepository : IStoreRepository
+    public async Task<Store?> GetStoreById(int id)
     {
-        private readonly ShopListDbContext _context;
-        public StoreRepository(ShopListDbContext context)
-        {
-            _context = context;
-        }
+        return await context.Stores.FirstOrDefaultAsync(s => s.Id == id);
+    }
 
-        public async Task<Store?> GetStoreById(int id)
-        {
-            return await _context.Stores.FirstOrDefaultAsync(s => s.Id == id);
-        }
-
-        public async Task<ICollection<Store>> GetStores()
-        {
-            return await _context.Stores.ToListAsync();
-        }
+    public async Task<ICollection<Store>> GetStores()
+    {
+        return await context.Stores.ToListAsync();
     }
 }

@@ -1,19 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace ShopListApp.API.Filters
+namespace ShopListApp.API.Filters;
+
+public class QuantityFilter : ActionFilterAttribute
 {
-    public class QuantityFilter : ActionFilterAttribute
-    {
-        public override void OnActionExecuting(ActionExecutingContext context)
-        {   
-            if (context.ActionArguments.TryGetValue("quantity", out var value) && value is int)
+    public override void OnActionExecuting(ActionExecutingContext context)
+    {   
+        if (context.ActionArguments.TryGetValue("quantity", out var value) && value is int)
+        {
+            int quantity = (int)value;
+            if (quantity < 1)
             {
-                int quantity = (int)value;
-                if (quantity < 1)
-                {
-                    context.Result = new BadRequestObjectResult("Quantity must be greater than 0.");
-                }
+                context.Result = new BadRequestObjectResult("Quantity must be greater than 0.");
             }
         }
     }

@@ -1,6 +1,5 @@
-﻿namespace ShopListApp.Core.Exceptions
+﻿namespace ShopListApp.Core.Exceptions;
+
+public class FetchingErrorException : Exception
 {
-    public class FetchingErrorException : Exception
-    {
-    }
 }

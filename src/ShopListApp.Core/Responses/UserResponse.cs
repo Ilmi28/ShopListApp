@@ -1,8 +1,7 @@
-﻿namespace ShopListApp.Core.Responses
+﻿namespace ShopListApp.Core.Responses;
+
+public class UserResponse
 {
-    public class UserResponse
-    {
-        public required string UserName { get; set; }
-        public required string Email { get; set; }
-    }
+    public required string UserName { get; set; }
+    public required string Email { get; set; }
 }
