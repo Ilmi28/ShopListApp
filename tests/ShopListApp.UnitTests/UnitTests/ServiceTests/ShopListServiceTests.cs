@@ -65,23 +65,7 @@ public class ShopListServiceTests
         await Assert.ThrowsAsync<UnauthorizedAccessException>(task);
     }
 
-    [Fact]
-    public async Task CreateShopList_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        var cmd = new CreateShopListCommand { Name = "ShopList1" };
-        var userDto = new UserDto
-        {
-            Id = "1",
-            UserName = "test",
-            Email = "test@gmail.com"
-        };
-        _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(userDto);
-        _mockShopListRepository.Setup(x => x.AddShopList(It.IsAny<ShopList>())).ThrowsAsync(new Exception());
-
-        Func<Task> task = () => _shopListService.CreateShopList("1", cmd);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
+    
 
     [Fact]
     public async Task CreateShopList_NullCmdArg_ThrowsArgumentNullException()
@@ -146,19 +130,7 @@ public class ShopListServiceTests
         await Assert.ThrowsAsync<ShopListNotFoundException>(task);
     }
 
-    [Fact]
-    public async Task AddProductToShopList_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        var store = new Store { Id = 1, Name = "Store1" };
-        var category = new Category { Name = "Category1" };
-        var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
-        var product = new Product { Id = 1, Name = "Product1", Category = category, Store = store };
-        _mockShopListRepository.Setup(x => x.GetShopListById(1)).ThrowsAsync(new Exception());
-
-        Func<Task> task = () => _shopListService.AddProductToShopList(1, 1);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
+    
 
     [Fact]
     public void DeleteShopList_ValidShopListId_DeletesShopList()
@@ -195,15 +167,7 @@ public class ShopListServiceTests
         await Assert.ThrowsAsync<ShopListNotFoundException>(task);
     }
 
-    [Fact]
-    public async Task DeleteShopList_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
-        _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync(shopList);
-        _mockShopListProductRepository.Setup(x => x.GetProductsForShopList(1)).ThrowsAsync(new Exception());
-        Func<Task> task = () => _shopListService.DeleteShopList(1);
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
+    
 
     [Fact]
     public async Task GetShopListById_ValidShopListId_ReturnsShopList()
@@ -249,15 +213,7 @@ public class ShopListServiceTests
         await Assert.ThrowsAsync<ShopListNotFoundException>(task);
     }
 
-    [Fact]
-    public async Task GetShopListProducts_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        _mockShopListRepository.Setup(x => x.GetShopListById(1)).ThrowsAsync(new Exception());
-
-        Func<Task> task = () => _shopListService.GetShopListById(1);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
+    
 
     [Fact]
     public void RemoveProductFromShopList_ValidArgs_RemovesProduct()
@@ -313,32 +269,7 @@ public class ShopListServiceTests
         await Assert.ThrowsAsync<ShopListProductNotFoundException>(task);
     }
 
-    [Fact]
-    public async Task RemoveProductFromShopList_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        var shopList = new ShopList
-        {
-            Id = 1,
-            Name = "ShopList1",
-            UserId = "1"
-        };
-        var store = new Store { Id = 1, Name = "Store1" };
-        var shopListProduct = new ShopListProduct
-        {
-            Id = 1,
-            ShopList = shopList,
-            Product = new Product { Id = 1, Name = "Product1", Store = store },
-            Quantity = 1
-        };
-        _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync(shopList);
-        _mockShopListProductRepository.Setup(x => x.GetShopListProduct(1, 1)).ReturnsAsync(shopListProduct);
-        _mockShopListProductRepository.Setup(x => x.RemoveShopListProduct(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(false);
-        _mockShopListProductRepository.Setup(x => x.UpdateShopListProductQuantity(It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(false);
-
-        Func<Task> task = () => _shopListService.RemoveProductFromShopList(1, 1);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
+    
 
     [Fact]
     public void UpdateShopList_ValidInput_UpdatesShopList()
@@ -365,20 +296,7 @@ public class ShopListServiceTests
         await Assert.ThrowsAsync<ShopListNotFoundException>(task);
     }
 
-    [Fact]
-    public async Task UpdateShopList_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        var shopList = new ShopList { Id = 1, Name = "ShopList1", UserId = "1" };
-        var updatedShopList = new ShopList { Id = 1, Name = "ShopList2", UserId = "1" };
-        var cmd = new UpdateShopListCommand { Name = "ShopList2" };
-
-        _mockShopListRepository.Setup(x => x.GetShopListById(1)).ReturnsAsync(shopList);
-        _mockShopListRepository.Setup(x => x.UpdateShopList(1, updatedShopList)).ThrowsAsync(new Exception());
-
-        Func<Task> task = () => _shopListService.UpdateShopList(1, cmd);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
+    
 
     [Fact]
     public async Task UpdateShopList_NullCmdArg_ThrowsArgumentNullException()
@@ -439,18 +357,5 @@ public class ShopListServiceTests
         await Assert.ThrowsAsync<ArgumentNullException>(task);
     }
 
-    [Fact]
-    public async Task GetShopListsForUser_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        var userDto = new UserDto
-        {
-            Id = "1",
-            UserName = "test",
-            Email = "test@gmail.com"
-        };
-        _mockUserManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(userDto);
-        _mockShopListRepository.Setup(x => x.GetShopListsByUser("1")).ThrowsAsync(new Exception());
-        Func<Task> task = () => _shopListService.GetShopListsForUser("1");
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
+    
 }

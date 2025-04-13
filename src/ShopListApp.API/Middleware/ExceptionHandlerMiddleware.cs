@@ -24,10 +24,6 @@ public class ExceptionHandlerMiddleware(RequestDelegate next)
                 context.Response.StatusCode = 401;
                 await context.Response.WriteAsync("Unauthorized access.");
                 return;
-            case DatabaseErrorException:
-                context.Response.StatusCode = 500;
-                await context.Response.WriteAsync("Database error occurred.");
-                return;
             case ArgumentNullException:
                 context.Response.StatusCode = 400;
                 await context.Response.WriteAsync("Invalid input.");

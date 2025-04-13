@@ -51,21 +51,7 @@ public class UserServiceTests
         await Assert.ThrowsAsync<ArgumentNullException>(task);
     }
 
-    [Fact]
-    public async Task CreateUser_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        RegisterUserCommand cmd = new RegisterUserCommand
-        {
-            UserName = "test",
-            Email = "test@gmail.com",
-            Password = "Password123@"
-        };
-        _mockManager.Setup(x => x.CreateAsync(It.IsAny<UserDto>(), cmd.Password)).ThrowsAsync(new Exception());
-
-        Func<Task> task = async () => await _userService.CreateUser(cmd);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
+    
 
     [Fact]
     public void DeleteUser_UserFound_DeletesUser()
@@ -148,29 +134,6 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task DeleteUser_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        string id = "1";
-        DeleteUserCommand cmd = new DeleteUserCommand
-        {
-            Password = "Password123@"
-        };
-        var userDto = new UserDto
-        {
-            Id = "1",
-            UserName = "test",
-            Email = "test@gmail.com"
-        };
-        _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(userDto);
-        _mockManager.Setup(x => x.CheckPasswordAsync(It.IsAny<UserDto>(), cmd.Password)).ReturnsAsync(true);
-        _mockManager.Setup(x => x.DeleteAsync(It.IsAny<UserDto>())).ThrowsAsync(new Exception());
-
-        Func<Task> task = async () => await _userService.DeleteUser(id, cmd);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
-
-    [Fact]
     public void UpdateUser_UserFound_UpdatesUser()
     {
         string id = "1";
@@ -244,29 +207,6 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task UpdateUser_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        string id = "1";
-        UpdateUserCommand cmd = new UpdateUserCommand
-        {
-            UserName = "updated",
-            CurrentPassword = "Password123@"
-        };
-        var userDto = new UserDto
-        {
-            Id = "1",
-            UserName = "test",
-            Email = "test@gmail.com"
-        };
-        _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(userDto);
-        _mockManager.Setup(x => x.UpdateAsync(It.IsAny<UserDto>())).ThrowsAsync(new Exception());
-
-        Func<Task> task = async () => await _userService.UpdateUser(id, cmd);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
-
-    [Fact]
     public async Task GetUserById_UserFound_ReturnsUser()
     {
         string id = "1";
@@ -294,16 +234,7 @@ public class UserServiceTests
         await Assert.ThrowsAsync<UnauthorizedAccessException>(task);
     }
 
-    [Fact]
-    public async Task GetUserById_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        string id = "1";
-        _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ThrowsAsync(new Exception());
-
-        Func<Task> task = async () => await _userService.GetUserById(id);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
+    
 
     [Fact]
     public async Task GetUserById_NullArg_ThrowsArgumentNullException()

@@ -12,71 +12,49 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
 {
     public async Task<ICollection<ProductResponse>> GetAllProducts()
     {
-        try
-        {
-            var products = await productRepository.GetAllProducts();
-            var productViews = GetProductViewsList(products);
-            return productViews;
-        }
-        catch { throw new DatabaseErrorException(); }
+        var products = await productRepository.GetAllProducts();
+        var productViews = GetProductViewsList(products);
+        return productViews;
     }
 
     public async Task<ICollection<ProductResponse>> GetProductsByCategoryId(int categoryId)
     {
-        try
-        {
-            _ = await categoryRepository.GetCategoryById(categoryId)
+        _ = await categoryRepository.GetCategoryById(categoryId)
                 ?? throw new CategoryNotFoundException();
-            var products = await productRepository.GetProductsByCategoryId(categoryId);
-            var productViews = GetProductViewsList(products);
-            return productViews;
-        }
-        catch (CategoryNotFoundException) { throw; }
-        catch { throw new DatabaseErrorException(); }
+        var products = await productRepository.GetProductsByCategoryId(categoryId);
+        var productViews = GetProductViewsList(products);
+        return productViews;
     }
 
     public async Task<ICollection<ProductResponse>> GetProductsByStoreId(int storeId)
     {
-        try
-        {
-            _ = await storeRepository.GetStoreById(storeId)
-                ?? throw new StoreNotFoundException();
-            var products = await productRepository.GetProductsByStoreId(storeId);
-            var productViews = GetProductViewsList(products);
-            return productViews;
-        }
-        catch (StoreNotFoundException) { throw; }
-        catch { throw new DatabaseErrorException(); }
+        _ = await storeRepository.GetStoreById(storeId)
+               ?? throw new StoreNotFoundException();
+        var products = await productRepository.GetProductsByStoreId(storeId);
+        var productViews = GetProductViewsList(products);
+        return productViews;
     }
 
     public async Task RefreshProducts()
     {
-        try
-        {
-            storePublisher.AddSubscribers();
-            await storePublisher.Notify();
-        }
-        catch { throw new FetchingErrorException(); }
+        storePublisher.AddSubscribers();
+        await storePublisher.Notify();
     }
 
     public async Task<ICollection<CategoryResponse>> GetCategories()
     {
-        try
+        var categories = await categoryRepository.GetAllCategories();
+        var categoryViews = new List<CategoryResponse>();
+        foreach (var category in categories)
         {
-            var categories = await categoryRepository.GetAllCategories();
-            var categoryViews = new List<CategoryResponse>();
-            foreach (var category in categories)
+            var categoryView = new CategoryResponse
             {
-                var categoryView = new CategoryResponse
-                {
-                    Id = category.Id,
-                    Name = category.Name,
-                };
-                categoryViews.Add(categoryView);
-            }
-            return categoryViews;
+                Id = category.Id,
+                Name = category.Name,
+            };
+            categoryViews.Add(categoryView);
         }
-        catch { throw new DatabaseErrorException(); }
+        return categoryViews;
     }
 
     private ICollection<ProductResponse> GetProductViewsList(ICollection<Product> products)
@@ -102,23 +80,18 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
 
     public async Task<ProductResponse?> GetProductById(int id)
     {
-        try
+        var product = await productRepository.GetProductById(id) ?? throw new ProductNotFoundException();
+        var productView = new ProductResponse
         {
-            var product = await productRepository.GetProductById(id) ?? throw new ProductNotFoundException();
-            var productView = new ProductResponse
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Price = product.Price,
-                StoreId = product.Store.Id,
-                CategoryId = product.Category?.Id,
-                CategoryName = product.Category?.Name,
-                StoreName = product.Store.Name,
-                ImageUrl = product.ImageUrl,
-            };
-            return productView;
-        }
-        catch (ProductNotFoundException) { throw; }
-        catch { throw new DatabaseErrorException(); }
+            Id = product.Id,
+            Name = product.Name,
+            Price = product.Price,
+            StoreId = product.Store.Id,
+            CategoryId = product.Category?.Id,
+            CategoryName = product.Category?.Name,
+            StoreName = product.Store.Name,
+            ImageUrl = product.ImageUrl,
+        };
+        return productView;
     }
 }

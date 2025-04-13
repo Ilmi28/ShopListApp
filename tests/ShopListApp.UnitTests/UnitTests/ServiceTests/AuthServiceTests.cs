@@ -102,22 +102,6 @@ public class AuthServiceTests
         await Assert.ThrowsAsync<ArgumentNullException>(task);
     }
 
-    [Fact]
-    public async Task RegisterUser_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        RegisterUserCommand cmd = new RegisterUserCommand
-        {
-            UserName = "test",
-            Email = "test@gmail.com",
-            Password = "Password123@"
-        };
-        _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.Email)).ReturnsAsync((UserDto?)null);
-        _mockUserManager.Setup(x => x.CreateAsync(It.IsAny<UserDto>(), cmd.Password)).ThrowsAsync(new Exception());
-
-        Func<Task> task = async () => await _authService.RegisterUser(cmd);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
 
     [Fact]
     public async Task LoginUser_ValidUsernameAndPassword_ReturnsTokens()
@@ -223,22 +207,6 @@ public class AuthServiceTests
     }
 
     [Fact]
-    public async Task LoginUser_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        LoginUserCommand cmd = new LoginUserCommand
-        {
-            UserIdentifier = "test",
-            Password = "Password123@"
-        };
-        _mockUserManager.Setup(x => x.FindByEmailAsync(cmd.UserIdentifier)).ReturnsAsync((UserDto?)null);
-        _mockUserManager.Setup(x => x.FindByNameAsync(cmd.UserIdentifier)).ThrowsAsync(new Exception());
-
-        Func<Task> task = async () => await _authService.LoginUser(cmd);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
-    }
-
-    [Fact]
     public async Task RefreshAccessToken_ValidToken_ReturnsToken()
     {
         var cmd = new RefreshTokenCommand
@@ -284,20 +252,5 @@ public class AuthServiceTests
         Func<Task> task = async () => await _authService.RefreshAccessToken(cmd);
 
         await Assert.ThrowsAsync<ArgumentNullException>(task);
-    }
-
-    [Fact]
-    public async Task RefreshAccessToken_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        var cmd = new RefreshTokenCommand
-        {
-            RefreshToken = "refreshToken"
-        };
-        _mockTokenManager.Setup(x => x.GetHashRefreshToken(cmd.RefreshToken)).Returns("hash");
-        _mockTokenRepository.Setup(x => x.GetToken("hash")).ThrowsAsync(new Exception());
-
-        Func<Task> task = async () => await _authService.RefreshAccessToken(cmd);
-
-        await Assert.ThrowsAsync<DatabaseErrorException>(task);
     }
 }

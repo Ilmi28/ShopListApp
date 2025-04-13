@@ -57,13 +57,6 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public async Task GetAllProducts_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        _mockProductRepository.Setup(x => x.GetAllProducts()).ThrowsAsync(new Exception());
-        await Assert.ThrowsAsync<DatabaseErrorException>(() => _productService.GetAllProducts());
-    }
-
-    [Fact]
     public async Task GetProductsByCategoryId_ValidCategoryId_ReturnsProducts()
     {
         var store = new Store { Id = 1, Name = "Store1" };
@@ -94,13 +87,6 @@ public class ProductServiceTests
     }
 
     [Fact]
-    public async Task GetProductsByCategoryId_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        _mockCategoryRepository.Setup(x => x.GetCategoryById(1)).ThrowsAsync(new Exception());
-        await Assert.ThrowsAsync<DatabaseErrorException>(() => _productService.GetProductsByCategoryId(1));
-    }
-
-    [Fact]
     public async Task GetProductsByStoreId_ValidStoreId_ReturnsProducts()
     {
         var store = new Store { Id = 1, Name = "Store1" };
@@ -128,12 +114,5 @@ public class ProductServiceTests
     {
         _mockStoreRepository.Setup(x => x.GetStoreById(1)).ReturnsAsync((Store?)null);
         await Assert.ThrowsAsync<StoreNotFoundException>(() => _productService.GetProductsByStoreId(1));
-    }
-
-    [Fact]
-    public async Task GetProductsByStoreId_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        _mockStoreRepository.Setup(x => x.GetStoreById(1)).ThrowsAsync(new Exception());
-        await Assert.ThrowsAsync<DatabaseErrorException>(() => _productService.GetProductsByStoreId(1));
     }
 }

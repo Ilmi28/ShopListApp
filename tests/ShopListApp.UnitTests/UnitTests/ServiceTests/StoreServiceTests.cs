@@ -45,12 +45,7 @@ public class StoreServiceTests
         Assert.Empty(result);
     }
 
-    [Fact]
-    public async Task GetStores_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        _mockStoreRepository.Setup(x => x.GetStores()).ThrowsAsync(new Exception());
-        await Assert.ThrowsAsync<DatabaseErrorException>(() => _storeService.GetStores());
-    }
+    
 
     [Fact]
     public async Task GetStorebyId_ValidStoreId_ReturnsStores()
@@ -68,11 +63,6 @@ public class StoreServiceTests
         await Assert.ThrowsAsync<StoreNotFoundException>(() => _storeService.GetStoreById(1));
     }
 
-    [Fact]
-    public async Task GetStorebyId_DatabaseError_ThrowsDatabaseErrorException()
-    {
-        _mockStoreRepository.Setup(x => x.GetStoreById(1)).ThrowsAsync(new Exception());
-        await Assert.ThrowsAsync<DatabaseErrorException>(() => _storeService.GetStoreById(1));
-    }
+    
 
 }
