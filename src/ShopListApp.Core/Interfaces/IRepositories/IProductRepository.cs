@@ -10,6 +10,9 @@ public interface IProductRepository
     Task<Product?> GetProductById(int id);
     Task<Product?> GetProductByName(string name);
     Task<ICollection<Product>> GetProductsByCategoryId(int categoryId);
+    Task<(ICollection<Product> products, int total)> GetPagedProductsByCategoryId(int categoryId, int pageNumber, int pageSize);
     Task<ICollection<Product>> GetProductsByStoreId(int storeId);
+    Task<(ICollection<Product> products, int total)> GetPagedProductsByStoreId(int storeId, int pageNumber, int pageSize);
     Task<ICollection<Product>> GetAllProducts();
+    Task<(ICollection<Product> products, int total)> GetPagedAllProducts(int pageNumber, int pageSize);
 }

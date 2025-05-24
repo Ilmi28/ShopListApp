@@ -8,22 +8,23 @@ namespace ShopListApp.API.Controllers;
 public class ProductController(IProductService productService) : ControllerBase
 {
     [HttpGet("get-all")]
-    public async Task<IActionResult> GetAllProducts()
+    public async Task<IActionResult> GetAllProducts(int pageNumber, int pageSize)
     {
-        return Ok(await productService.GetAllProducts());
+        return Ok(await productService.GetPagedAllProducts(pageNumber, pageSize));
     }
 
     [HttpGet("get-by-category/{id}")]
-    public async Task<IActionResult> GetProductsByCategory(int id)
+    public async Task<IActionResult> GetProductsByCategory(int id,  int pageNumber, int pageSize)
     {
-        return Ok(await productService.GetProductsByCategoryId(id));
+        var response = await productService.GetPagedProductsByCategoryId(id, pageNumber, pageSize);
+        return Ok(response);
     }
 
 
     [HttpGet("get-by-store/{id}")]
-    public async Task<IActionResult> GetProductsByStore(int id)
+    public async Task<IActionResult> GetProductsByStore(int id, int pageNumber, int pageSize)
     {
-        return Ok(await productService.GetProductsByStoreId(id));
+        return Ok(await productService.GetPagedProductsByStoreId(id,  pageNumber, pageSize));
     }
 
     [HttpPatch("refresh")]

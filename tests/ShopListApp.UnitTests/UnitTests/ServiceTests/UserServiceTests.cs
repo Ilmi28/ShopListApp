@@ -14,9 +14,9 @@ namespace ShopListApp.UnitTests.UnitTests.ServiceTests;
 
 public class UserServiceTests
 {
-    private Mock<IUserManager> _mockManager;
-    private Mock<IDbLogger<UserDto>> _mockLogger;
-    private UserService _userService;
+    private readonly Mock<IUserManager> _mockManager;
+    private readonly Mock<IDbLogger<UserDto>> _mockLogger;
+    private readonly UserService _userService;
     public UserServiceTests()
     {
         var store = new Mock<IUserStore<User>>();

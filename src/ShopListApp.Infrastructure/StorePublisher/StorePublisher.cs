@@ -12,7 +12,7 @@ public class StorePublisher(IHtmlFetcher<HtmlNode, HtmlDocument> htmlFetcher,
     ICategoryRepository categoryRepository,
     IStoreRepository storeRepository) : IStorePublisher
 {
-    private List<IStoreSubscriber> _subscribers = new List<IStoreSubscriber>();
+    private readonly List<IStoreSubscriber> _subscribers = new List<IStoreSubscriber>();
 
     public async Task Notify()
     {

@@ -12,11 +12,11 @@ namespace ShopListApp.UnitTests.UnitTests.ServiceTests;
 
 public class AuthServiceTests
 {
-    private AuthService _authService;
-    private Mock<IUserManager> _mockUserManager;
-    private Mock<IDbLogger<UserDto>> _mockLogger;
-    private Mock<ITokenManager> _mockTokenManager;
-    private Mock<ITokenRepository> _mockTokenRepository;
+    private readonly AuthService _authService;
+    private readonly Mock<IUserManager> _mockUserManager;
+    private readonly Mock<IDbLogger<UserDto>> _mockLogger;
+    private readonly Mock<ITokenManager> _mockTokenManager;
+    private readonly Mock<ITokenRepository> _mockTokenRepository;
     public AuthServiceTests()
     {
         _mockUserManager = new Mock<IUserManager>();

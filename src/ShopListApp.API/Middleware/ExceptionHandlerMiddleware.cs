@@ -20,6 +20,10 @@ public class ExceptionHandlerMiddleware(RequestDelegate next)
     {
         switch (ex)
         {
+            case InvalidOperationException:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsync(ex.Message);
+                return;
             case UnauthorizedAccessException:
                 context.Response.StatusCode = 401;
                 await context.Response.WriteAsync("Unauthorized access.");

@@ -10,11 +10,39 @@ namespace ShopListApp.Application.Services;
 public class ProductService(IProductRepository productRepository, IStoreRepository storeRepository,
     ICategoryRepository categoryRepository, IStorePublisher storePublisher) : IProductService
 {
+    public async Task<PagedProductResponse> GetPagedProductsByStoreId(int storeId, int pageNumber, int pageSize)
+    {
+        if (pageNumber < 1 || pageSize < 1) 
+            throw new InvalidOperationException("Page number and page size must be greater than zero.");
+        _ = await storeRepository.GetStoreById(storeId)
+            ??  throw new StoreNotFoundException();
+        (var products, int totalCount) = await productRepository.GetPagedProductsByStoreId(storeId, pageNumber, pageSize);
+        var productViews = GetProductViewsList(products);
+        return new PagedProductResponse
+        {
+            TotalProducts = totalCount,
+            Products = productViews,
+        };
+    }
+
     public async Task<ICollection<ProductResponse>> GetAllProducts()
     {
         var products = await productRepository.GetAllProducts();
         var productViews = GetProductViewsList(products);
         return productViews;
+    }
+
+    public async Task<PagedProductResponse> GetPagedAllProducts(int pageNumber, int pageSize)
+    {
+        if (pageNumber < 1 || pageSize < 1) 
+            throw new InvalidOperationException("Page number and page size must be greater than zero.");
+        (var products, int totalCount) = await productRepository.GetPagedAllProducts(pageNumber, pageSize);
+        var productViews = GetProductViewsList(products);
+        return new PagedProductResponse
+        {
+            TotalProducts = totalCount,
+            Products = productViews,
+        };
     }
 
     public async Task<ICollection<ProductResponse>> GetProductsByCategoryId(int categoryId)
@@ -24,6 +52,21 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
         var products = await productRepository.GetProductsByCategoryId(categoryId);
         var productViews = GetProductViewsList(products);
         return productViews;
+    }
+
+    public async Task<PagedProductResponse> GetPagedProductsByCategoryId(int categoryId, int pageNumber, int pageSize)
+    {
+        if (pageNumber < 1 || pageSize < 1) 
+            throw new InvalidOperationException("Page number and page size must be greater than zero.");
+        _ = await categoryRepository.GetCategoryById(categoryId)
+            ?? throw new CategoryNotFoundException();
+        (var products, int totalCount) = await productRepository.GetPagedProductsByCategoryId(categoryId, pageNumber, pageSize);
+        var productViews = GetProductViewsList(products);
+        return new PagedProductResponse
+        {
+            TotalProducts = totalCount,
+            Products = productViews,
+        };
     }
 
     public async Task<ICollection<ProductResponse>> GetProductsByStoreId(int storeId)

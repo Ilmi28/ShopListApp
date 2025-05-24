@@ -3,6 +3,8 @@ using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.IntegrationTests.IntegrationTests.WebApplicationFactories;
 using System.Net;
+using Newtonsoft.Json;
+using ShopListApp.Core.Responses;
 
 namespace ShopListApp.IntegrationTests.IntegrationTests;
 
@@ -39,54 +41,66 @@ public class ProductTests : IClassFixture<ProductWebApplicationFactory>
     [Fact]
     public async Task GetAllProducts_ReturnsAllProducts()
     {
-        var result = await _client.GetAsync("/api/product/get-all");
-
-        var productCount = _context.Products.Count();
+        var result = await _client.GetAsync("/api/product/get-all?pageNumber=1&pageSize=2");
+        
+        var content = await result.Content.ReadAsStringAsync();
+        var pagedProductResponse = JsonConvert.DeserializeObject<PagedProductResponse>(content);
+        var returnedProducts = pagedProductResponse!.Products.ToList();
         var dbProducts = _context.Products.ToList();
+        
         Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-        Assert.Equal(4, productCount);
-        Assert.Equal(1, dbProducts[0].Id);
-        Assert.Equal(2, dbProducts[1].Id);
-        Assert.Equal(3, dbProducts[2].Id);
-        Assert.Equal(4, dbProducts[3].Id);
+        Assert.Equal(4, pagedProductResponse!.TotalProducts);
+        Assert.Equal(2, returnedProducts.Count);
+        Assert.Equal(returnedProducts[0].Id, dbProducts[0].Id);
+        Assert.Equal(returnedProducts[1].Id, dbProducts[1].Id);
     }
 
     [Fact]
     public async Task GetProductsByCategory_CategoryFound_ReturnsAllProductsWithCategory()
     {
-        var result = await _client.GetAsync("/api/product/get-by-category/1");
+        var result = await _client.GetAsync("/api/product/get-by-category/1?pageNumber=2&pageSize=2");
+        
+        var content = await result.Content.ReadAsStringAsync();
+        var pagedProductResponse = JsonConvert.DeserializeObject<PagedProductResponse>(content);
+        var returnedProducts = pagedProductResponse!.Products.ToList();
         var dbProducts = _context.Products.Where(x => x.Category!.Id == 1).ToList();
+        
         Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-        Assert.Equal(3, dbProducts.Count);
-        Assert.Equal(1, dbProducts[0].Id);
-        Assert.Equal(2, dbProducts[1].Id);
-        Assert.Equal(3, dbProducts[2].Id);
+        Assert.Equal(3, pagedProductResponse.TotalProducts);
+        Assert.Single(returnedProducts);
+        Assert.Equal(returnedProducts[0].Id, dbProducts[2].Id);
     }
 
     [Fact]
     public async Task GetProductsByCategory_CategoryNotFound_ReturnsNotFound()
     {
-        var result = await _client.GetAsync("/api/product/get-by-category/100");
+        var result = await _client.GetAsync("/api/product/get-by-category/100?pageNumber=1&pageSize=2");
         Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
     }
 
     [Fact]
     public async Task GetProductsByStore_StoreFound_ReturnsAllProductsWithStore()
     {
-        var result = await _client.GetAsync("/api/product/get-by-store/1");
+        var result = await _client.GetAsync("/api/product/get-by-store/1?pageNumber=1&pageSize=4");
+        
+        var content = await result.Content.ReadAsStringAsync();
+        var pagedProductResponse = JsonConvert.DeserializeObject<PagedProductResponse>(content);
+        var returnedProducts = pagedProductResponse!.Products.ToList();
         var dbProducts = _context.Products.Where(x => x.Store.Id == 1).ToList();
+        
         Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-        Assert.Equal(4, dbProducts.Count);
-        Assert.Equal(1, dbProducts[0].Id);
-        Assert.Equal(2, dbProducts[1].Id);
-        Assert.Equal(3, dbProducts[2].Id);
-        Assert.Equal(4, dbProducts[3].Id);
+        Assert.Equal(4, pagedProductResponse.TotalProducts);
+        Assert.Equal(4, returnedProducts.Count);
+        Assert.Equal(returnedProducts[0].Id, dbProducts[0].Id);
+        Assert.Equal(returnedProducts[1].Id, dbProducts[1].Id);
+        Assert.Equal(returnedProducts[2].Id, dbProducts[2].Id);
+        Assert.Equal(returnedProducts[3].Id, dbProducts[3].Id);
     }
 
     [Fact]
     public async Task GetProductsByStore_StoreNotFound_ReturnsNotFound()
     {
-        var result = await _client.GetAsync("/api/product/get-by-store/100");
+        var result = await _client.GetAsync("/api/product/get-by-store/100?pageNumber=1&pageSize=2");
         Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
     }
 

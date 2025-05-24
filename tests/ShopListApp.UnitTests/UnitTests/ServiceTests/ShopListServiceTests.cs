@@ -15,12 +15,12 @@ namespace ShopListApp.UnitTests.UnitTests.ServiceTests;
 
 public class ShopListServiceTests
 {
-    private ShopListService _shopListService;
-    private Mock<IShopListRepository> _mockShopListRepository;
-    private Mock<IShopListProductRepository> _mockShopListProductRepository;
-    private Mock<IProductRepository> _mockProductRepository;
-    private Mock<IDbLogger<ShopList>> _mockLogger;
-    private Mock<IUserManager> _mockUserManager;
+    private readonly ShopListService _shopListService;
+    private readonly Mock<IShopListRepository> _mockShopListRepository;
+    private readonly Mock<IShopListProductRepository> _mockShopListProductRepository;
+    private readonly Mock<IProductRepository> _mockProductRepository;
+    private readonly Mock<IDbLogger<ShopList>> _mockLogger;
+    private readonly Mock<IUserManager> _mockUserManager;
     public ShopListServiceTests()
     {
         _mockShopListRepository = new Mock<IShopListRepository>();

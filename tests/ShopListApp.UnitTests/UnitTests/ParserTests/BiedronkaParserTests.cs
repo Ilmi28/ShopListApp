@@ -7,7 +7,7 @@ namespace ShopListApp.UnitTests.UnitTests.ParserTests;
 
 public class BiedronkaParserTests
 {
-    private BiedronkaParser _parser;
+    private readonly BiedronkaParser _parser;
     public BiedronkaParserTests()
     {
         var fetcher = new BiedronkaHtmlFetcherStub();

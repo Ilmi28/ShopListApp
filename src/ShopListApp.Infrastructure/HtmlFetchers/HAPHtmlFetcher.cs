@@ -6,7 +6,7 @@ namespace ShopListApp.Infrastructure.HtmlFetchers;
 
 public class HAPHtmlFetcher : IHtmlFetcher<HtmlNode, HtmlDocument>
 {
-    private HttpClient _client = null!;
+    private readonly HttpClient _client = null!;
     public HAPHtmlFetcher(HttpClient client)
     {
         _client = client;

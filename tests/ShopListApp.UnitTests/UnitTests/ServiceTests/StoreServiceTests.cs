@@ -8,8 +8,8 @@ namespace ShopListApp.UnitTests.UnitTests.ServiceTests;
 
 public class StoreServiceTests
 {
-    private StoreService _storeService;
-    private Mock<IStoreRepository> _mockStoreRepository;
+    private readonly StoreService _storeService;
+    private readonly Mock<IStoreRepository> _mockStoreRepository;
 
     public StoreServiceTests()
     {
