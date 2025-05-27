@@ -27,6 +27,7 @@ ASP.NET Core Web API for managing shopping lists with real-time product price tr
 - Entity Framework Core
 - JWT Authentication
 - HTML Agility Pack for scraping
+- SQL Server
 
 ## Quick Start
 
