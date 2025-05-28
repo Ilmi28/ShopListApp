@@ -13,7 +13,6 @@ ASP.NET Core Web API for managing shopping lists with real-time product price tr
   - Live price scraping from stores
   - Product categorization
   - Image support
-  - Price history tracking
 
 - **Store Integration**
   - Biedronka store integration
