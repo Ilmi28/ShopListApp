@@ -45,4 +45,10 @@ public class ProductController(IProductService productService) : ControllerBase
     {
         return Ok(await productService.GetProductById(id));
     }
+
+    [HttpGet("search")]
+    public async Task<IActionResult> SearchProducts(string q, int pageNumber, int pageSize)
+    {
+        return Ok(await productService.SearchProducts(q, pageNumber, pageSize));   
+    }
 }

@@ -137,4 +137,17 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
         };
         return productView;
     }
+
+    public async Task<PagedProductResponse> SearchProducts(string search, int pageNumber, int pageSize)
+    {
+        if (pageNumber < 1 || pageSize < 1) 
+            throw new InvalidOperationException("Page number and page size must be greater than zero.");
+        (var products, int count) = await productRepository.SearchProductsByName(search, pageNumber, pageSize);
+        var productViews = GetProductViewsList(products);
+        return new PagedProductResponse
+        {
+            TotalProducts = count,
+            Products = productViews,
+        };
+    }
 }

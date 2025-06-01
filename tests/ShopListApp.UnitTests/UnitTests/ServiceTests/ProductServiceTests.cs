@@ -229,4 +229,32 @@ public class ProductServiceTests
     {
         await Assert.ThrowsAsync<InvalidOperationException>(() => _productService.GetPagedAllProducts(pageNumber, pageSize));
     }
+
+    [Fact]
+    public async Task SearchProducts_ValidData_ReturnsProducts()
+    {
+        var store = new Store { Id = 1, Name = "Store1" };
+        var category = new Category { Id = 1, Name = "Category1" };
+        var products = new List<Product>
+        {
+            new Product { Id = 1, Name = "Product1", Price = 1.99m, Category = category, Store = store },
+        };
+        
+        _mockProductRepository.Setup(x => x.SearchProductsByName(It.IsAny<string>(), 1, 1))
+            .ReturnsAsync((products, 1));
+        
+        var result = await _productService.SearchProducts(It.IsAny<string>(), 1, 1);
+        
+        Assert.Equal(1, result.TotalProducts);
+        Assert.Single(result.Products);
+    }
+
+    [Theory]
+    [InlineData(1, 0)]
+    [InlineData(0, 1)]
+    [InlineData(0, 0)]
+    public async Task SearchProducts_InvalidPageValues_ThrowsInvalidOperationException(int pageNumber, int pageSize)
+    {
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _productService.SearchProducts(It.IsAny<string>(), pageNumber, pageSize));
+    }
 }

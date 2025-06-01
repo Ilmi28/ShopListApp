@@ -13,4 +13,5 @@ public interface IProductService
     Task<PagedProductResponse> GetPagedAllProducts(int pageNumber, int pageSize);
     Task<ICollection<CategoryResponse>> GetCategories();
     Task<ProductResponse?> GetProductById(int id);
+    Task<PagedProductResponse> SearchProducts(string search, int pageNumber, int pageSize);
 }

@@ -145,4 +145,18 @@ public class ProductTests : IClassFixture<ProductWebApplicationFactory>
         Assert.Equal(14.99m, dbProducts[2].Price);
 
     }
+
+    [Fact]
+    public async Task SearchProducts_ValidArgs()
+    {
+        var result = await _client.GetAsync("/api/product/search?q=papryka&pageNumber=1&pageSize=4");
+        
+        var content = await result.Content.ReadAsStringAsync();
+        var pagedProductResponse = JsonConvert.DeserializeObject<PagedProductResponse>(content);
+        var returnedProducts = pagedProductResponse!.Products.ToList();
+        
+        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(1, pagedProductResponse.TotalProducts);
+        Assert.Single(returnedProducts);
+    }
 }

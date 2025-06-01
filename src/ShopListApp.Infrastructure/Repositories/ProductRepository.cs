@@ -105,8 +105,24 @@ public class ProductRepository(ShopListDbContext context) : IProductRepository
         return (products, count);
     }
 
+    public async Task<(ICollection<Product>, int)> SearchProductsByName(string name, int pageNumber, int pageSize)
+    {
+        var query = context.Products
+            .Include(x => x.Store)
+            .Include(x => x.Category)
+            .Where(x => x.Name.ToLower().Contains(name.ToLower()));
+        var count = await query.CountAsync();
+        return (await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(), count);
+    }
+
     public async Task<Product?> GetProductByName(string name)
     {
-        return await context.Products.Include(x => x.Store).Include(x => x.Category).FirstOrDefaultAsync(x => x.Name == name);
+        return await context.Products
+            .Include(x => x.Store)
+            .Include(x => x.Category)
+            .FirstOrDefaultAsync(x => x.Name == name);
     }
 }
