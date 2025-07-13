@@ -14,26 +14,27 @@ public class JwtTokenManager(IConfiguration config) : ITokenManager
     public string GenerateAccessToken(UserDto user)
     {
         var tokenConfig = config.GetSection("TokenConfiguration");
-        string issuer = "https://localhost:7101";
-        string audience = "https://localhost:7101";
-        string secretKey = Environment.GetEnvironmentVariable("SecretJwtKey") 
-            ?? tokenConfig.GetValue<string>("SecretKey") 
+        string issuer = tokenConfig.GetSection("Issuer").Get<string>() ?? string.Empty;
+        string[] audience = tokenConfig.GetSection("Audience").Get<string[]>() ?? [];
+        string secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY") 
             ?? string.Empty;
         int jwtExpireMinutes = tokenConfig.GetValue<int>("AccessTokenExpirationMinutes");
         DateTime jwtExpireDate = DateTime.Now.AddMinutes(jwtExpireMinutes);
         var symmKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var credentials = new SigningCredentials(symmKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new[]
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id),
             new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
             new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
         };
 
+        foreach (var aud in audience)
+            claims.Add(new Claim("aud", aud));
+
         var token = new JwtSecurityToken(
             issuer: issuer,
-            audience: audience,   
             claims: claims, 
             expires: jwtExpireDate, 
             signingCredentials: credentials);

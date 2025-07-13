@@ -25,7 +25,7 @@ public class StoreService(IStoreRepository storeRepository) : IStoreService
 
     public async Task<StoreResponse> GetStoreById(int id)
     {
-        var store = await storeRepository.GetStoreById(id) ?? throw new StoreNotFoundException();
+        var store = await storeRepository.GetStoreById(id) ?? throw new StoreNotFoundException($"Store with id {id} not found.");
         var storeView = new StoreResponse
         {
             Id = store.Id,

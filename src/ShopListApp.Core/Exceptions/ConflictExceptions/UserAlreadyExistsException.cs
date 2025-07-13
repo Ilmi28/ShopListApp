@@ -1,5 +1,7 @@
-﻿namespace ShopListApp.Core.Exceptions;
+﻿using ShopListApp.Core.Exceptions.BaseExceptions;
 
-public class UserAlreadyExistsException : Exception
+namespace ShopListApp.Core.Exceptions;
+
+public class UserAlreadyExistsException(string message) : ConflictException(message)
 {
 }

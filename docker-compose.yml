@@ -1,0 +1,10 @@
+services:
+  shoplistapp.api:
+    image: ${DOCKER_REGISTRY-}shoplistappapi
+    build:
+      context: .
+      dockerfile: src/ShopListApp.API/Dockerfile
+    ports:
+      - "5181:5181"
+      - "7278:7278"
+

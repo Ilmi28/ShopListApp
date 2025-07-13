@@ -15,7 +15,7 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
         if (pageNumber < 1 || pageSize < 1) 
             throw new InvalidOperationException("Page number and page size must be greater than zero.");
         _ = await storeRepository.GetStoreById(storeId)
-            ??  throw new StoreNotFoundException();
+            ??  throw new StoreNotFoundException($"Store with id {storeId} not found");
         (var products, int totalCount) = await productRepository.GetPagedProductsByStoreId(storeId, pageNumber, pageSize);
         var productViews = GetProductViewsList(products);
         return new PagedProductResponse
@@ -48,7 +48,7 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
     public async Task<ICollection<ProductResponse>> GetProductsByCategoryId(int categoryId)
     {
         _ = await categoryRepository.GetCategoryById(categoryId)
-                ?? throw new CategoryNotFoundException();
+                ?? throw new CategoryNotFoundException($"Category with id {categoryId} not found.");
         var products = await productRepository.GetProductsByCategoryId(categoryId);
         var productViews = GetProductViewsList(products);
         return productViews;
@@ -59,7 +59,7 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
         if (pageNumber < 1 || pageSize < 1) 
             throw new InvalidOperationException("Page number and page size must be greater than zero.");
         _ = await categoryRepository.GetCategoryById(categoryId)
-            ?? throw new CategoryNotFoundException();
+            ?? throw new CategoryNotFoundException($"Category with id {categoryId} not found");
         (var products, int totalCount) = await productRepository.GetPagedProductsByCategoryId(categoryId, pageNumber, pageSize);
         var productViews = GetProductViewsList(products);
         return new PagedProductResponse
@@ -72,7 +72,7 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
     public async Task<ICollection<ProductResponse>> GetProductsByStoreId(int storeId)
     {
         _ = await storeRepository.GetStoreById(storeId)
-               ?? throw new StoreNotFoundException();
+               ?? throw new StoreNotFoundException($"Store with id {storeId} not found.");
         var products = await productRepository.GetProductsByStoreId(storeId);
         var productViews = GetProductViewsList(products);
         return productViews;
@@ -123,7 +123,7 @@ public class ProductService(IProductRepository productRepository, IStoreReposito
 
     public async Task<ProductResponse?> GetProductById(int id)
     {
-        var product = await productRepository.GetProductById(id) ?? throw new ProductNotFoundException();
+        var product = await productRepository.GetProductById(id) ?? throw new ProductNotFoundException($"Product with id {id} not found.");
         var productView = new ProductResponse
         {
             Id = product.Id,

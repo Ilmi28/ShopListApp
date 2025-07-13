@@ -77,8 +77,7 @@ public static class ServiceExtensionMethods
 
     public static void AddIdentityDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        var connString = Environment.GetEnvironmentVariable("ShopListAppConnectionString") 
-            ?? configuration!.GetConnectionString("DefaultConnection")
+        var connString = Environment.GetEnvironmentVariable("CONNECTION_STRING") 
             ?? string.Empty;
         services.AddDbContext<ShopListDbContext>(options =>
         {
@@ -97,8 +96,7 @@ public static class ServiceExtensionMethods
         }).AddJwtBearer(options =>
         {
             var tokenConfiguration = configuration!.GetSection("TokenConfiguration");
-            string secretKey = Environment.GetEnvironmentVariable("JwtSecretKey")
-                ?? tokenConfiguration.GetValue<string>("SecretKey")
+            string secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY")
                 ?? string.Empty;
             options.TokenValidationParameters = new TokenValidationParameters
             {
@@ -107,7 +105,7 @@ public static class ServiceExtensionMethods
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = tokenConfiguration.GetValue<string>("Issuer"),
-                ValidAudience = tokenConfiguration.GetValue<string>("Audience"),
+                ValidAudiences = tokenConfiguration.GetSection("Audience").Get<string[]>() ?? [],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
             };
         });

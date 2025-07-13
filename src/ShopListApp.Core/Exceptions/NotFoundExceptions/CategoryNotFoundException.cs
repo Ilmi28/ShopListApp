@@ -1,5 +1,7 @@
-﻿namespace ShopListApp.Core.Exceptions;
+﻿using ShopListApp.Core.Exceptions.BaseExceptions;
 
-public class CategoryNotFoundException : Exception
+namespace ShopListApp.Core.Exceptions;
+
+public class CategoryNotFoundException(string message) : NotFoundException(message)
 {
 }

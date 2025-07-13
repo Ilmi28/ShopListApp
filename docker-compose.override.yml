@@ -1,0 +1,16 @@
+services:
+  shoplistapp.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=5181
+      - ASPNETCORE_HTTPS_PORTS=7278
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - CONNECTION_STRING=${CONNECTION_STRING} 
+    ports:
+      - "5181:5181"
+      - "7278:7278"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro

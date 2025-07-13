@@ -17,8 +17,8 @@ public class ShopListService(IShopListRepository shopListRepository, IShopListPr
 {
     public async Task AddProductToShopList(int shopListId, int productId, int quantity = 1)
     {
-        var shopList = await shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException();
-        var product = await productRepository.GetProductById(productId) ?? throw new ProductNotFoundException();
+        var shopList = await shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException($"Shop list with id {shopListId} not found.");
+        var product = await productRepository.GetProductById(productId) ?? throw new ProductNotFoundException($"Product with id {productId} not found.");
         var dbShopListProduct = await shopListProductRepository.GetShopListProduct(shopListId, productId);
         if (dbShopListProduct != null)
         {
@@ -55,27 +55,27 @@ public class ShopListService(IShopListRepository shopListRepository, IShopListPr
     public async Task DeleteShopList(int shopListId)
     {
         bool result;
-        var shopList = await shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException();
+        var shopList = await shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException($"Shop list with id {shopListId} not found.");
         var shopListProducts = await shopListProductRepository.GetProductsForShopList(shopListId);
         foreach (var product in shopListProducts)
         {
             result = await shopListProductRepository.RemoveShopListProduct(shopListId, product.Id);
-            if (!result) throw new ShopListProductNotFoundException();
+            if (!result) throw new ShopListProductNotFoundException($"Product with id {product.Id} not found in shop list with id {shopListId}");
         }
         result = await shopListRepository.RemoveShopList(shopListId);
-        if (!result) throw new ShopListNotFoundException();
+        if (!result) throw new ShopListNotFoundException($"Shop list with id {shopListId} not found.");
         await logger.Log(Operation.Delete, shopList);
     }
 
     public async Task<ShopListResponse> GetShopListById(int shopListId)
     {
-        var shopList = await shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException();
+        var shopList = await shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException($"Shop list with id {shopListId} not found.");
         var shopListProducts = await shopListProductRepository.GetProductsForShopList(shopListId);
         var productViews = new List<ProductResponse>();
         foreach (var product in shopListProducts)
         {
             var shopListProductForQuantity = await shopListProductRepository.GetShopListProduct(shopListId, product.Id)
-                ?? throw new ShopListProductNotFoundException();
+                ?? throw new ShopListProductNotFoundException($"Product with id {product.Id} not found in shop list with id {shopListId}");
             productViews.Add(new ProductResponse
             {
                 Id = product.Id,
@@ -101,9 +101,9 @@ public class ShopListService(IShopListRepository shopListRepository, IShopListPr
 
     public async Task RemoveProductFromShopList(int shopListId, int productId, int quantity = int.MaxValue)
     {
-        var shopList = await shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException();
+        var shopList = await shopListRepository.GetShopListById(shopListId) ?? throw new ShopListNotFoundException($"Shop list with id {shopListId} not found");
         var shopListProduct = await shopListProductRepository.GetShopListProduct(shopListId, productId)
-            ?? throw new ShopListProductNotFoundException();
+            ?? throw new ShopListProductNotFoundException($"Product with id {productId} not found in shop list with id {shopListId}");
         bool result;
         if (quantity >= shopListProduct.Quantity)
             result = await shopListProductRepository.RemoveShopListProduct(shopListId, productId);
@@ -120,13 +120,13 @@ public class ShopListService(IShopListRepository shopListRepository, IShopListPr
     {
         _ = cmd ?? throw new ArgumentNullException();
         var shopList = await shopListRepository.GetShopListById(shopListId)
-                ?? throw new ShopListNotFoundException();
+                ?? throw new ShopListNotFoundException($"Shop list with id {shopListId} not found.");
         var updatedShopList = new ShopList
         {
             Name = cmd.Name,
             UserId = shopList.UserId
         };
-        if (shopList == null) throw new ShopListNotFoundException();
+        if (shopList == null) throw new ShopListNotFoundException($"Shop list with id {shopListId} not found.");
         var result = await shopListRepository.UpdateShopList(shopListId, updatedShopList);
         if (!result) throw new Exception("Unexpected error occured");
     }
@@ -159,7 +159,7 @@ public class ShopListService(IShopListRepository shopListRepository, IShopListPr
         foreach (var product in shopListProducts)
         {
             var shopListProductForQuantity = await shopListProductRepository.GetShopListProduct(shopList.Id, product.Id)
-                ?? throw new ShopListProductNotFoundException();
+                ?? throw new ShopListProductNotFoundException($"Product with id {product.Id} not found in shop list with id {shopList.Id}");
             productViews.Add(new ProductResponse
             {
                 Id = product.Id,

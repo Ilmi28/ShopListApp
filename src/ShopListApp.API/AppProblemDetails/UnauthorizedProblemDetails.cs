@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ShopListApp.API.AppProblemDetails;
 
-public class UnathorizedProblemDetails : ProblemDetails
+public class UnauthorizedProblemDetails : ProblemDetails
 {
     public UnauthorizedProblemDetails(string? detail)
     {

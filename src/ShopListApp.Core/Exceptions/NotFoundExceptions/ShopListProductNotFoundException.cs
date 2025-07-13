@@ -1,5 +1,7 @@
-﻿namespace ShopListApp.Core.Exceptions;
+﻿using ShopListApp.Core.Exceptions.BaseExceptions;
 
-public class ShopListProductNotFoundException : Exception
+namespace ShopListApp.Core.Exceptions;
+
+public class ShopListProductNotFoundException(string message) : NotFoundException(message)
 {
 }

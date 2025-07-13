@@ -28,9 +28,9 @@ public class AuthService(IUserManager userManager,
         var userByEmail = await userManager.FindByEmailAsync(cmd.Email);
         var userByName = await userManager.FindByNameAsync(cmd.UserName);
         if (userByEmail != null)
-            throw new UserWithEmailAlreadyExistsException();
+            throw new UserWithEmailAlreadyExistsException($"User with email {cmd.Email} already exists");
         if (userByName != null)
-            throw new UserWithUserNameAlreadyExistsException();
+            throw new UserWithUserNameAlreadyExistsException($"User with username {cmd.UserName} already exists");
         await userManager.CreateAsync(user, cmd.Password);
         string identityToken = tokenManager.GenerateAccessToken(user);
         string refreshToken = tokenManager.GenerateRefreshToken();

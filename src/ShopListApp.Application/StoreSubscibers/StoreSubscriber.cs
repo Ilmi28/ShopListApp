@@ -36,7 +36,7 @@ public class StoreSubscriber(IParser parser, IProductRepository productRepositor
     private async Task AddParsedProductToDb(ParseProductCommand cmd)
     {
         var category = await categoryRepository.GetCategoryByName(cmd.CategoryName);
-        var store = await storeRepository.GetStoreById(cmd.StoreId) ?? throw new StoreNotFoundException();
+        var store = await storeRepository.GetStoreById(cmd.StoreId) ?? throw new StoreNotFoundException($"Store with id {cmd.StoreId} not found.");
         var product = new Product
         {
             Name = cmd.Name,
@@ -51,7 +51,7 @@ public class StoreSubscriber(IParser parser, IProductRepository productRepositor
     private async Task<bool> UpdateParsedProductInDb(ParseProductCommand cmd, Product existingProduct)
     {
         var category = await categoryRepository.GetCategoryByName(cmd.CategoryName);
-        var store = await storeRepository.GetStoreById(cmd.StoreId) ?? throw new StoreNotFoundException();
+        var store = await storeRepository.GetStoreById(cmd.StoreId) ?? throw new StoreNotFoundException($"Store with id {cmd.StoreId} not found");
         var product = new Product
         {
             Name = cmd.Name,

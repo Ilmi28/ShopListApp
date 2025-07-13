@@ -1,5 +1,7 @@
-﻿namespace ShopListApp.Core.Exceptions;
+﻿using ShopListApp.Core.Exceptions.BaseExceptions;
 
-public class UserNotFoundException : Exception
+namespace ShopListApp.Core.Exceptions;
+
+public class UserNotFoundException(string message) : NotFoundException(message)
 {
 }

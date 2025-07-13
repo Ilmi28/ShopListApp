@@ -1,5 +1,5 @@
 ﻿namespace ShopListApp.Core.Exceptions;
 
-public class UserWithEmailAlreadyExistsException : UserAlreadyExistsException
+public class UserWithEmailAlreadyExistsException(string message) : UserAlreadyExistsException(message)
 {
 }
