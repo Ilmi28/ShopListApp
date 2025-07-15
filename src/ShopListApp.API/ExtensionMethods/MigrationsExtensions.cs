@@ -9,10 +9,7 @@ namespace ShopListApp.API.ExtensionMethods
         {
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<ShopListDbContext>();
-            if(!dbContext.Database.CanConnect())
-            {
-                dbContext.Database.Migrate();
-            }
+            dbContext.Database.Migrate();
         }
     }
 }
