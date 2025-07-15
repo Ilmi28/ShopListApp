@@ -81,7 +81,7 @@ public static class ServiceExtensionMethods
         Console.WriteLine($"Connection String: {connString}");
         services.AddDbContext<ShopListDbContext>(options =>
         {
-            options.UseSqlServer(connString);
+            options.UseSqlServer(connString, sql => sql.EnableRetryOnFailure());
         });
         services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<ShopListDbContext>();
     }
