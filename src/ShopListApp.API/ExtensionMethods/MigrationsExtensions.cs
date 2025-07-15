@@ -9,9 +9,16 @@ namespace ShopListApp.API.ExtensionMethods
         {
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<ShopListDbContext>();
-            if (dbContext.Database.IsRelational())
+            if (dbContext.Database.IsRelational() && dbContext.Database.GetPendingMigrations().Any())
             {
-                dbContext.Database.Migrate();
+                try
+                {
+                    dbContext.Database.Migrate();
+                }
+                catch
+                {
+                    Console.WriteLine("Migrations not migrated");
+                }
             }
         }
     }
