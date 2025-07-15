@@ -6,8 +6,11 @@ using ShopListApp.Infrastructure.Database.Identity.AppUser;
 
 namespace ShopListApp.Infrastructure.Database.Context;
 
-public class ShopListDbContext(DbContextOptions options) : IdentityDbContext<User>(options)
+public class ShopListDbContext : IdentityDbContext<User>
 {
+    public ShopListDbContext(DbContextOptions<ShopListDbContext> options) : base(options)
+    {
+    }
     public DbSet<Product> Products { get; set; }
     public DbSet<ShopList> ShopLists { get; set; }
     public DbSet<ShopListProduct> ShopListProducts { get; set; }

@@ -77,8 +77,8 @@ public static class ServiceExtensionMethods
 
     public static void AddIdentityDbContext(this IServiceCollection services, IConfiguration configuration)
     {
-        var connString = Environment.GetEnvironmentVariable("CONNECTION_STRING") 
-            ?? string.Empty;
+        var connString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? string.Empty;
+        Console.WriteLine($"Connection String: {connString}");
         services.AddDbContext<ShopListDbContext>(options =>
         {
             options.UseSqlServer(connString);

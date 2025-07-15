@@ -1,5 +1,6 @@
 services:
   shoplistapp.api:
+    container_name: shoplistapp.api
     image: ${DOCKER_REGISTRY-}shoplistappapi
     build:
       context: .
@@ -7,4 +8,22 @@ services:
     ports:
       - "5181:5181"
       - "7278:7278"
+    depends_on:
+      - shoplistapp.database
+    environment:
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - CONNECTION_STRING=${CONNECTION_STRING}
+  shoplistapp.database:
+    container_name: shoplistapp.database
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Passw0rd
+    ports:
+      - "1433:1433"
+    volumes:
+      - shoplistapp.database:/var/opt/mssql
+volumes:
+  shoplistapp.database:
+    external: true
 
