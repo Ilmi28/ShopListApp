@@ -14,9 +14,10 @@ public class AuthWebApplicationFactory : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        Environment.SetEnvironmentVariable("JWT_SECRET_KEY", "wJ6p+9nRJvBTqqkdmkz4zJ2OBt3nqu0YK0R5gTrgrYhVzwgNnFTH8XzSAQnEDDWX");
         builder.ConfigureTestServices(services =>
         {
-            services.RemoveAll<DbContextOptions<ShopListDbContext>>();
+            services.RemoveAll<DbContextOptions>();
             services.RemoveAll<ShopListDbContext>();
 
             services.AddDbContext<TestDbContext>(options =>

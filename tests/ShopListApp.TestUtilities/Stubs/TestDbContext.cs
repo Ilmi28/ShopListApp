@@ -4,7 +4,7 @@ using ShopListApp.Infrastructure.Database.Context;
 
 namespace ShopListApp.TestUtilities.Stubs;
 
-public class TestDbContext(DbContextOptions<TestDbContext> options) : ShopListDbContext(options)
+public class TestDbContext(DbContextOptions options) : ShopListDbContext(options)
 {
     protected override void SeedData(ModelBuilder modelBuilder)
     {

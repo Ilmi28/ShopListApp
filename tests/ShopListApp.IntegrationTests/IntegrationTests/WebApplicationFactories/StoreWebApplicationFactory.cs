@@ -16,7 +16,7 @@ public class StoreWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.ConfigureTestServices(services =>
         {
-            services.RemoveAll<DbContextOptions<ShopListDbContext>>();
+            services.RemoveAll<DbContextOptions>();
             services.RemoveAll<ShopListDbContext>();
 
             services.AddDbContext<TestDbContext>(options =>

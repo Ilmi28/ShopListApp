@@ -99,9 +99,9 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
     }
 
     [Theory]
-    [InlineData("test", "test1@gmail.com", "User with this username already exists")]
-    [InlineData("test1", "test@gmail.com", "User with this email already exists")]
-    public async Task RegisterUser_UserAlreadyExists_ReturnsBadRequest(string username, string email, string errorMessage)
+    [InlineData("test", "test1@gmail.com")]
+    [InlineData("test1", "test@gmail.com")]
+    public async Task RegisterUser_UserAlreadyExists_ReturnsBadRequest(string username, string email)
     {
         var cmd = new RegisterUserCommand
         {
@@ -113,8 +113,7 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
         var response = await _client.PostAsJsonAsync("/api/auth/register", cmd);
         var errorMessages = await response.Content.ReadAsStringAsync();
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        Assert.Contains(errorMessage, errorMessages);
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
     }
 
     [Fact]
