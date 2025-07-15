@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using System.Globalization;
+using HtmlAgilityPack;
 using ShopListApp.Core.Commands.Other;
 using ShopListApp.Core.Interfaces.Parsing;
 using System.Text;
@@ -91,8 +92,8 @@ public class BiedronkaParser(IHtmlFetcher<HtmlNode, HtmlDocument> htmlFetcher) :
         string integerPart = sb.ToString().Trim();
         var decNode = htmlFetcher.GetElementsByClassName(htmlDoc, "price-tile__decimal").FirstOrDefault();
         string decimalPart = htmlFetcher.GetElementsByClassName(htmlDoc, "price-tile__decimal").FirstOrDefault()!.InnerHtml ?? "00";
-        string fullNum = $"{integerPart},{decimalPart}";
-        bool result = decimal.TryParse(fullNum, out decimal price);
+        string fullNum = $"{integerPart}.{decimalPart}";
+        bool result = decimal.TryParse(fullNum, NumberStyles.Number, CultureInfo.InvariantCulture, out decimal price);
         if (!result) return null;
         return price;
     }

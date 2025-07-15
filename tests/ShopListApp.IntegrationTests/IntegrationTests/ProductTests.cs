@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
 using ShopListApp.Core.Models;
 using ShopListApp.Infrastructure.Database.Context;
 using ShopListApp.IntegrationTests.IntegrationTests.WebApplicationFactories;
@@ -15,6 +16,8 @@ public class ProductTests : IClassFixture<ProductWebApplicationFactory>
 
     public ProductTests(ProductWebApplicationFactory factory)
     {
+        CultureInfo.DefaultThreadCurrentCulture = CultureInfo.InvariantCulture;
+        CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.InvariantCulture;
         _client = factory.CreateClient();
         var scope = factory.Services.CreateScope();
         _context = scope.ServiceProvider.GetRequiredService<ShopListDbContext>();
