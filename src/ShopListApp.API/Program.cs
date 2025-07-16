@@ -63,13 +63,25 @@ public class Program
                 await context.Response.WriteAsJsonAsync(problemDetails);
             });
         });
+        app.UseStatusCodePages(async context =>
+        {
+            var response = context.HttpContext.Response;
+
+            if (response.StatusCode == 404)
+            {
+                response.ContentType = "application/json";
+
+                var problemDetails = new NotFoundProblemDetails("Resource not found");
+
+                await response.WriteAsJsonAsync(problemDetails);
+            }
+        });
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
             app.ApplyMigrations();
         }
-        app.UseStatusCodePages();
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
