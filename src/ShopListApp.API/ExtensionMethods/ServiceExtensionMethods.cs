@@ -27,6 +27,7 @@ using ShopListApp.Infrastructure.Repositories;
 using ShopListApp.Infrastructure.StorePublisher;
 using ShopListApp.Infrastructure.TokenManagers;
 using System.Text;
+using ShopListApp.API.AppProblemDetails;
 
 namespace ShopListApp.API.ExtensionMethods;
 
@@ -107,6 +108,26 @@ public static class ServiceExtensionMethods
                 ValidIssuer = tokenConfiguration.GetValue<string>("Issuer"),
                 ValidAudiences = tokenConfiguration.GetSection("Audience").Get<string[]>() ?? [],
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
+            };
+            options.Events = new JwtBearerEvents
+            {
+                OnChallenge = context =>
+                {
+                    context.HandleResponse();
+                    context.Response.StatusCode = 401;
+                    context.Response.ContentType = "application/json";
+
+                    var problemDetails = new UnauthorizedProblemDetails("Authentication is required to access this resource.");
+                    return context.Response.WriteAsJsonAsync(problemDetails);
+                },
+                OnForbidden = context =>
+                {
+                    context.Response.StatusCode = 403;
+                    context.Response.ContentType = "application/json";
+
+                    var problemDetails = new ForbiddenProblemDetails("You do not have permission to access this resource.");
+                    return context.Response.WriteAsJsonAsync(problemDetails);
+                },
             };
         });
     }

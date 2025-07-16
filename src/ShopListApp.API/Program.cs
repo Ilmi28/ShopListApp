@@ -69,6 +69,7 @@ public class Program
             app.UseSwaggerUI();
             app.ApplyMigrations();
         }
+        app.UseStatusCodePages();
         app.UseHttpsRedirection();
         app.UseAuthentication();
         app.UseAuthorization();
