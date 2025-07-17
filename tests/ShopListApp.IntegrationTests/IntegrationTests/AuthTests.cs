@@ -9,6 +9,7 @@ using ShopListApp.IntegrationTests.IntegrationTests.WebApplicationFactories;
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace ShopListApp.IntegrationTests.IntegrationTests;
 
@@ -18,7 +19,6 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
     private readonly ShopListDbContext _context;
     private readonly UserManager<User> _manager;
     private readonly ITokenManager _tokenManager;
-
     public AuthTests(AuthWebApplicationFactory factory)
     {
         _client = factory.CreateClient();
@@ -78,24 +78,21 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
             Email = "test1@gmail.com",
             Password = "Password123@"
         };
-
+        
         var response = await _client.PostAsJsonAsync("/api/auth/register", cmd);
-        response.EnsureSuccessStatusCode();
-        var content = await response.Content.ReadAsStringAsync();
-        var json = JsonDocument.Parse(content);
-
-        string? accessToken = json.RootElement.GetProperty("identityToken").GetString();
-        string? refreshToken = json.RootElement.GetProperty("refreshToken").GetString();
+        response.Headers.TryGetValues("Set-Cookie", out var cookieValues);
+        var accessToken = cookieValues.Where(v => v.StartsWith("accessToken=")).FirstOrDefault();
+        var refreshToken = cookieValues.Where(v => v.StartsWith("refreshToken=")).FirstOrDefault(); 
         int userCount = _context.Users.Count();
         int tokenCount = _context.Tokens.Count();
         int userLogsCount = _context.UserLogs.Count();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.False(string.IsNullOrEmpty(accessToken));
-        Assert.False(string.IsNullOrEmpty(refreshToken));
         Assert.True(userCount == 2);
         Assert.True(tokenCount == 4);
         Assert.True(userLogsCount == 1);
+        Assert.False(string.IsNullOrEmpty(accessToken));
+        Assert.False(string.IsNullOrEmpty(refreshToken));
     }
 
     [Theory]
@@ -156,22 +153,20 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
         };
 
         var response = await _client.PostAsJsonAsync("/api/auth/login", cmd);
+        response.Headers.TryGetValues("Set-Cookie", out var cookieValues);
+        var accessToken = cookieValues.Where(v => v.StartsWith("accessToken=")).ToString();
+        var refreshToken = cookieValues.Where(v => v.StartsWith("refreshToken=")).ToString();
         response.EnsureSuccessStatusCode();
-        var content = await response.Content.ReadAsStringAsync();
-        var json = JsonDocument.Parse(content);
-        string? accessToken = json.RootElement.GetProperty("identityToken").GetString();
-        string? refreshToken = json.RootElement.GetProperty("refreshToken").GetString();
         int tokenCount = _context.Tokens.Count();
         int revokedTokenCount = _context.Tokens.Where(x => x.IsRevoked).Count();
         int userLogsCount = _context.UserLogs.Count();
 
-
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.False(string.IsNullOrEmpty(accessToken));
-        Assert.False(string.IsNullOrEmpty(refreshToken));
         Assert.True(tokenCount == 4);
         Assert.True(userLogsCount == 1);
         Assert.True(revokedTokenCount == 2);
+        Assert.False(string.IsNullOrEmpty(accessToken));
+        Assert.False(string.IsNullOrEmpty(refreshToken));
     }
 
     [Fact]
@@ -209,25 +204,22 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
         {
             RefreshToken = "Xj4z8x+7Q0A="
         };
-
-        var response = await _client.PostAsJsonAsync("/api/auth/refresh", cmd);
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/refresh");
+        request.Headers.Add("Cookie", $"refreshToken={cmd.RefreshToken};");
+        var response = await _client.SendAsync(request);
         response.EnsureSuccessStatusCode();
-        var content = await response.Content.ReadAsStringAsync();
-        var json = JsonDocument.Parse(content);
-        string? accessToken = json.RootElement.GetProperty("identityToken").GetString();
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        Assert.False(string.IsNullOrEmpty(accessToken));
     }
 
     [Fact]
-    public async Task RefreshToken_NullRequest_ReturnsBadRequest()
+    public async Task RefreshToken_NullRequest_ReturnsUnathorized()
     {
         RefreshTokenCommand? cmd = null;
 
         var response = await _client.PostAsJsonAsync("/api/auth/refresh", cmd);
 
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Theory]

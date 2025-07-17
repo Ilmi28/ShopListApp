@@ -6,6 +6,7 @@ public interface ITokenManager
 {
     string GenerateAccessToken(UserDto user);
     int GetRefreshTokenExpirationDays();
+    int GetAccessTokenExpirationMinutes();
     string? GetHashRefreshToken(string refreshToken);
     string GenerateRefreshToken();
 }

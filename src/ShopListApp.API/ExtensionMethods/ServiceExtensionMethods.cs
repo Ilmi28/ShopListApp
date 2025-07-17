@@ -161,4 +161,18 @@ public static class ServiceExtensionMethods
             .AddPolicy("ShopListOwnerPolicy", policy => policy.Requirements.Add(new ShopListOwnerRequirement()));
         services.AddScoped<IAuthorizationHandler, ShopListOwnerAuthorizationHandler>();
     }
+
+    public static void AddCorsPolicy(this IServiceCollection services)
+    {
+        services.AddCors(options =>
+        {
+            options.AddPolicy("AllowFrontend", policy =>
+            {
+                policy.WithOrigins("http://localhost:3000", "https://localhost:3001")
+                    .AllowCredentials() 
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+            });
+        });
+    }
 }

@@ -55,6 +55,7 @@ public class JwtTokenManager(IConfiguration config) : ITokenManager
     public string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
     public int GetRefreshTokenExpirationDays() => config.GetValue<int>("TokenConfiguration:RefreshTokenExpirationDays");
+    public int GetAccessTokenExpirationMinutes() => config.GetValue<int>("TokenConfiguration:AccessTokenExpirationMinutes");
 
     public string? GetHashRefreshToken(string refreshToken)
     {

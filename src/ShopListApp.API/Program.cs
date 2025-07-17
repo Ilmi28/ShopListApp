@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ShopListApp.API.AppProblemDetails;
 using ShopListApp.API.ExtensionMethods;
+using ShopListApp.API.Middleware;
 using ShopListApp.Core.Exceptions.BaseExceptions;
 
 namespace ShopListApp.API;
@@ -37,6 +38,7 @@ public class Program
         builder.Services.AddSwaggerGenWithAuthorization();
         builder.Services.AddAuthorizationWithHandlers();
         builder.Services.AddStoreObserver();
+        builder.Services.AddCorsPolicy();
 
     }
 
@@ -83,6 +85,8 @@ public class Program
             app.ApplyMigrations();
         }
         app.UseHttpsRedirection();
+        app.UseMiddleware<JwtCookieMiddleware>();
+        app.UseCors("AllowFrontend");
         app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
