@@ -4,6 +4,7 @@ using ShopListApp.Core.Commands.Delete;
 using ShopListApp.Core.Commands.Update;
 using ShopListApp.Core.Interfaces.IServices;
 using System.Security.Claims;
+using ShopListApp.Core.Responses;
 
 namespace ShopListApp.API.Controllers;
 
@@ -13,6 +14,7 @@ namespace ShopListApp.API.Controllers;
 public class UserController(IUserService userService) : ControllerBase
 {
     [HttpPut("update")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> UpdateUser([FromBody]UpdateUserCommand cmd)
     {
         string id = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -21,6 +23,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpDelete("delete")]
+    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     public async Task<IActionResult> DeleteUser([FromBody]DeleteUserCommand cmd)
     {
         string id = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -29,6 +32,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpGet("get")]
+    [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUser()
     {
         string id = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;

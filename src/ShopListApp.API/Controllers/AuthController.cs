@@ -11,6 +11,7 @@ namespace ShopListApp.API.Controllers;
 public class AuthController(IAuthService authService, ITokenManager tokenManager) : ControllerBase
 {
     [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<IActionResult> RegisterUser([FromBody] RegisterUserCommand cmd)
     {
         var response = await authService.RegisterUser(cmd);
@@ -31,10 +32,11 @@ public class AuthController(IAuthService authService, ITokenManager tokenManager
             Expires = DateTime.UtcNow.AddDays(tokenManager.GetRefreshTokenExpirationDays())
         });
 
-        return Ok();
+        return Created();
     }
 
     [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> LoginUser([FromBody] LoginUserCommand cmd)
     {
         var response = await authService.LoginUser(cmd);
@@ -55,10 +57,11 @@ public class AuthController(IAuthService authService, ITokenManager tokenManager
             Expires = DateTime.UtcNow.AddDays(tokenManager.GetRefreshTokenExpirationDays())
         });
 
-        return Ok();
+        return NoContent();
     }
 
     [HttpPost("refresh")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> RefreshToken()
     {
         if (!Request.Cookies.TryGetValue("refreshToken", out var refreshToken) || string.IsNullOrEmpty(refreshToken))
@@ -73,15 +76,16 @@ public class AuthController(IAuthService authService, ITokenManager tokenManager
             Expires = DateTime.UtcNow.AddMinutes(tokenManager.GetAccessTokenExpirationMinutes())
         });
 
-        return Ok();
+        return NoContent();
     }
 
     [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public IActionResult Logout()
     {
         Response.Cookies.Delete("accessToken");
         Response.Cookies.Delete("refreshToken");
-        return Ok();
+        return NoContent();
     }
     
 }
