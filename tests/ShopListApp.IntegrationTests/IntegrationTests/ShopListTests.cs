@@ -77,7 +77,7 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
     }
 
     [Fact]
-    public async Task CreateShopList_ValidModel_ReturnsOK()
+    public async Task CreateShopList_ValidModel_ReturnsCreated()
     {
         var user = await _userManager.FindByIdAsync("1");
         var cmd = new CreateShopListCommand
@@ -96,7 +96,7 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
         var result = await _client.PostAsJsonAsync("api/shoplist/create", cmd);
         var dbShopList = _context.ShopLists.FirstOrDefault(x => x.Name == "Test shop list");
 
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.Created, result.StatusCode);
         Assert.Equal("Test shop list", dbShopList!.Name);
     }
 
@@ -176,7 +176,7 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
     }
 
     [Fact]
-    public async Task DeleteShopList_OwnerAndAuthorized_ReturnsOK()
+    public async Task DeleteShopList_OwnerAndAuthorized_ReturnsNoContent()
     {
         var user = await _userManager.FindByIdAsync("1");
         var userDto = new UserDto
@@ -192,7 +192,7 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
 
         var dbShopList = _context.ShopLists.Count();
         var dbShopListProducts = _context.ShopListProducts.Count();
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         Assert.Equal(1, dbShopList);
         Assert.Equal(1, dbShopListProducts);
     }
@@ -242,7 +242,7 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
     }
 
     [Fact]
-    public async Task AddProductToShopList_ProductAlreadyInShopListAndAuthorizedWIthQuantity_ReturnsOKAndAddsQuantity()
+    public async Task AddProductToShopList_ProductAlreadyInShopListAndAuthorizedWIthQuantity_ReturnsNoContentAndAddsQuantity()
     {
         var user = await _userManager.FindByIdAsync("1");
         var userDto = new UserDto
@@ -259,12 +259,12 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
         var shopListProduct = _context.ShopListProducts.First(x => x.Product.Id == 1 && x.ShopList.Id == 1);
         await _context.Entry(shopListProduct).ReloadAsync();
 
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         Assert.Equal(4, shopListProduct.Quantity);
     }
 
     [Fact]
-    public async Task AddProductToShopList_ProductAlreadyInShopListAndAuthorizedWIthoutQuantity_ReturnsOKAndAddsOneQuantity()
+    public async Task AddProductToShopList_ProductAlreadyInShopListAndAuthorizedWIthoutQuantity_ReturnsNoContentAndAddsOneQuantity()
     {
         var user = await _userManager.FindByIdAsync("1");
         var userDto = new UserDto
@@ -281,12 +281,12 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
         var shopListProduct = _context.ShopListProducts.First(x => x.Product.Id == 1 && x.ShopList.Id == 1);
         await _context.Entry(shopListProduct).ReloadAsync();
 
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         Assert.Equal(3, shopListProduct.Quantity);
     }
 
     [Fact]
-    public async Task AddProductToShopList_ProductNotInShopListAndAuthorizedWithQuantity_ReturnsOKAndAddsNewShopListProduct()
+    public async Task AddProductToShopList_ProductNotInShopListAndAuthorizedWithQuantity_ReturnsNoContentAndAddsNewShopListProduct()
     {
         var user = await _userManager.FindByIdAsync("1");
         var userDto = new UserDto
@@ -302,13 +302,13 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
 
         var shopListProduct = _context.ShopListProducts.First(x => x.Product.Id == 3 && x.ShopList.Id == 1);
         int shopListProductCount = _context.ShopListProducts.Count();
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         Assert.Equal(2, shopListProduct.Quantity);
         Assert.Equal(4, shopListProductCount);
     }
 
     [Fact]
-    public async Task AddProductToShopList_ProductNotInShopListAndAuthorizedWithoutQuantity_ReturnsOKAndAddsNewShopListProductWIthOneQuantity()
+    public async Task AddProductToShopList_ProductNotInShopListAndAuthorizedWithoutQuantity_ReturnsNoContentAndAddsNewShopListProductWIthOneQuantity()
     {
         var user = await _userManager.FindByIdAsync("1");
         var userDto = new UserDto
@@ -324,7 +324,7 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
 
         var shopListProduct = _context.ShopListProducts.First(x => x.Product.Id == 3 && x.ShopList.Id == 1);
         int shopListProductCount = _context.ShopListProducts.Count();
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         Assert.Equal(1, shopListProduct.Quantity);
         Assert.Equal(4, shopListProductCount);
     }
@@ -396,7 +396,7 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
     }
 
     [Fact]
-    public async Task RemoveProductFromShopList_ProductInShopListAndAuthorizedWithoutQuantity_ReturnsOKAndRemovesProductEntirely()
+    public async Task RemoveProductFromShopList_ProductInShopListAndAuthorizedWithoutQuantity_ReturnsNoContentAndRemovesProductEntirely()
     {
         var user = await _userManager.FindByIdAsync("1");
         var userDto = new UserDto
@@ -411,12 +411,12 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
         var result = await _client.PatchAsync($"api/shoplist/update/delete-product/1/1", null!);
 
         var shopListProductCount = _context.ShopListProducts.Count();
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         Assert.Equal(2, shopListProductCount);
     }
 
     [Fact]
-    public async Task RemoveProductFromShopList_ProductInShopListAndAuthorizedWithQuantity_ReturnsOKAndRemovesProductQuantity()
+    public async Task RemoveProductFromShopList_ProductInShopListAndAuthorizedWithQuantity_ReturnsNoContentAndRemovesProductQuantity()
     {
         var user = await _userManager.FindByIdAsync("2");
         var userDto = new UserDto
@@ -432,12 +432,12 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
 
         var shopListProduct = _context.ShopListProducts.First(x => x.ShopList.Id == 2 && x.Product.Id == 1);
         await _context.Entry(shopListProduct).ReloadAsync();
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         Assert.Equal(1, shopListProduct.Quantity);
     }
 
     [Fact]
-    public async Task RemoveProductFromShopList_ProductInShopListAndAuthorizedWithoutQuantity_ReturnsOkAndRemovesEntireProduct()
+    public async Task RemoveProductFromShopList_ProductInShopListAndAuthorizedWithoutQuantity_ReturnsNoContentAndRemovesEntireProduct()
     {
         var user = await _userManager.FindByIdAsync("2");
         var userDto = new UserDto
@@ -452,7 +452,7 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
         var result = await _client.PatchAsync($"api/shoplist/update/delete-product/2/1", null!);
 
         var shopListProductCount = _context.ShopListProducts.Count();
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         Assert.Equal(2, shopListProductCount);
     }
 
@@ -613,7 +613,7 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
     }
 
     [Fact]
-    public async Task UpdateShopList_AuthorizedAndValidModel_ReturnsOK()
+    public async Task UpdateShopList_AuthorizedAndValidModel_ReturnsNoContent()
     {
         var user = await _userManager.FindByIdAsync("1");
         var cmd = new UpdateShopListCommand
@@ -633,7 +633,7 @@ public class ShopListTests : IClassFixture<ShopListWebApplicationFactory>
 
         var dbShopList = _context.ShopLists.First(x => x.Id == 1);
         await _context.Entry(dbShopList).ReloadAsync();
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         Assert.Equal("Updated shop list", dbShopList.Name);
     }
 

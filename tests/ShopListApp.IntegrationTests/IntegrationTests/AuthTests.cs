@@ -70,7 +70,7 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
     }
 
     [Fact]
-    public async Task RegisterUser_ValidUser_ReturnsOKAndTokens()
+    public async Task RegisterUser_ValidUser_ReturnsNoContent()
     {
         var cmd = new RegisterUserCommand
         {
@@ -87,7 +87,7 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
         int tokenCount = _context.Tokens.Count();
         int userLogsCount = _context.UserLogs.Count();
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.True(userCount == 2);
         Assert.True(tokenCount == 4);
         Assert.True(userLogsCount == 1);
@@ -144,7 +144,7 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
     [Theory]
     [InlineData("test", "Password123@")]
     [InlineData("test@gmail.com", "Password123@")]
-    public async Task LoginUser_ValidInput_ReturnsOK(string userIdentifier, string password)
+    public async Task LoginUser_ValidInput_ReturnsNoContent(string userIdentifier, string password)
     {
         LoginUserCommand cmd = new()
         {
@@ -161,7 +161,7 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
         int revokedTokenCount = _context.Tokens.Where(x => x.IsRevoked).Count();
         int userLogsCount = _context.UserLogs.Count();
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.True(tokenCount == 4);
         Assert.True(userLogsCount == 1);
         Assert.True(revokedTokenCount == 2);
@@ -198,7 +198,7 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
     }
 
     [Fact]
-    public async Task RefreshToken_ValidRequest_ReturnsOK()
+    public async Task RefreshToken_ValidRequest_ReturnsNoContent()
     {
         RefreshTokenCommand cmd = new RefreshTokenCommand
         {
@@ -209,7 +209,7 @@ public class AuthTests : IClassFixture<AuthWebApplicationFactory>
         var response = await _client.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
     }
 
     [Fact]

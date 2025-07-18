@@ -20,7 +20,7 @@ public class ShopListController(IShopListService shopListService, IAuthorization
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
         await shopListService.CreateShopList(userId, cmd);
-        return Created();
+        return Created($"api/shoplist/{cmd.Name}", null);
     }
 
     [HttpDelete("delete/{shopListId}")]

@@ -141,7 +141,7 @@ public class ProductTests : IClassFixture<ProductWebApplicationFactory>
         foreach (var entity in _context.ChangeTracker.Entries().ToList())
             await entity.ReloadAsync();
 
-        Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
         Assert.Equal(3, dbProducts.Count);
         Assert.Equal(8.99m, dbProducts[0].Price);
         Assert.Equal(16.99m, dbProducts[1].Price);
