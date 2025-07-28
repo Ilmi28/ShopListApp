@@ -83,8 +83,15 @@ public class AuthController(IAuthService authService, ITokenManager tokenManager
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public IActionResult Logout()
     {
-        Response.Cookies.Delete("accessToken");
-        Response.Cookies.Delete("refreshToken");
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.None
+        };
+        
+        Response.Cookies.Delete("accessToken", cookieOptions);
+        Response.Cookies.Delete("refreshToken", cookieOptions);
         return NoContent();
     }
     
