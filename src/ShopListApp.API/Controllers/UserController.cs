@@ -14,21 +14,21 @@ namespace ShopListApp.API.Controllers;
 public class UserController(IUserService userService) : ControllerBase
 {
     [HttpPut("update")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateUser([FromBody]UpdateUserCommand cmd)
     {
         string id = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
         await userService.UpdateUser(id, cmd);
-        return Ok(id);
+        return NoContent();
     }
 
     [HttpDelete("delete")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteUser([FromBody]DeleteUserCommand cmd)
     {
         string id = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
         await userService.DeleteUser(id, cmd);
-        return Ok(id);
+        return NoContent();
     }
 
     [HttpGet("get")]

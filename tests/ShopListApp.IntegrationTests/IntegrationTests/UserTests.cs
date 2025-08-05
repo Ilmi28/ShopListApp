@@ -50,7 +50,7 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
     }
 
     [Fact]
-    public async Task UpdateUser_ValidInput_UpdatesUser()
+    public async Task UpdateUser_ValidInput_ReturnsNoContent()
     {
         var user = await _manager.FindByIdAsync("1");
         string? oldHashPassword = user!.PasswordHash;
@@ -76,7 +76,7 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
         var updatedUser = await _manager.FindByIdAsync(userDto.Id);
         var userLogCount = _context.UserLogs.Count();
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Equal("newName", updatedUser!.UserName);
         Assert.Equal("new@gmail.com", updatedUser.Email);
         Assert.NotEqual(oldHashPassword, updatedUser.PasswordHash);
@@ -84,7 +84,7 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
     }
 
     [Fact]
-    public async Task UpdateUser_ProvidedNullValuesAndValidPassword_ReturnsOK()
+    public async Task UpdateUser_ProvidedNullValuesAndValidPassword_ReturnsNoContent()
     {
         var cmd = new UpdateUserCommand
         {
@@ -108,7 +108,7 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
         var updatedUser = await _manager.FindByIdAsync("1");
         var userLogCount = _context.UserLogs.Count();
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Equal(oldUser!.UserName, updatedUser!.UserName);
         Assert.Equal(oldUser.Email, updatedUser.Email);
         Assert.Equal(oldUser.PasswordHash, updatedUser.PasswordHash);
@@ -211,7 +211,7 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
     }
 
     [Fact]
-    public async Task DeleteUser_ValidPassword_ReturnsOK()
+    public async Task DeleteUser_ValidPassword_ReturnsNoContent()
     {
         var cmd = new DeleteUserCommand
         {
@@ -237,7 +237,7 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
 
         var  dbUserCount = _context.Users.Count();
         var userLogCount = _context.UserLogs.Count();
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.Equal(1, dbUserCount);
         Assert.Equal(1, userLogCount);
     }
