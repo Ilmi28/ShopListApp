@@ -14,7 +14,7 @@ namespace ShopListApp.API.Controllers;
 public class UserController(IUserService userService) : ControllerBase
 {
     [HttpPut("update")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
+    [ProducesResponseType( StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateUser([FromBody]UpdateUserCommand cmd)
     {
         string id = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
@@ -23,7 +23,7 @@ public class UserController(IUserService userService) : ControllerBase
     }
 
     [HttpDelete("delete")]
-    [ProducesResponseType(typeof(string), StatusCodes.Status204NoContent)]
+    [ProducesResponseType( StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteUser([FromBody]DeleteUserCommand cmd)
     {
         string id = User.FindFirst(ClaimTypes.NameIdentifier)!.Value;
