@@ -206,6 +206,34 @@ public class UserServiceTests
         await Assert.ThrowsAsync<ArgumentNullException>(task);
     }
 
+    [Theory]
+    [InlineData("test", "test1@mail.com")]
+    [InlineData("test1", "test@mail.com")]
+    [InlineData("test", "test@mail.com")]
+    public async Task UpdateUser_UserAlreadyExists_ThrowsUserAlreadyExistsException(string username, string email)
+    {
+        var dto = new UserDto
+        {
+            Id = "1",
+            UserName = "test",
+            Email = "test@mail.com"
+        };
+        
+        _mockManager.Setup(x => x.FindByNameAsync("test")).ReturnsAsync(dto);
+        _mockManager.Setup(x => x.FindByEmailAsync("test@mail.com")).ReturnsAsync(dto);
+
+        var cmd = new UpdateUserCommand
+        {
+            UserName = username,
+            Email = email,
+            CurrentPassword = "Password123@"
+        };
+
+        Func<Task> task = async () => await _userService.UpdateUser("1", cmd);
+        
+        await Assert.ThrowsAsync<UserAlreadyExistsException>(task);
+    }
+
     [Fact]
     public async Task GetUserById_UserFound_ReturnsUser()
     {
@@ -233,8 +261,6 @@ public class UserServiceTests
 
         await Assert.ThrowsAsync<UnauthorizedAccessException>(task);
     }
-
-    
 
     [Fact]
     public async Task GetUserById_NullArg_ThrowsArgumentNullException()

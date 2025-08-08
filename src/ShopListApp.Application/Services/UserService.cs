@@ -46,6 +46,12 @@ public class UserService(IDbLogger<UserDto> logger, IUserManager userManager) : 
     {
         _ = id ?? throw new ArgumentNullException(nameof(id));
         _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
+        var existingUserWithUserName = await userManager.FindByNameAsync(cmd.UserName ?? string.Empty);
+        if (existingUserWithUserName != null)
+            throw new UserAlreadyExistsException("User with the given username already exists.");
+        var existingUserWithEmail = await userManager.FindByEmailAsync(cmd.Email ?? string.Empty);
+        if (existingUserWithEmail != null)
+            throw new UserAlreadyExistsException("User with the given email already exists.");
         var user = await userManager.FindByIdAsync(id) ?? throw new UnauthorizedAccessException();
         user.UserName = cmd.UserName ?? user.UserName;
         user.Email = cmd.Email ?? user.Email;

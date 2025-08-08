@@ -135,6 +135,32 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    [Theory]
+    [InlineData("other", "test@mail.com")]
+    [InlineData("other1", "test2@gmail.com")]
+    [InlineData("other", "test2@gmail.com")]
+    public async Task UpdateUser_UserWithCredentialsExists_ReturnsConflict(string username, string email)
+    {
+        var cmd = new UpdateUserCommand
+        {
+            UserName = username,
+            Email = email,
+            CurrentPassword = "Password123@",
+        };
+        var user = await _manager.FindByIdAsync("1");
+        var userDto = new UserDto
+        {
+            Id = user!.Id,
+            UserName = user.UserName!,
+            Email = user.Email!
+        };
+        var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+
+        var response = await _client.PutAsJsonAsync("api/user/update", cmd);
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
 
     [Fact]
     public async Task UpdateUser_InvalidCurrentPassword_ReturnsUnauthorized()
