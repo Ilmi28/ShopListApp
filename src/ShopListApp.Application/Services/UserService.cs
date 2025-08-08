@@ -46,21 +46,24 @@ public class UserService(IDbLogger<UserDto> logger, IUserManager userManager) : 
     {
         _ = id ?? throw new ArgumentNullException(nameof(id));
         _ = cmd ?? throw new ArgumentNullException(nameof(cmd));
+        var user = await userManager.FindByIdAsync(id) ?? throw new UnauthorizedAccessException();
         var existingUserWithUserName = await userManager.FindByNameAsync(cmd.UserName ?? string.Empty);
-        if (existingUserWithUserName != null)
+        if (existingUserWithUserName != null && cmd.UserName != user.UserName)
             throw new UserAlreadyExistsException("User with the given username already exists.");
         var existingUserWithEmail = await userManager.FindByEmailAsync(cmd.Email ?? string.Empty);
-        if (existingUserWithEmail != null)
+        if (existingUserWithEmail != null && cmd.Email != user.Email)  
             throw new UserAlreadyExistsException("User with the given email already exists.");
-        var user = await userManager.FindByIdAsync(id) ?? throw new UnauthorizedAccessException();
         user.UserName = cmd.UserName ?? user.UserName;
         user.Email = cmd.Email ?? user.Email;
         var result = await userManager.UpdateAsync(user);
-        var passwordResult = await userManager.ChangePasswordAsync(user,
-            cmd.CurrentPassword,
-            cmd.NewPassword ?? cmd.CurrentPassword);
-        if (!result || !passwordResult)
-            throw new UnauthorizedAccessException();
+        if (cmd.NewPassword != null)
+        {
+            var passwordResult = await userManager.ChangePasswordAsync(user,
+                cmd.CurrentPassword,
+                cmd.NewPassword ?? cmd.CurrentPassword);
+            if (!result || !passwordResult)
+                throw new UnauthorizedAccessException();
+        }
         int propertiesCount = typeof(UpdateUserCommand).GetProperties().Length;
         int nullCount = GetLengthOfNullProperties(cmd);
         if (nullCount < propertiesCount - 1)

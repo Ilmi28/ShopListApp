@@ -157,6 +157,36 @@ public class UserServiceTests
         Assert.True(task.IsCompletedSuccessfully);
     }
 
+    [Theory]
+    [InlineData("test", "test1@mail.com")]
+    [InlineData("test1", "test@mail.com")]
+    [InlineData("test", "test@mail.com")]
+    public void UpdateUser_ChangingToSameCredentials_UpdatesUser(string username, string email)
+    {
+        var dto = new UserDto
+        {
+            Id = "1",
+            UserName = "test",
+            Email = "test@mail.com"
+        };
+        
+        _mockManager.Setup(x => x.FindByIdAsync(It.IsAny<string>())).ReturnsAsync(dto);
+        _mockManager.Setup(x => x.UpdateAsync(It.IsAny<UserDto>())).ReturnsAsync(true);
+        _mockManager.Setup(x => x.FindByNameAsync("test")).ReturnsAsync(dto);
+        _mockManager.Setup(x => x.FindByEmailAsync("test@mail.com")).ReturnsAsync(dto);
+
+        var cmd = new UpdateUserCommand
+        {
+            UserName = username,
+            Email = email,
+            CurrentPassword = "Password123@"
+        };
+
+        var task = _userService.UpdateUser("1", cmd);
+        
+        Assert.True(task.IsCompletedSuccessfully);
+    }
+
     [Fact]
     public async Task UpdateUser_NotFound_ThrowsUnathorizedAccessException()
     {
@@ -205,22 +235,32 @@ public class UserServiceTests
 
         await Assert.ThrowsAsync<ArgumentNullException>(task);
     }
-
+    
+    
     [Theory]
-    [InlineData("test", "test1@mail.com")]
-    [InlineData("test1", "test@mail.com")]
-    [InlineData("test", "test@mail.com")]
+    [InlineData("test2", "test@mail.com")]
+    [InlineData("test", "test2@mail.com")]
+    [InlineData("test2", "test2@mail.com")]
     public async Task UpdateUser_UserAlreadyExists_ThrowsUserAlreadyExistsException(string username, string email)
     {
-        var dto = new UserDto
+        var myUser = new UserDto
         {
             Id = "1",
             UserName = "test",
             Email = "test@mail.com"
         };
+        var existingOtherUser = new UserDto
+        {
+            Id = "2",
+            UserName = "test2",
+            Email = "test2@mail.com"
+        };
         
-        _mockManager.Setup(x => x.FindByNameAsync("test")).ReturnsAsync(dto);
-        _mockManager.Setup(x => x.FindByEmailAsync("test@mail.com")).ReturnsAsync(dto);
+        _mockManager.Setup(x => x.FindByIdAsync("1")).ReturnsAsync(myUser);
+        _mockManager.Setup(x => x.FindByNameAsync("test")).ReturnsAsync(myUser);
+        _mockManager.Setup(x => x.FindByEmailAsync("test@mail.com")).ReturnsAsync(myUser);
+        _mockManager.Setup(x => x.FindByNameAsync("test2")).ReturnsAsync(existingOtherUser);
+        _mockManager.Setup(x => x.FindByEmailAsync("test2@mail.com")).ReturnsAsync(existingOtherUser);
 
         var cmd = new UpdateUserCommand
         {

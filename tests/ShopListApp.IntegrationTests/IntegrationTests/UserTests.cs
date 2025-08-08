@@ -49,6 +49,38 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
         _manager.CreateAsync(otherUser, "Password123@");
     }
 
+    [Theory]
+    [InlineData("test", "test3@mail.com")]
+    [InlineData("test1", "test@gmail.com")]
+    [InlineData("test", "test@gmail.com")]
+    public async Task UpdateUser_ChangingToSameCredentials_ReturnsNoContent(string username, string email)
+    {
+        var user = await _manager.FindByIdAsync("1");
+        string? oldHashPassword = user!.PasswordHash;
+        var userDto = new UserDto
+        {
+            Id = user.Id,
+            UserName = user.UserName!,
+            Email = user.Email!
+        };
+        string jwtToken = _tokenManager.GenerateAccessToken(userDto!);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
+        var cmd = new UpdateUserCommand
+        {
+            UserName = username,
+            Email = email,
+            CurrentPassword = "Password123@"
+        };
+
+        var response = await _client.PutAsJsonAsync("api/user/update", cmd);
+
+        await _context.Entry(user!).ReloadAsync();
+        var userLogCount = _context.UserLogs.Count();
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal(1, userLogCount);
+    }
+    
     [Fact]
     public async Task UpdateUser_ValidInput_ReturnsNoContent()
     {
