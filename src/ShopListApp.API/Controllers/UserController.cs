@@ -22,7 +22,7 @@ public class UserController(IUserService userService) : ControllerBase
         return NoContent();
     }
 
-    [HttpDelete("delete")]
+    [HttpPost("delete")]
     [ProducesResponseType( StatusCodes.Status204NoContent)]
     public async Task<IActionResult> DeleteUser([FromBody]DeleteUserCommand cmd)
     {

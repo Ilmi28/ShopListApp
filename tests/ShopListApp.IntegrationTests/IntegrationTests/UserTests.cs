@@ -285,13 +285,8 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
         var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
 
-        var request = new HttpRequestMessage
-        {
-            Method = HttpMethod.Delete,
-            RequestUri = new Uri("api/user/delete", UriKind.Relative),
-            Content = JsonContent.Create(cmd)
-        };
-        var response = await _client.SendAsync(request);
+        
+        var response = await _client.PostAsJsonAsync("api/user/delete", cmd);
 
         var  dbUserCount = _context.Users.Count();
         var userLogCount = _context.UserLogs.Count();
@@ -316,13 +311,8 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
         };
         var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-        var request = new HttpRequestMessage
-        {
-            Method = HttpMethod.Delete,
-            RequestUri = new Uri("api/user/delete", UriKind.Relative),
-            Content = JsonContent.Create(cmd)
-        };
-        var response = await _client.SendAsync(request);
+        
+        var response = await _client.PostAsJsonAsync("api/user/delete", cmd);
         var dbUserCount = _context.Users.Count();
         var userLogCount = _context.UserLogs.Count();
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -343,13 +333,7 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
         };
         var jwtToken = _tokenManager.GenerateAccessToken(userDto!);
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", jwtToken);
-        var request = new HttpRequestMessage
-        {
-            Method = HttpMethod.Delete,
-            RequestUri = new Uri("api/user/delete", UriKind.Relative),
-            Content = JsonContent.Create(cmd)
-        };
-        var response = await _client.SendAsync(request);
+        var response = await _client.PostAsJsonAsync("api/user/delete", cmd);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
@@ -363,14 +347,8 @@ public class UserTests : IClassFixture<UserWebApplicationFactory>
             Password = "Password123@"
         };
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        var request = new HttpRequestMessage
-        {
-            Method = HttpMethod.Delete,
-            RequestUri = new Uri("api/user/delete", UriKind.Relative),
-            Content = JsonContent.Create(cmd)
-        };
-        var response = await _client.SendAsync(request);
+        
+        var response = await _client.PostAsJsonAsync("api/user/delete", cmd);
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
